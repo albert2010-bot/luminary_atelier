@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Submit Artwork — Luminary Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--surface:#0f0e12;--surface2:#18161e;--surface3:#201d28;--gold:#c9a84c;--gold-l:#e8c97e;--gold-d:#7a6130;--cream:#f0ead6;--muted:#5a5040;--violet:#7b5ea7;--teal:#2a9a8a;--teal-l:#4dc9b4;--rose:#c94a6a;--nav:58px;--ease:cubic-bezier(.25,.46,.45,.94);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}body{background:var(--bg);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.8;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}button{cursor:pointer;font-family:inherit;}img{display:block;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:2px;}
+input,textarea,select{font-family:'Josefin Sans',sans-serif;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes progressBar{from{width:0}to{width:var(--target-w)}}
+@keyframes successPop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.rev{opacity:0}.rev.in{animation:fadeUp .65s var(--ease) forwards;}
+.d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 3rem;background:rgba(6,6,10,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,168,76,.12);}
+.nav-logo{font-family:'Playfair Display SC',serif;font-size:.88rem;letter-spacing:.38em;color:var(--gold);}.nav-logo span{color:var(--cream);}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center;}
+.nav-links a{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(240,234,214,.5);transition:color .25s;position:relative;padding-bottom:3px;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.nav-cta{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;padding:.5rem 1.2rem;border:1px solid rgba(201,168,76,.4);color:var(--gold);transition:all .3s;background:rgba(201,168,76,.06);}.nav-cta:hover{background:var(--gold);color:var(--bg);}
+.nav-hamburger{display:none;flex-direction:column;justify-content:space-between;width:26px;height:18px;background:none;border:none;cursor:pointer;padding:0;}
+.nav-hamburger span{display:block;width:100%;height:2px;background:var(--gold);border-radius:1px;transition:all .3s;}
+.nav-hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg);}.nav-hamburger.open span:nth-child(2){opacity:0;}.nav-hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(6,6,10,.7);z-index:490;backdrop-filter:blur(2px);}.nav-overlay.open{display:block;}
+/* HERO */
+.page-hero{padding:9rem 4rem 3.5rem;position:relative;overflow:hidden;border-bottom:1px solid rgba(201,168,76,.08);}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(201,168,76,.04) 0%,transparent 60%);}
+.page-hero h1{font-family:'Playfair Display SC',serif;font-size:clamp(2rem,4.5vw,4rem);font-weight:400;color:var(--cream);position:relative;z-index:2;animation:fadeUp .9s ease forwards;}
+.page-hero p{font-size:1rem;font-style:italic;color:rgba(240,234,214,.45);max-width:480px;margin-top:.7rem;z-index:2;position:relative;animation:fadeUp .9s ease .18s forwards;opacity:0;}
+/* STEPS */
+.steps-bar{display:flex;align-items:center;padding:2rem 4rem;gap:0;position:sticky;top:var(--nav);background:rgba(6,6,10,.96);backdrop-filter:blur(12px);z-index:100;border-bottom:1px solid rgba(201,168,76,.08);}
+.step-item{display:flex;align-items:center;gap:.6rem;flex:1;}
+.step-num{width:30px;height:30px;border-radius:50%;border:2px solid rgba(201,168,76,.25);color:var(--muted);font-family:'Josefin Sans',sans-serif;font-size:.6rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;}
+.step-num.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.1);}
+.step-num.done{border-color:var(--teal-l);color:var(--teal-l);background:rgba(42,154,138,.12);}
+.step-label{font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .3s;}
+.step-label.active{color:var(--gold);}
+.step-label.done{color:var(--teal-l);}
+.step-line{flex:1;height:1px;background:rgba(201,168,76,.1);margin:0 .5rem;transition:background .4s;}
+.step-line.done{background:rgba(42,154,138,.4);}
+/* MAIN */
+.submit-main{max-width:760px;margin:0 auto;padding:3rem 4rem 6rem;}
+.form-section{display:none;}.form-section.active{display:block;animation:fadeUp .5s var(--ease) forwards;}
+.section-title{font-family:'Playfair Display SC',serif;font-size:1.5rem;font-weight:400;color:var(--cream);margin-bottom:.4rem;}
+.section-sub{font-size:.9rem;font-style:italic;color:rgba(240,234,214,.4);margin-bottom:2rem;}
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed rgba(201,168,76,.2);padding:3.5rem 2rem;text-align:center;cursor:pointer;transition:all .3s;position:relative;background:rgba(201,168,76,.02);}
+.upload-zone:hover,.upload-zone.drag{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.05);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:3rem;margin-bottom:.8rem;opacity:.5;}
+.upload-text{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);}
+.upload-hint{font-size:.78rem;color:rgba(240,234,214,.3);margin-top:.4rem;font-style:italic;}
+.preview-wrap{position:relative;margin-top:1.2rem;display:none;}
+.preview-wrap.show{display:block;}
+.preview-img{width:100%;max-height:420px;object-fit:contain;border:1px solid rgba(201,168,76,.15);display:block;}
+.preview-remove{position:absolute;top:.5rem;right:.5rem;width:30px;height:30px;border-radius:50%;background:rgba(10,9,14,.9);border:1px solid rgba(201,168,76,.3);color:var(--muted);font-size:.8rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
+.preview-remove:hover{border-color:var(--rose);color:var(--rose);}
+.studio-import-btn{display:flex;align-items:center;gap:.6rem;margin-top:1rem;font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;padding:.55rem 1.2rem;border:1px solid rgba(201,168,76,.25);color:var(--muted);background:transparent;transition:all .3s;cursor:pointer;width:fit-content;}
+.studio-import-btn:hover{border-color:var(--gold);color:var(--gold);}
+/* FIELDS */
+.field{margin-bottom:1.1rem;}
+.field label{display:block;font-family:'Josefin Sans',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;}
+.field label .req{color:var(--rose);}
+.field input,.field textarea,.field select{width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.18);color:var(--cream);padding:.55rem .75rem;font-size:.92rem;outline:none;transition:border-color .2s;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold);}
+.field textarea{height:100px;font-family:'Cormorant Garamond',serif;resize:vertical;}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M0 0l6 7 6-7z' fill='%235a5040'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.char-count{font-family:'Josefin Sans',sans-serif;font-size:.48rem;letter-spacing:.1em;color:var(--muted);text-align:right;margin-top:.2rem;}
+/* TAGS */
+.tags-input{display:flex;flex-wrap:wrap;gap:.4rem;padding:.45rem .6rem;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.18);min-height:44px;cursor:text;transition:border-color .2s;}
+.tags-input:focus-within{border-color:var(--gold);}
+.tag-chip{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.25);color:var(--gold);font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.12em;padding:.18rem .55rem;display:flex;align-items:center;gap:.3rem;}
+.tag-chip button{background:none;border:none;color:inherit;cursor:pointer;font-size:.7rem;line-height:1;padding:0;}
+.tags-input input{border:none;background:none;color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:.72rem;outline:none;min-width:80px;flex:1;}
+/* CHALLENGE PILL */
+.challenge-pick{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem;}
+.ch-pill{font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;padding:.32rem .75rem;border:1px solid rgba(201,168,76,.18);color:var(--muted);background:transparent;transition:all .25s;cursor:pointer;}
+.ch-pill.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08);}
+/* SETTINGS */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.8rem 0;border-bottom:1px solid rgba(201,168,76,.07);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info h4{font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cream);margin-bottom:.15rem;}
+.toggle-info p{font-size:.82rem;color:rgba(240,234,214,.4);line-height:1.4;}
+.toggle-sw{position:relative;width:46px;height:24px;flex-shrink:0;}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-sw span{position:absolute;inset:0;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.25);border-radius:12px;cursor:pointer;transition:background .2s;}
+.toggle-sw span::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:left .2s,background .2s;}
+.toggle-sw input:checked+span{background:rgba(201,168,76,.35);}
+.toggle-sw input:checked+span::after{left:25px;background:var(--gold);}
+/* NAV BTNS */
+.form-nav{display:flex;gap:.8rem;margin-top:2.5rem;justify-content:space-between;}
+.btn-back{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;padding:.6rem 1.4rem;border:1px solid rgba(201,168,76,.25);color:var(--muted);background:transparent;transition:all .3s;cursor:pointer;}
+.btn-back:hover{border-color:var(--gold);color:var(--gold);}
+.btn-next{font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;padding:.65rem 2rem;border:1px solid var(--gold);color:var(--gold);background:transparent;transition:all .3s;cursor:pointer;}
+.btn-next:hover{background:var(--gold);color:var(--bg);}
+.btn-next.solid{background:var(--gold);color:var(--bg);}.btn-next.solid:hover{background:var(--gold-l);}
+/* REVIEW CARD */
+.review-card{background:var(--surface2);border:1px solid rgba(201,168,76,.12);padding:1.5rem;margin-bottom:1.2rem;}
+.review-label{font-family:'Josefin Sans',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;}
+.review-val{font-size:.95rem;color:var(--cream);line-height:1.5;}
+.review-img{width:100%;max-height:280px;object-fit:contain;border:1px solid rgba(201,168,76,.1);display:block;margin-bottom:1rem;}
+/* SUCCESS */
+.success-screen{display:none;text-align:center;padding:5rem 2rem;}
+.success-screen.show{display:block;animation:successPop .5s var(--ease) forwards;}
+.success-icon{font-size:4rem;margin-bottom:1.2rem;}
+.success-title{font-family:'Playfair Display SC',serif;font-size:2rem;color:var(--gold);margin-bottom:.6rem;}
+.success-msg{font-size:1rem;font-style:italic;color:rgba(240,234,214,.5);max-width:400px;margin:0 auto 2rem;line-height:1.7;}
+.success-actions{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;}
+footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:'Playfair Display SC',serif;font-size:.9rem;letter-spacing:.38em;color:var(--gold);}
+.footer-links-row{display:flex;gap:1.4rem;flex-wrap:wrap;}
+.footer-links-row a{font-family:'Josefin Sans',sans-serif;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .25s;}
+.footer-links-row a:hover{color:var(--gold);}
+@media(max-width:1024px){
+  nav{padding:0 1.5rem;}.nav-cta{display:none;}.nav-hamburger{display:flex;}
+  .nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:rgba(10,9,14,.98);backdrop-filter:blur(16px);flex-direction:column;padding:5rem 2rem 2rem;gap:0;border-left:1px solid rgba(201,168,76,.15);z-index:495;transition:right .35s var(--ease);align-items:flex-start;}
+  .nav-links.open{right:0;}
+  .nav-links li{width:100%;border-bottom:1px solid rgba(201,168,76,.07);}
+  .nav-links a{display:block;padding:.9rem 0;font-size:.7rem;}
+  .page-hero,.submit-main{padding-left:1.5rem;padding-right:1.5rem;}
+  .steps-bar{padding:1.2rem 1.5rem;gap:0;}
+  .step-label{display:none;}
+  .field-row{grid-template-columns:1fr;}
+  footer{padding:1.5rem;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">Luminary <span>Atelier</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="artists.html">Artists</a></li>
+    <li><a href="studio.html">Studio</a></li>
+    <li><a href="challenges.html">Challenges</a></li>
+    <li><a href="submit.html" class="active">Submit</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+  <a href="studio.html" class="nav-cta">Open Studio</a>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+
+<div class="page-hero">
+  <div class="hero-bg"></div>
+  <h1>Submit Artwork</h1>
+  <p>Share your creation with the Luminary community and enter challenges.</p>
+</div>
+
+<div class="steps-bar" id="stepsBar">
+  <div class="step-item"><div class="step-num active" id="sn1">1</div><span class="step-label active" id="sl1">Upload</span></div>
+  <div class="step-line" id="line1"></div>
+  <div class="step-item"><div class="step-num" id="sn2">2</div><span class="step-label" id="sl2">Details</span></div>
+  <div class="step-line" id="line2"></div>
+  <div class="step-item"><div class="step-num" id="sn3">3</div><span class="step-label" id="sl3">Settings</span></div>
+  <div class="step-line" id="line3"></div>
+  <div class="step-item"><div class="step-num" id="sn4">4</div><span class="step-label" id="sl4">Review</span></div>
+</div>
+
+<div class="submit-main">
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">🎨</div>
+    <div class="success-title">Artwork Submitted!</div>
+    <div class="success-msg">Your work has been shared with the Luminary community. It will appear in the gallery after a brief review. Thank you for contributing to our collection.</div>
+    <div class="success-actions">
+      <button class="btn-next solid" onclick="location.href='studio-gallery.html'">View Community Gallery →</button>
+      <button class="btn-next" onclick="location.href='challenges.html'">Browse Challenges</button>
+      <button class="btn-next" onclick="location.href='studio.html'">Back to Studio</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: UPLOAD -->
+  <div class="form-section active" id="step1">
+    <div class="section-title">Upload Your Artwork</div>
+    <div class="section-sub">Import from Studio or upload from your device.</div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)">
+      <div class="upload-icon">🖼</div>
+      <div class="upload-text">Drag & Drop or Click to Upload</div>
+      <div class="upload-hint">PNG, JPG, WEBP · Max 20MB</div>
+    </div>
+    <div class="preview-wrap" id="previewWrap">
+      <img class="preview-img" id="previewImg" src="" alt="Preview">
+      <button class="preview-remove" onclick="removeFile()">✕</button>
+    </div>
+    <button class="studio-import-btn" onclick="importFromStudio()">🎨 Import Latest from Studio</button>
+    <div class="form-nav">
+      <span></span>
+      <button class="btn-next solid" onclick="nextStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: DETAILS -->
+  <div class="form-section" id="step2">
+    <div class="section-title">Artwork Details</div>
+    <div class="section-sub">Tell the community about your work.</div>
+    <div class="field">
+      <label>Title <span class="req">*</span></label>
+      <input type="text" id="artTitle" placeholder="Give your artwork a name" maxlength="80" oninput="document.getElementById('titleCount').textContent=this.value.length+'/80'">
+      <div class="char-count" id="titleCount">0/80</div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Medium</label>
+        <select id="artMedium"><option value="">— Select —</option><option>Digital Painting</option><option>Oil Paint</option><option>Watercolour</option><option>Pencil / Charcoal</option><option>Mixed Media</option><option>Photography</option><option>Collage</option><option>Animation</option></select>
+      </div>
+      <div class="field"><label>Category</label>
+        <select id="artCategory"><option value="">— Select —</option><option>Landscape</option><option>Portrait</option><option>Abstract</option><option>Still Life</option><option>Architecture</option><option>Fantasy</option><option>Seascape</option><option>Study</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="artDesc" placeholder="Share the story behind this work — inspiration, technique, thoughts…" maxlength="500" oninput="document.getElementById('descCount').textContent=this.value.length+'/500'"></textarea>
+      <div class="char-count" id="descCount">0/500</div>
+    </div>
+    <div class="field"><label>Tags</label>
+      <div class="tags-input" id="tagsWrap" onclick="document.getElementById('tagInput').focus()">
+        <input type="text" id="tagInput" placeholder="Add tag + Enter" onkeydown="handleTag(event)">
+      </div>
+      <div style="font-size:.78rem;color:rgba(240,234,214,.3);margin-top:.3rem;font-style:italic;">Press Enter to add a tag. Up to 8 tags.</div>
+    </div>
+    <div class="field"><label>Enter Challenge (optional)</label>
+      <div class="challenge-pick" id="challengePick"></div>
+    </div>
+    <div class="form-nav">
+      <button class="btn-back" onclick="nextStep(1)">← Back</button>
+      <button class="btn-next solid" onclick="nextStep(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: SETTINGS -->
+  <div class="form-section" id="step3">
+    <div class="section-title">Submission Settings</div>
+    <div class="section-sub">Control how your artwork is shared.</div>
+    <div class="toggle-row">
+      <div class="toggle-info"><h4>Public Gallery</h4><p>Show this artwork in the Community Gallery for everyone to discover.</p></div>
+      <label class="toggle-sw"><input type="checkbox" id="togPublic" checked><span></span></label>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info"><h4>Allow Comments</h4><p>Let other artists leave feedback and reactions on your work.</p></div>
+      <label class="toggle-sw"><input type="checkbox" id="togComments" checked><span></span></label>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info"><h4>Allow Inspiration Saves</h4><p>Other artists can save your work as inspiration for their own pieces.</p></div>
+      <label class="toggle-sw"><input type="checkbox" id="togSaves" checked><span></span></label>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info"><h4>Show in Challenges</h4><p>If you selected a challenge, display this entry on the challenge page.</p></div>
+      <label class="toggle-sw"><input type="checkbox" id="togChallenge" checked><span></span></label>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info"><h4>Mature Content Label</h4><p>Mark this work as mature content — will be hidden from general browsing.</p></div>
+      <label class="toggle-sw"><input type="checkbox" id="togMature"><span></span></label>
+    </div>
+    <div class="field" style="margin-top:1.2rem;">
+      <label>License</label>
+      <select id="artLicense">
+        <option value="cc-by">CC BY — Attribution required</option>
+        <option value="cc-by-nc">CC BY-NC — Non-commercial only</option>
+        <option value="cc-by-nd">CC BY-ND — No derivatives</option>
+        <option value="all-rights">All Rights Reserved</option>
+      </select>
+    </div>
+    <div class="form-nav">
+      <button class="btn-back" onclick="nextStep(2)">← Back</button>
+      <button class="btn-next solid" onclick="nextStep(4)">Review →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: REVIEW -->
+  <div class="form-section" id="step4">
+    <div class="section-title">Review & Submit</div>
+    <div class="section-sub">Check everything looks right before submitting.</div>
+    <div id="reviewContent"></div>
+    <div class="field" style="margin-top:1.2rem;">
+      <label><input type="checkbox" id="agreeTerms" style="width:auto;margin-right:.5rem;accent-color:var(--gold);">I confirm this is my original artwork and I agree to the <a href="about.html" style="color:var(--gold);">Community Guidelines</a>.</label>
+    </div>
+    <div class="form-nav">
+      <button class="btn-back" onclick="nextStep(3)">← Back</button>
+      <button class="btn-next solid" onclick="submitArtwork()">🎨 Submit Artwork</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Luminary Atelier</div>
+  <div class="footer-links-row">
+    <a href="index.html">Home</a><a href="gallery.html">Gallery</a><a href="studio.html">Studio</a>
+    <a href="challenges.html">Challenges</a><a href="profile.html">Profile</a><a href="about.html">About</a>
+  </div>
+  <span style="font-family:Josefin Sans,sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:#1a1410;">© 2025 Luminary Atelier</span>
+</footer>
+
+<script>
+/* ── NAV ── */
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navOverlay').classList.toggle('open');}
+function closeNav(){['navLinks','navHamburger','navOverlay'].forEach(id=>document.getElementById(id).classList.remove('open'));}
+/* ── STATE ── */
+const LS='luminary_state_v2';
+function getState(){try{return JSON.parse(localStorage.getItem(LS))||{};}catch{return{};}}
+function setState(p){const s=Object.assign({},getState(),p);localStorage.setItem(LS,JSON.stringify(s));return s;}
+function addNotif(msg){const n={id:Date.now()+'',msg,type:'submit',time:new Date().toISOString(),read:false};const ns=[n,...(getState().notifications||[])].slice(0,30);setState({notifications:ns});}
+/* ── FILE ── */
+let uploadedFile=null,uploadedDataURL=null;
+function handleFile(e){
+  const f=e.target.files[0];if(!f)return;
+  if(f.size>20*1024*1024){alert('File too large. Maximum 20MB.');return;}
+  uploadedFile=f;
+  const r=new FileReader();
+  r.onload=ev=>{
+    uploadedDataURL=ev.target.result;
+    document.getElementById('previewImg').src=uploadedDataURL;
+    document.getElementById('previewWrap').classList.add('show');
+    document.getElementById('uploadZone').style.opacity='.4';
+  };
+  r.readAsDataURL(f);
+}
+function removeFile(){uploadedFile=null;uploadedDataURL=null;document.getElementById('previewWrap').classList.remove('show');document.getElementById('uploadZone').style.opacity='1';document.getElementById('fileInput').value='';}
+function importFromStudio(){
+  const arts=(getState().recentArtworks||[]);
+  if(!arts.length){alert('No artworks found in Studio. Save a painting first!');return;}
+  const latest=arts[0];
+  if(latest.thumbnail){
+    uploadedDataURL=latest.thumbnail;
+    document.getElementById('previewImg').src=uploadedDataURL;
+    document.getElementById('previewWrap').classList.add('show');
+    document.getElementById('uploadZone').style.opacity='.4';
+    document.getElementById('artTitle').value=latest.name||'';
+    toast('Imported from Studio ✓');
+  }
+}
+/* ── DRAG & DROP ── */
+const zone=document.getElementById('uploadZone');
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});
+zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');const f=e.dataTransfer.files[0];if(f){document.getElementById('fileInput').files=e.dataTransfer.files;handleFile({target:{files:[f]}});}});
+/* ── TAGS ── */
+const tags=[];
+function handleTag(e){
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const v=e.target.value.trim();
+    if(!v||tags.includes(v)||tags.length>=8)return;
+    tags.push(v);e.target.value='';
+    renderTags();
+  }
+}
+function renderTags(){
+  const wrap=document.getElementById('tagsWrap');
+  const input=document.getElementById('tagInput');
+  wrap.innerHTML='';
+  tags.forEach(t=>{
+    const chip=document.createElement('span');chip.className='tag-chip';
+    chip.innerHTML=t+` <button onclick="removeTag('${t}')">✕</button>`;
+    wrap.appendChild(chip);
+  });
+  wrap.appendChild(input);
+}
+function removeTag(t){tags.splice(tags.indexOf(t),1);renderTags();}
+/* ── CHALLENGES ── */
+const LIVE_CHALLENGES=['The Golden Hour','Monochrome Masters','Water Worlds'];
+let selectedChallenge='';
+function renderChallengePick(){
+  document.getElementById('challengePick').innerHTML=LIVE_CHALLENGES.map(c=>`<button class="ch-pill${selectedChallenge===c?' active':''}" onclick="pickChallenge('${c}',this)">${c}</button>`).join('')+'<button class="ch-pill" onclick="pickChallenge(\'\',this)">None</button>';
+  // Pre-select from URL
+  const u=new URLSearchParams(window.location.search).get('challenge');
+  if(u){const match=LIVE_CHALLENGES.find(c=>c.toLowerCase().replace(/ /g,'-')===u);if(match){selectedChallenge=match;renderChallengePick();}}
+}
+function pickChallenge(c,btn){selectedChallenge=c;document.querySelectorAll('.ch-pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+renderChallengePick();
+/* ── STEPS ── */
+let currentStep=1;
+function nextStep(n){
+  if(n===2&&!uploadedDataURL){toast('Please upload an artwork first');return;}
+  if(n===4)buildReview();
+  document.querySelectorAll('.form-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  for(let i=1;i<=4;i++){
+    document.getElementById('sn'+i).className='step-num'+(i<n?' done':i===n?' active':'');
+    document.getElementById('sl'+i).className='step-label'+(i<n?' done':i===n?' active':'');
+    if(i<4)document.getElementById('line'+i).className='step-line'+(i<n?' done':'');
+  }
+  currentStep=n;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+/* ── REVIEW ── */
+function buildReview(){
+  const rc=document.getElementById('reviewContent');
+  rc.innerHTML=`
+    ${uploadedDataURL?`<img class="review-img" src="${uploadedDataURL}" alt="Preview">`:''}
+    <div class="review-card"><div class="review-label">Title</div><div class="review-val">${document.getElementById('artTitle').value||'(untitled)'}</div></div>
+    <div class="review-card"><div class="review-label">Medium</div><div class="review-val">${document.getElementById('artMedium').value||'—'}</div></div>
+    <div class="review-card"><div class="review-label">Category</div><div class="review-val">${document.getElementById('artCategory').value||'—'}</div></div>
+    ${document.getElementById('artDesc').value?`<div class="review-card"><div class="review-label">Description</div><div class="review-val">${document.getElementById('artDesc').value}</div></div>`:''}
+    ${tags.length?`<div class="review-card"><div class="review-label">Tags</div><div class="review-val">${tags.join(', ')}</div></div>`:''}
+    ${selectedChallenge?`<div class="review-card"><div class="review-label">Challenge Entry</div><div class="review-val">${selectedChallenge}</div></div>`:''}
+    <div class="review-card"><div class="review-label">License</div><div class="review-val">${document.getElementById('artLicense').value}</div></div>
+  `;
+}
+/* ── SUBMIT ── */
+function submitArtwork(){
+  if(!document.getElementById('agreeTerms').checked){toast('Please agree to the Community Guidelines');return;}
+  if(!uploadedDataURL){toast('Please upload an artwork');return;}
+  const title=document.getElementById('artTitle').value||'Untitled';
+  const sub={id:Date.now()+'',title,medium:document.getElementById('artMedium').value,category:document.getElementById('artCategory').value,desc:document.getElementById('artDesc').value,tags:[...tags],challenge:selectedChallenge,thumbnail:uploadedDataURL,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})};
+  // Save to state
+  const subs=[sub,...(getState().submissions||[])].slice(0,20);
+  const arts=[{id:sub.id,name:title,thumbnail:uploadedDataURL,date:sub.date},...(getState().recentArtworks||[])].slice(0,12);
+  setState({submissions:subs,recentArtworks:arts});
+  addNotif(`Your artwork "${title}" was submitted to the community!`);
+  // Show success
+  document.getElementById('step4').classList.remove('active');
+  document.getElementById('successScreen').classList.add('show');
+  document.getElementById('successScreen').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+/* ── TOAST ── */
+function toast(msg){
+  let t=document.getElementById('subToast');
+  if(!t){t=document.createElement('div');t.id='subToast';t.style.cssText='position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(15,14,18,.98);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;padding:.5rem 1.4rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2200);
+}
+</script>
+</body>
+</html>

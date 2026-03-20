@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Challenges — Luminary Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--surface:#0f0e12;--surface2:#18161e;--surface3:#201d28;--gold:#c9a84c;--gold-l:#e8c97e;--gold-d:#7a6130;--cream:#f0ead6;--muted:#5a5040;--violet:#7b5ea7;--violet-l:#a87fd4;--teal:#2a9a8a;--teal-l:#4dc9b4;--rose:#c94a6a;--amber:#e07830;--nav:58px;--ease:cubic-bezier(.25,.46,.45,.94);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}body{background:var(--bg);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.8;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}button{cursor:pointer;font-family:inherit;}img{display:block;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:2px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes revealScale{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:none}}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes badgeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.rev{opacity:0}.rev.in{animation:fadeUp .7s var(--ease) forwards;}
+.rev-s{opacity:0}.rev-s.in{animation:revealScale .6s var(--ease) forwards;}
+.d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}.d5{animation-delay:.30s}
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 3rem;background:rgba(6,6,10,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,168,76,.12);}
+.nav-logo{font-family:'Playfair Display SC',serif;font-size:.88rem;letter-spacing:.38em;color:var(--gold);}.nav-logo span{color:var(--cream);}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center;}
+.nav-links a{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(240,234,214,.5);transition:color .25s;position:relative;padding-bottom:3px;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.nav-cta{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;padding:.5rem 1.2rem;border:1px solid rgba(201,168,76,.4);color:var(--gold);transition:all .3s;background:rgba(201,168,76,.06);}.nav-cta:hover{background:var(--gold);color:var(--bg);}
+.nav-hamburger{display:none;flex-direction:column;justify-content:space-between;width:26px;height:18px;background:none;border:none;cursor:pointer;padding:0;}
+.nav-hamburger span{display:block;width:100%;height:2px;background:var(--gold);border-radius:1px;transition:all .3s;}
+.nav-hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg);}.nav-hamburger.open span:nth-child(2){opacity:0;}.nav-hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(6,6,10,.7);z-index:490;backdrop-filter:blur(2px);}.nav-overlay.open{display:block;}
+/* HERO */
+.page-hero{padding:10rem 4rem 4rem;position:relative;overflow:hidden;}
+.page-hero::after{content:'';position:absolute;bottom:0;left:4rem;right:4rem;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 70% 40%,rgba(123,94,167,.07) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 20% 60%,rgba(201,168,76,.04) 0%,transparent 55%);}
+.page-hero h1{font-family:'Playfair Display SC',serif;font-size:clamp(2.4rem,5vw,5rem);font-weight:400;color:var(--cream);position:relative;z-index:2;animation:fadeUp .9s ease forwards;}
+.page-hero p{font-size:1.05rem;font-style:italic;color:rgba(240,234,214,.45);max-width:520px;margin-top:.8rem;z-index:2;position:relative;animation:fadeUp .9s ease .2s forwards;opacity:0;}
+/* FEATURED CHALLENGE */
+.featured-banner{margin:3rem 4rem 0;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d0b16 0%,#1a1228 50%,#0e1616 100%);border:1px solid rgba(201,168,76,.18);padding:3rem;}
+.fb-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'Josefin Sans',sans-serif;font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.3);padding:.25rem .7rem;margin-bottom:1.2rem;animation:badgeFloat 3s ease infinite;}
+.fb-title{font-family:'Playfair Display SC',serif;font-size:clamp(1.6rem,3vw,2.8rem);font-weight:400;color:var(--cream);margin-bottom:.8rem;max-width:600px;}
+.fb-desc{font-size:.98rem;font-style:italic;color:rgba(240,234,214,.5);max-width:500px;margin-bottom:1.8rem;line-height:1.7;}
+.fb-meta{display:flex;gap:2.5rem;margin-bottom:2rem;flex-wrap:wrap;}
+.fb-stat{text-align:center;}
+.fb-stat-num{font-family:'Playfair Display SC',serif;font-size:1.6rem;color:var(--gold);}
+.fb-stat-label{font-family:'Josefin Sans',sans-serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+.fb-timer{font-family:'Josefin Sans',sans-serif;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--teal-l);background:rgba(42,154,138,.1);border:1px solid rgba(42,154,138,.25);padding:.4rem 1rem;display:inline-flex;align-items:center;gap:.5rem;margin-bottom:2rem;animation:timerPulse 2s ease infinite;}
+.fb-actions{display:flex;gap:.8rem;flex-wrap:wrap;}
+.btn-ch{font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;padding:.65rem 1.6rem;border:1px solid var(--gold);color:var(--gold);background:transparent;transition:all .3s;cursor:pointer;}
+.btn-ch:hover{background:var(--gold);color:var(--bg);}
+.btn-ch.solid{background:var(--gold);color:var(--bg);}.btn-ch.solid:hover{background:var(--gold-l);}
+.btn-ch.joined{background:rgba(42,154,138,.15);border-color:var(--teal-l);color:var(--teal-l);}
+.fb-art{position:absolute;right:3rem;top:50%;transform:translateY(-50%);width:220px;height:220px;border:1px solid rgba(201,168,76,.15);}
+/* FILTER */
+.challenges-filter{padding:2.5rem 4rem 0;display:flex;gap:.55rem;flex-wrap:wrap;align-items:center;}
+.cf-btn{font-family:'Josefin Sans',sans-serif;font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;padding:.38rem .9rem;border:1px solid rgba(201,168,76,.18);color:var(--muted);background:transparent;transition:all .25s;cursor:pointer;}
+.cf-btn.active,.cf-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.07);}
+.cf-search{flex:1;min-width:180px;max-width:280px;background:rgba(240,234,214,.04);border:1px solid rgba(201,168,76,.2);color:var(--cream);padding:.4rem .9rem;font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.1em;outline:none;}
+.cf-search:focus{border-color:var(--gold);}
+/* GRID */
+.challenges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.6rem;padding:2.5rem 4rem 5rem;}
+.challenge-card{background:var(--surface2);border:1px solid rgba(201,168,76,.08);overflow:hidden;transition:all .35s;position:relative;}
+.challenge-card:hover{border-color:rgba(201,168,76,.35);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4);}
+.cc-preview{height:190px;position:relative;overflow:hidden;}
+.cc-preview canvas{display:block;width:100%;height:100%;}
+.cc-status{position:absolute;top:.7rem;left:.7rem;font-family:'Josefin Sans',sans-serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;padding:.22rem .6rem;border-radius:2px;}
+.cc-status.live{background:rgba(42,154,138,.25);color:var(--teal-l);border:1px solid rgba(42,154,138,.3);}
+.cc-status.upcoming{background:rgba(123,94,167,.2);color:var(--violet-l);border:1px solid rgba(123,94,167,.3);}
+.cc-status.ended{background:rgba(90,80,64,.2);color:var(--muted);border:1px solid rgba(90,80,64,.3);}
+.cc-prize{position:absolute;top:.7rem;right:.7rem;font-family:'Josefin Sans',sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:.22rem .55rem;}
+.cc-body{padding:1.4rem;}
+.cc-tag{font-family:'Josefin Sans',sans-serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:var(--violet-l);margin-bottom:.4rem;}
+.cc-title{font-family:'Playfair Display SC',serif;font-size:1.1rem;color:var(--cream);margin-bottom:.4rem;line-height:1.2;}
+.cc-desc{font-size:.88rem;color:rgba(240,234,214,.45);line-height:1.6;margin-bottom:1rem;}
+.cc-meta-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.4rem;}
+.cc-deadline{font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.cc-deadline span{color:var(--gold);}
+.cc-entries{font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.12em;color:var(--muted);}
+.cc-progress{height:3px;background:rgba(201,168,76,.1);border-radius:2px;margin-bottom:1rem;overflow:hidden;}
+.cc-progress-fill{height:100%;background:linear-gradient(to right,var(--gold),var(--teal-l));border-radius:2px;transition:width 1s ease;}
+.cc-footer{display:flex;align-items:center;justify-content:space-between;gap:.6rem;}
+.cc-join-btn{flex:1;font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;padding:.5rem 1rem;border:1px solid var(--gold);color:var(--gold);background:transparent;transition:all .3s;cursor:pointer;}
+.cc-join-btn:hover,.cc-join-btn.joined{background:var(--gold);color:var(--bg);}
+.cc-join-btn.joined{background:rgba(42,154,138,.15);border-color:var(--teal-l);color:var(--teal-l);}
+.cc-join-btn.joined:hover{background:var(--teal);border-color:var(--teal);color:#fff;}
+.cc-view-btn{font-family:'Josefin Sans',sans-serif;font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;padding:.5rem .9rem;border:1px solid rgba(201,168,76,.2);color:var(--muted);background:transparent;transition:all .3s;cursor:pointer;}
+.cc-view-btn:hover{border-color:var(--gold);color:var(--gold);}
+/* LEADERBOARD */
+.leaderboard-section{padding:4rem;background:var(--surface);border-top:1px solid rgba(201,168,76,.08);}
+.section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;}
+.section-hd h2{font-family:'Playfair Display SC',serif;font-size:1.9rem;font-weight:400;color:var(--cream);}
+.gold-line{width:48px;height:1px;background:linear-gradient(to right,var(--gold),transparent);margin:.6rem 0;}
+.lb-table{width:100%;border-collapse:collapse;}
+.lb-table th{font-family:'Josefin Sans',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);padding:.5rem 1rem;text-align:left;border-bottom:1px solid rgba(201,168,76,.1);}
+.lb-table td{padding:.7rem 1rem;border-bottom:1px solid rgba(201,168,76,.05);font-size:.9rem;color:var(--cream);vertical-align:middle;}
+.lb-table tr:hover td{background:rgba(201,168,76,.03);}
+.lb-rank{font-family:'Playfair Display SC',serif;font-size:1.1rem;color:var(--muted);}
+.lb-rank.top{color:var(--gold);}
+.lb-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface3);}
+.lb-score{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.12em;color:var(--gold);}
+/* PRIZES */
+.prizes-section{padding:4rem;background:var(--bg);}
+.prizes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:2.5rem;}
+.prize-card{border-top:2px solid rgba(201,168,76,.15);padding:1.8rem;text-align:center;transition:border-color .3s;background:var(--surface2);}
+.prize-card:first-child{border-top-color:var(--gold);}
+.prize-card:hover{border-top-color:var(--gold);}
+.prize-icon{font-size:2.5rem;margin-bottom:.8rem;}
+.prize-place{font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;}
+.prize-title{font-family:'Playfair Display SC',serif;font-size:1.1rem;color:var(--gold);margin-bottom:.4rem;}
+.prize-desc{font-size:.88rem;color:rgba(240,234,214,.45);line-height:1.6;}
+/* TOAST */
+.ch-toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(15,14,18,.98);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;padding:.5rem 1.4rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;}
+.ch-toast.show{opacity:1;}
+footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:0;}
+.footer-logo{font-family:'Playfair Display SC',serif;font-size:.9rem;letter-spacing:.38em;color:var(--gold);}
+.footer-links-row{display:flex;gap:1.4rem;flex-wrap:wrap;}
+.footer-links-row a{font-family:'Josefin Sans',sans-serif;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .25s;}
+.footer-links-row a:hover{color:var(--gold);}
+@media(max-width:1024px){
+  nav{padding:0 1.5rem;}.nav-cta{display:none;}.nav-hamburger{display:flex;}
+  .nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:rgba(10,9,14,.98);backdrop-filter:blur(16px);flex-direction:column;padding:5rem 2rem 2rem;gap:0;border-left:1px solid rgba(201,168,76,.15);z-index:495;transition:right .35s var(--ease);align-items:flex-start;}
+  .nav-links.open{right:0;}
+  .nav-links li{width:100%;border-bottom:1px solid rgba(201,168,76,.07);}
+  .nav-links a{display:block;padding:.9rem 0;font-size:.7rem;}
+  .page-hero,.featured-banner,.challenges-filter,.challenges-grid,.leaderboard-section,.prizes-section{padding-left:1.5rem;padding-right:1.5rem;}
+  .featured-banner{margin-left:1.5rem;margin-right:1.5rem;}
+  .fb-art{display:none;}
+  .challenges-grid{grid-template-columns:1fr;gap:1.2rem;}
+  .prizes-grid{grid-template-columns:1fr;gap:1rem;}
+  footer{padding:1.5rem;}
+}
+@media(max-width:600px){
+  .page-hero{padding:8rem 1.5rem 3rem;}
+  .fb-meta{gap:1.4rem;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">Luminary <span>Atelier</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="artists.html">Artists</a></li>
+    <li><a href="studio.html">Studio</a></li>
+    <li><a href="challenges.html" class="active">Challenges</a></li>
+    <li><a href="submit.html">Submit</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+  <a href="studio.html" class="nav-cta">Open Studio</a>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+
+<div class="page-hero">
+  <div class="hero-bg"></div>
+  <h1>Art Challenges</h1>
+  <p>Push your craft. Compete with the global Luminary community. Win recognition and prizes.</p>
+</div>
+
+<!-- FEATURED -->
+<div class="featured-banner rev">
+  <div class="fb-badge">⭐ Featured Challenge</div>
+  <h2 class="fb-title">The Golden Hour — Light & Shadow Study</h2>
+  <p class="fb-desc">Capture the fleeting beauty of golden hour light. Use any medium to explore the drama of warm light against deep shadow — from landscape to still life, abstraction to hyperrealism.</p>
+  <div class="fb-meta">
+    <div class="fb-stat"><div class="fb-stat-num" id="featEntries">847</div><div class="fb-stat-label">Entries</div></div>
+    <div class="fb-stat"><div class="fb-stat-num">1st</div><div class="fb-stat-label">Prize</div></div>
+    <div class="fb-stat"><div class="fb-stat-num">12</div><div class="fb-stat-label">Days Left</div></div>
+    <div class="fb-stat"><div class="fb-stat-num">∞</div><div class="fb-stat-label">Open</div></div>
+  </div>
+  <div class="fb-timer" id="featTimer">⏱ Loading timer…</div>
+  <div class="fb-actions">
+    <button class="btn-ch solid" id="featJoinBtn" onclick="joinFeatured()">Join Challenge</button>
+    <button class="btn-ch" onclick="location.href='submit.html?challenge=golden-hour'">Submit Work →</button>
+  </div>
+  <canvas class="fb-art" id="featCanvas" width="220" height="220"></canvas>
+</div>
+
+<!-- FILTER -->
+<div class="challenges-filter">
+  <button class="cf-btn active" onclick="filterChallenges('all',this)">All</button>
+  <button class="cf-btn" onclick="filterChallenges('live',this)">Live</button>
+  <button class="cf-btn" onclick="filterChallenges('upcoming',this)">Upcoming</button>
+  <button class="cf-btn" onclick="filterChallenges('ended',this)">Ended</button>
+  <button class="cf-btn" onclick="filterChallenges('joined',this)">My Challenges</button>
+  <input class="cf-search" id="cfSearch" type="search" placeholder="Search challenges…" oninput="searchChallenges(this.value)">
+</div>
+
+<!-- GRID -->
+<div class="challenges-grid" id="challengesGrid"></div>
+
+<!-- LEADERBOARD -->
+<div class="leaderboard-section">
+  <div class="section-hd">
+    <div><h2>Leaderboard</h2><div class="gold-line"></div></div>
+    <span style="font-family:Josefin Sans,sans-serif;font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">Current Cycle</span>
+  </div>
+  <table class="lb-table"><thead><tr><th>Rank</th><th>Artist</th><th>Entries</th><th>Wins</th><th>Points</th></tr></thead>
+  <tbody id="leaderboardBody"></tbody></table>
+</div>
+
+<!-- PRIZES -->
+<div class="prizes-section">
+  <div class="section-hd"><div><h2>Prizes & Recognition</h2><div class="gold-line"></div></div></div>
+  <div class="prizes-grid">
+    <div class="prize-card rev"><div class="prize-icon">🥇</div><div class="prize-place">First Place</div><div class="prize-title">Featured Artist Spotlight</div><div class="prize-desc">Your work shown on the homepage, a dedicated gallery feature, and an official Luminary Atelier certificate.</div></div>
+    <div class="prize-card rev d2"><div class="prize-icon">🥈</div><div class="prize-place">Second Place</div><div class="prize-title">Community Gallery Feature</div><div class="prize-desc">Permanent placement in the Community Highlights gallery and a profile badge for your achievements.</div></div>
+    <div class="prize-card rev d3"><div class="prize-icon">🥉</div><div class="prize-place">Third Place</div><div class="prize-title">Honourable Mention</div><div class="prize-desc">Your work highlighted in our monthly newsletter, sent to thousands of art enthusiasts worldwide.</div></div>
+  </div>
+</div>
+
+<div class="ch-toast" id="chToast"></div>
+
+<footer>
+  <div class="footer-logo">Luminary Atelier</div>
+  <div class="footer-links-row">
+    <a href="index.html">Home</a><a href="gallery.html">Gallery</a><a href="studio.html">Studio</a>
+    <a href="submit.html">Submit</a><a href="profile.html">Profile</a><a href="about.html">About</a>
+  </div>
+  <span style="font-family:Josefin Sans,sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:#1a1410;">© 2025 Luminary Atelier</span>
+</footer>
+
+<script>
+/* ── NAV ── */
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navOverlay').classList.toggle('open');}
+function closeNav(){['navLinks','navHamburger','navOverlay'].forEach(id=>document.getElementById(id).classList.remove('open'));}
+/* ── STATE ── */
+const LS='luminary_state_v2';
+function getState(){try{return JSON.parse(localStorage.getItem(LS))||{};}catch{return{};}}
+function setState(p){const s=Object.assign({},getState(),p);localStorage.setItem(LS,JSON.stringify(s));return s;}
+function getJoined(){return getState().joinedChallenges||[];}
+function joinChallenge(id){const j=[...new Set([...getJoined(),id])];setState({joinedChallenges:j});addNotif(`You joined a challenge!`);}
+function leaveChallenge(id){const j=getJoined().filter(c=>c!==id);setState({joinedChallenges:j});}
+function addNotif(msg){const n={id:Date.now()+'',msg,type:'challenge',time:new Date().toISOString(),read:false};const ns=[n,...(getState().notifications||[])].slice(0,30);setState({notifications:ns});}
+
+/* ── CHALLENGE DATA ── */
+const CHALLENGES=[
+  {id:'golden-hour',title:'The Golden Hour',tag:'Landscape',desc:'Capture warm light and deep shadow in any medium — golden hour drama awaits.',status:'live',deadline:'2025-04-15',entries:847,maxEntries:1200,prize:'Featured Spotlight',palette:['#1a1000','#c9a84c','#e07830','#f5d78a','#2a1a00']},
+  {id:'monochrome-masters',title:'Monochrome Masters',tag:'Study',desc:'Explore the full tonal range with a single hue. Discover how much can be said with one colour.',status:'live',deadline:'2025-04-22',entries:534,maxEntries:800,prize:'Gallery Feature',palette:['#0a0a0a','#303030','#606060','#a0a0a0','#f0f0f0']},
+  {id:'water-worlds',title:'Water Worlds',tag:'Seascape',desc:'Oceans, rivers, rain — interpret water in any form. Reflections welcome.',status:'live',deadline:'2025-05-01',entries:312,maxEntries:600,prize:'Newsletter Feature',palette:['#06060a','#1a2a4a','#2a6a9a','#4dc9b4','#c0d8f0']},
+  {id:'portrait-unplugged',title:'Portrait Unplugged',tag:'Portrait',desc:'No reference photos — paint a portrait entirely from imagination or memory.',status:'upcoming',deadline:'2025-05-10',entries:0,maxEntries:500,prize:'Featured Spotlight',palette:['#2a1a10','#8a5020','#c9a84c','#f0d8b0','#fff8f0']},
+  {id:'abstract-geometry',title:'Abstract Geometry',tag:'Abstract',desc:'Pure form, line, and colour. Let geometry guide your composition.',status:'upcoming',deadline:'2025-05-18',entries:0,maxEntries:400,prize:'Community Badge',palette:['#06060a','#7b5ea7','#c9a84c','#2a9a8a','#c94a6a']},
+  {id:'seasonal-spirits',title:'Seasonal Spirits — Spring',tag:'Seasonal',desc:'Capture the essence of spring in all its fleeting, blossoming glory.',status:'upcoming',deadline:'2025-06-01',entries:0,maxEntries:1000,prize:'Gallery Feature',palette:['#c8f8d0','#80d890','#e8b8e0','#f8f0c0','#a0c8f0']},
+  {id:'the-old-masters',title:'The Old Masters Revisited',tag:'Study',desc:'Study and reinterpret a classical masterwork. Add your own voice to 500 years of tradition.',status:'ended',deadline:'2025-03-01',entries:621,maxEntries:800,prize:'Ended',palette:['#2a1a00','#8a6020','#c9a84c','#e8c97e','#f0ead6']},
+  {id:'urban-sketches',title:'Urban Sketches',tag:'Architecture',desc:'Cities, streets, buildings — capture the poetry in architecture and urban life.',status:'ended',deadline:'2025-02-15',entries:488,maxEntries:600,prize:'Ended',palette:['#06060a','#1a1a2a','#4a4a6a','#8a8aa0','#c0c0d0']},
+];
+let filtered=[...CHALLENGES];
+
+function filterChallenges(f,btn){
+  document.querySelectorAll('.cf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  const joined=getJoined();
+  if(f==='all')filtered=[...CHALLENGES];
+  else if(f==='joined')filtered=CHALLENGES.filter(c=>joined.includes(c.id));
+  else filtered=CHALLENGES.filter(c=>c.status===f);
+  document.getElementById('cfSearch').value='';
+  renderGrid();
+}
+function searchChallenges(q){
+  filtered=CHALLENGES.filter(c=>c.title.toLowerCase().includes(q.toLowerCase())||c.tag.toLowerCase().includes(q.toLowerCase())||c.desc.toLowerCase().includes(q.toLowerCase()));
+  renderGrid();
+}
+
+/* ── DRAW CHALLENGE PREVIEW ── */
+function drawPreview(canvas,c){
+  const ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+  ctx.fillStyle=c.palette[0];ctx.fillRect(0,0,W,H);
+  c.palette.slice(1).forEach((col,i)=>{
+    ctx.globalAlpha=0.28+i*0.1;
+    const x=W*(0.1+i*0.2),y=H*(0.2+Math.sin(i*1.3)*0.4);
+    const rg=ctx.createRadialGradient(x,y,0,x,y,W*.55);
+    rg.addColorStop(0,col);rg.addColorStop(1,'transparent');
+    ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  });
+  ctx.globalAlpha=.12;ctx.strokeStyle=c.palette[2]||'#c9a84c';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  ctx.globalAlpha=.9;ctx.fillStyle=c.palette[2]||'#c9a84c';
+  ctx.font='bold 8px Josefin Sans,sans-serif';
+  ctx.fillText(c.tag.toUpperCase(),8,H-8);
+  ctx.globalAlpha=1;
+}
+
+/* ── RENDER GRID ── */
+function renderGrid(){
+  const grid=document.getElementById('challengesGrid');
+  const joined=getJoined();
+  if(!filtered.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted);font-family:Josefin Sans,sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;">No challenges found</div>`;return;}
+  grid.innerHTML=filtered.map((c,i)=>{
+    const isJoined=joined.includes(c.id);
+    const pct=Math.round((c.entries/c.maxEntries)*100);
+    const days=Math.max(0,Math.round((new Date(c.deadline)-new Date())/(1000*60*60*24)));
+    return`<div class="challenge-card rev-s" style="animation-delay:${i*.07}s" id="card-${c.id}">
+      <div class="cc-preview"><canvas id="prev-${c.id}" width="340" height="190"></canvas>
+        <span class="cc-status ${c.status}">${c.status==='live'?'● Live':c.status==='upcoming'?'◈ Upcoming':'✓ Ended'}</span>
+        <span class="cc-prize">${c.prize}</span>
+      </div>
+      <div class="cc-body">
+        <div class="cc-tag">${c.tag}</div>
+        <div class="cc-title">${c.title}</div>
+        <div class="cc-desc">${c.desc}</div>
+        <div class="cc-meta-row">
+          <span class="cc-deadline">Deadline: <span>${c.status==='ended'?'Closed':days+' days'}</span></span>
+          <span class="cc-entries">${c.entries.toLocaleString()} entries</span>
+        </div>
+        <div class="cc-progress"><div class="cc-progress-fill" style="width:${pct}%"></div></div>
+        <div class="cc-footer">
+          ${c.status!=='ended'?`<button class="cc-join-btn${isJoined?' joined':''}" id="joinbtn-${c.id}" onclick="toggleJoin('${c.id}')">${isJoined?'✓ Joined':'Join Challenge'}</button>`:'<button class="cc-join-btn" style="opacity:.5;cursor:default">Challenge Ended</button>'}
+          <button class="cc-view-btn" onclick="location.href='submit.html?challenge=${c.id}'">Submit →</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  filtered.forEach(c=>{
+    const canvas=document.getElementById('prev-'+c.id);
+    if(canvas)drawPreview(canvas,c);
+  });
+  initReveal();
+}
+
+function toggleJoin(id){
+  const c=CHALLENGES.find(x=>x.id===id);if(!c||c.status==='ended')return;
+  const joined=getJoined();const isJoined=joined.includes(id);
+  if(isJoined){leaveChallenge(id);toast('Left challenge: '+c.title);}
+  else{joinChallenge(id);c.entries++;toast('Joined: '+c.title+' ✓');}
+  const btn=document.getElementById('joinbtn-'+id);
+  if(btn){btn.textContent=!isJoined?'✓ Joined':'Join Challenge';btn.className='cc-join-btn'+((!isJoined)?' joined':'');}
+}
+
+/* ── FEATURED ── */
+function drawFeaturedCanvas(){
+  const c=document.getElementById('featCanvas');if(!c)return;
+  drawPreview(c,CHALLENGES[0]);
+}
+function joinFeatured(){
+  const btn=document.getElementById('featJoinBtn');
+  const joined=getJoined().includes('golden-hour');
+  if(joined){leaveChallenge('golden-hour');btn.textContent='Join Challenge';btn.className='btn-ch solid';toast('Left challenge');}
+  else{joinChallenge('golden-hour');btn.textContent='✓ Joined!';btn.className='btn-ch solid';const c=CHALLENGES[0];c.entries++;document.getElementById('featEntries').textContent=c.entries.toLocaleString();toast('Joined The Golden Hour challenge ✓');}
+}
+function startTimer(){
+  const end=new Date('2025-04-15T23:59:59');
+  function update(){
+    const now=new Date();const diff=end-now;if(diff<0){document.getElementById('featTimer').textContent='⏱ Challenge Closed';return;}
+    const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+    document.getElementById('featTimer').textContent=`⏱ ${d}d ${h}h ${m}m ${s}s remaining`;
+  }
+  update();setInterval(update,1000);
+}
+
+/* ── LEADERBOARD ── */
+const LB_DATA=[
+  {name:'Elena Marchetti',entries:12,wins:3,pts:2840},
+  {name:'Kai Nakamura',entries:9,wins:2,pts:2210},
+  {name:'Sophie van Dijk',entries:11,wins:1,pts:1980},
+  {name:'Arjun Mehta',entries:7,wins:2,pts:1755},
+  {name:'Lena Müller',entries:8,wins:1,pts:1530},
+  {name:'Tom Ashworth',entries:6,wins:1,pts:1210},
+  {name:'Aiko Tanaka',entries:5,wins:0,pts:890},
+  {name:'Marco Rossi',entries:4,wins:0,pts:670},
+];
+function renderLeaderboard(){
+  const cols=['#c9a84c','#7b5ea7','#2a9a8a','#c94a6a','#e07830'];
+  document.getElementById('leaderboardBody').innerHTML=LB_DATA.map((p,i)=>{
+    const col=cols[p.name.charCodeAt(0)%cols.length];
+    const av=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="16" fill="${col}"/><text x="50%" y="50%" dy=".35em" text-anchor="middle" fill="#fff" font-family="Josefin Sans,sans-serif" font-size="12">${p.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</text></svg>`;
+    return`<tr><td class="lb-rank ${i<3?'top':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)}</td><td style="display:flex;align-items:center;gap:.8rem;"><img src="data:image/svg+xml;base64,${btoa(av)}" class="lb-avatar" alt="${p.name}"><span>${p.name}</span></td><td>${p.entries}</td><td>${p.wins}</td><td class="lb-score">${p.pts.toLocaleString()}</td></tr>`;
+  }).join('');
+}
+
+/* ── TOAST ── */
+function toast(msg){const t=document.getElementById('chToast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ── REVEAL ── */
+function initReveal(){
+  const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.05});
+  document.querySelectorAll('.rev:not(.in),.rev-s:not(.in)').forEach(el=>io.observe(el));
+}
+
+/* ── INIT ── */
+if(getJoined().includes('golden-hour')){const btn=document.getElementById('featJoinBtn');if(btn){btn.textContent='✓ Joined';btn.className='btn-ch solid';}}
+renderGrid();renderLeaderboard();drawFeaturedCanvas();startTimer();initReveal();
+window.addEventListener('storage',e=>{if(e.key==='luminary_state_v2')renderGrid();});
+</script>
+</body>
+</html>

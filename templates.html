@@ -135,13 +135,15 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
 </div>
 
 <div class="template-filter">
-  <button class="tf-btn active" onclick="filterTemplates('all',this)">All</button>
+  <button class="tf-btn active" onclick="filterTemplates('all',this)">All (28)</button>
   <button class="tf-btn" onclick="filterTemplates('abstract',this)">Abstract</button>
   <button class="tf-btn" onclick="filterTemplates('landscape',this)">Landscape</button>
   <button class="tf-btn" onclick="filterTemplates('portrait',this)">Portrait</button>
   <button class="tf-btn" onclick="filterTemplates('still-life',this)">Still Life</button>
   <button class="tf-btn" onclick="filterTemplates('pattern',this)">Pattern</button>
   <button class="tf-btn" onclick="filterTemplates('study',this)">Study</button>
+  <button class="tf-btn" onclick="filterTemplates('popular',this)">★ Popular</button>
+  <input id="tmplSearch" type="search" placeholder="Search templates…" style="margin-left:auto;background:rgba(240,234,214,.04);border:1px solid rgba(201,168,76,.2);color:var(--cream);padding:.4rem .9rem;font-family:Josefin Sans,sans-serif;font-size:.6rem;letter-spacing:.1em;outline:none;min-width:0;width:200px;transition:border-color .2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.2)'" oninput="searchTemplates(this.value)">
 </div>
 
 <div class="templates-grid" id="templatesGrid"></div>
@@ -193,19 +195,45 @@ const TEMPLATES=[
   {id:10,name:'Botanical Study Sheet',tag:'study',badge:'free',desc:'Three botanical specimens arranged in scientific-illustration style — great for fine detail practice.',size:'1200×1600',uses:'6,890',palette:['#f0ead6','#2a5a20','#8aba50','#d0a8b0','#c86040'],seeds:[45,46,47,48,49]},
   {id:11,name:'Pop Art Portrait',tag:'portrait',badge:'popular',desc:'High-contrast Warhol-inspired portrait grid — bold lines and flat colour blocking.',size:'1200×1200',uses:'4,218',palette:['#ffd700','#ff6600','#cc0066','#00cccc','#ffffff'],seeds:[50,51,52,53,54]},
   {id:12,name:'Geometric Pattern',tag:'pattern',badge:'advanced',desc:'A tessellating geometric tile canvas — create infinitely repeating ornamental designs.',size:'1000×1000',uses:'3,122',palette:['#1a1a2a','#c9a84c','#a87fd4','#2a9a8a','#c94a6a'],seeds:[55,56,57,58,59]},
+  {id:13,name:'Golden Ratio Spiral',tag:'study',badge:'popular',desc:'Fibonacci spiral overlay on a warm golden canvas — ideal for practising compositional harmony.',size:'1200×1200',uses:'7,840',palette:['#1a1000','#c9a84c','#e8c97e','#f5d78a','#7a6130']},
+  {id:14,name:'Ink Wash Mountains',tag:'landscape',badge:'free',desc:'A serene East Asian ink wash mountain composition — explore soft gradients and negative space.',size:'1600×900',uses:'5,230',palette:['#f0ead6','#c0b8a0','#808070','#404038','#101010']},
+  {id:15,name:'Neon Cityscape',tag:'abstract',badge:'popular',desc:'A night city skyline with glowing neon reflections — practice light, glow, and urban atmosphere.',size:'1920×1080',uses:'6,450',palette:['#02020a','#c94a6a','#4dc9b4','#a87fd4','#e07830']},
+  {id:16,name:'Vintage Poster',tag:'pattern',badge:'free',desc:'A classic 1920s travel poster layout — bold typography guides, flat colour fills, and border.',size:'1000×1400',uses:'4,120',palette:['#f5e8c0','#c94a3a','#2a5a8a','#e8c97e','#1a1a1a']},
+  {id:17,name:'Baroque Chiaroscuro',tag:'study',badge:'advanced',desc:'Deep shadow study inspired by Rembrandt — a single dramatic light source against dark ground.',size:'1200×1600',uses:'3,670',palette:['#0a0600','#3a2010','#c9a84c','#e8c090','#f5e0c0']},
+  {id:18,name:'Pastel Dream',tag:'abstract',badge:'free',desc:'Soft pastel cloud formations and colour blooms — dreamy and ethereal, perfect for relaxed practice.',size:'1400×1000',uses:'8,910',palette:['#f8e8f0','#e8d0f0','#d0e8f8','#f0e8d0','#e8f0d8']},
+  {id:19,name:'Ocean Depths',tag:'landscape',badge:'popular',desc:'An underwater scene study — bioluminescent creatures, light rays, and deep-sea atmosphere.',size:'1200×1600',uses:'5,780',palette:['#000818','#001830','#0040a0','#4dc9b4','#a0f0e8']},
+  {id:20,name:'Renaissance Drapery',tag:'study',badge:'advanced',desc:'A classical fabric and drapery study — folds, light, and texture in the tradition of the masters.',size:'900×1200',uses:'2,990',palette:['#2a1a08','#8a6040','#c8a070','#e8d8c0','#f5f0e8']},
+  {id:21,name:'Celestial Map',tag:'pattern',badge:'popular',desc:'An ornate star chart with constellation lines and celestial bodies — beautiful and meditative.',size:'1400×1400',uses:'4,650',palette:['#02020e','#1a1a4a','#c9a84c','#f5d78a','#a87fd4']},
+  {id:22,name:'Expressionist Forest',tag:'landscape',badge:'free',desc:'Twisted, emotional trees in the Expressionist style — practise gesture, distortion, and mood.',size:'1200×1600',uses:'3,440',palette:['#0a1208','#1a2a14','#4a6a30','#8aba50','#c0e090']},
+  {id:23,name:'Colour Theory Wheel',tag:'study',badge:'free',desc:'A full colour theory practice sheet — primary, secondary, tertiary with complementary guides.',size:'1200×1200',uses:'6,120',palette:['#ff0000','#ff8800','#ffff00','#00aa00','#0000ff','#8800aa']},
+  {id:24,name:'Kinetic Art Grid',tag:'abstract',badge:'advanced',desc:'Op-art inspired optical illusion grid — repeating geometric forms that seem to vibrate and move.',size:'1000×1000',uses:'2,340',palette:['#ffffff','#000000','#c9a84c','#2a9a8a','#c94a6a']},
+  {id:25,name:'Portrait in Gold',tag:'portrait',badge:'popular',desc:'A Klimt-inspired decorative portrait canvas — golden ornamental patterns meeting figurative form.',size:'900×1200',uses:'5,990',palette:['#1a1000','#c9a84c','#e8c97e','#a87fd4','#c94a6a']},
+  {id:26,name:'Weather Study',tag:'study',badge:'free',desc:'Sky and cloud studies in four quadrants — cumulus, storm, clear, and dusk conditions.',size:'1600×900',uses:'4,210',palette:['#c0d8f0','#8090d0','#404860','#f0d8b0','#e0a060']},
+  {id:27,name:'Sacred Geometry',tag:'pattern',badge:'advanced',desc:'Metatron\'s cube, the Flower of Life, and nested geometric forms — meditative complexity.',size:'1200×1200',uses:'3,870',palette:['#06060a','#c9a84c','#e8c97e','#2a9a8a','#7b5ea7']},
+  {id:28,name:'Sunrise Gradient',tag:'landscape',badge:'free',desc:'A warm, atmospheric sunrise gradient from deep indigo to gold — practice colour mixing and blending.',size:'1920×1080',uses:'9,430',palette:['#1a0a2a','#4a1a6a','#c94a6a','#e07830','#f5d78a']},
 ];
 
-let activeTag='all';
+let activeTag='all',searchQuery='';
 function filterTemplates(tag,btn){
-  activeTag=tag;document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+  activeTag=tag;searchQuery='';document.getElementById('tmplSearch').value='';
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+  renderTemplates();
+}
+function searchTemplates(q){
+  searchQuery=q.toLowerCase();
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
   renderTemplates();
 }
 
 function renderTemplates(){
-  const filtered=activeTag==='all'?TEMPLATES:TEMPLATES.filter(t=>t.tag===activeTag);
+  let filtered=TEMPLATES;
+  if(activeTag==='popular')filtered=TEMPLATES.filter(t=>t.badge==='popular');
+  else if(activeTag!=='all')filtered=TEMPLATES.filter(t=>t.tag===activeTag);
+  if(searchQuery)filtered=filtered.filter(t=>t.name.toLowerCase().includes(searchQuery)||t.tag.toLowerCase().includes(searchQuery)||t.desc.toLowerCase().includes(searchQuery));
   const grid=document.getElementById('templatesGrid');
+  if(!filtered.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:5rem 2rem;color:var(--muted);font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;">No templates found</div>`;return;}
   grid.innerHTML=filtered.map((t,i)=>`
-    <div class="template-card rev-s" style="animation-delay:${(i%4)*.08}s">
+    <div class="template-card rev-s" style="animation-delay:${(i%4)*.07}s">
       <div class="template-preview">
         <canvas id="tc-${t.id}" width="300" height="200"></canvas>
         <div class="tp-overlay">
@@ -213,7 +241,7 @@ function renderTemplates(){
         </div>
       </div>
       <div class="template-card-body">
-        <span class="tc-badge badge-${t.badge}">${t.badge==='popular'?'★ Popular':t.badge==='advanced'?'Advanced':'Free'}</span>
+        <span class="tc-badge badge-${t.badge}">${t.badge==='popular'?'★ Popular':t.badge==='advanced'?'✦ Advanced':'Free'}</span>
         <p class="tc-name">${t.name}</p>
         <p class="tc-desc">${t.desc}</p>
         <div class="tc-meta">

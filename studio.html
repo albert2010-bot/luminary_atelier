@@ -212,21 +212,32 @@ canvas{display:block;cursor:crosshair;}
 /* ══════════════ MOBILE TOOLBOX ══════════════ */
 .mobile-toolbox{display:none;position:fixed;bottom:0;left:0;right:0;z-index:400;background:rgba(8,7,12,.98);border-top:1px solid rgba(201,168,76,.14);}
 .mtb-tabs{display:flex;border-bottom:1px solid rgba(201,168,76,.1);}
-.mtb-tab{flex:1;padding:.42rem .2rem;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:none;border:none;border-top:2px solid transparent;transition:all .2s;white-space:nowrap;}
+/* Bigger touch targets — min 48px tall per WCAG / Android HIG */
+.mtb-tab{flex:1;padding:.52rem .2rem;min-height:44px;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:none;border:none;border-top:2px solid transparent;transition:all .2s;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .mtb-tab.active{color:var(--gold);border-top-color:var(--gold);}
-.mtb-panel{display:none;padding:.4rem .5rem;overflow-x:auto;}
-.mtb-panel.active{display:flex;align-items:center;gap:.3rem;}
+.mtb-panel{display:none;padding:.5rem .55rem;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.mtb-panel.active{display:flex;align-items:center;gap:.4rem;}
 .mtb-panel::-webkit-scrollbar{height:0;}
-.mtb-tool{width:52px;height:52px;flex-shrink:0;background:none;border:1px solid rgba(201,168,76,.14);color:var(--muted);font-size:1.2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:5px;transition:all .2s;gap:1px;}
-.mtb-tool span{font-size:.36rem;letter-spacing:.08em;text-transform:uppercase;color:inherit;}
-.mtb-tool:hover,.mtb-tool.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08);}
+/* Bigger tool buttons — 56px minimum touch area */
+.mtb-tool{width:56px;height:56px;flex-shrink:0;background:none;border:1px solid rgba(201,168,76,.14);color:var(--muted);font-size:1.35rem;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;transition:all .2s;gap:2px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;user-select:none;}
+.mtb-tool span{font-size:.38rem;letter-spacing:.07em;text-transform:uppercase;color:inherit;line-height:1;}
+.mtb-tool:active{transform:scale(.92);background:rgba(201,168,76,.18);}
+.mtb-tool.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.1);}
+/* Gesture hint strip — appears once, then fades */
+.gesture-hint{display:none;align-items:center;justify-content:center;gap:.5rem;padding:.3rem .7rem;background:rgba(201,168,76,.06);border-bottom:1px solid rgba(201,168,76,.1);font-family:'Josefin Sans',sans-serif;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);animation:gestureHintFade 4s ease 1s forwards;}
+@keyframes gestureHintFade{0%{opacity:1}70%{opacity:1}100%{opacity:0;height:0;padding:0;overflow:hidden;}}
+.gesture-hint .gh-icon{font-size:.85rem;}
+/* Swipe indicator dots for panel scroll */
+.mtb-scroll-indicator{display:flex;justify-content:center;gap:3px;padding:.15rem 0;background:rgba(8,7,12,.98);}
+.mtb-scroll-dot{width:4px;height:4px;border-radius:50%;background:rgba(201,168,76,.2);transition:background .2s;}
+.mtb-scroll-dot.active{background:var(--gold);}
 
 /* Properties FAB & Sheet */
-.props-fab{display:none;position:fixed;right:1rem;bottom:120px;width:48px;height:48px;background:var(--gold);color:var(--bg);font-size:1.3rem;border-radius:50%;border:none;align-items:center;justify-content:center;z-index:500;box-shadow:0 4px 20px rgba(201,168,76,.35);}
+.props-fab{display:none;position:fixed;right:1rem;bottom:176px;width:52px;height:52px;background:var(--gold);color:var(--bg);font-size:1.4rem;border-radius:50%;border:none;align-items:center;justify-content:center;z-index:500;box-shadow:0 4px 24px rgba(201,168,76,.4);-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .props-sheet{display:none;position:fixed;bottom:0;left:0;right:0;z-index:800;background:rgba(10,9,14,.99);border-top:1px solid rgba(201,168,76,.2);border-radius:16px 16px 0 0;max-height:70vh;overflow-y:auto;padding:1rem;transform:translateY(100%);transition:transform .3s var(--ease);backdrop-filter:blur(8px);}
 .props-sheet.open{transform:translateY(0);}
 .ps-handle{width:40px;height:3px;background:rgba(201,168,76,.3);border-radius:2px;margin:0 auto .8rem;}
-.ps-close{position:absolute;top:.8rem;right:.8rem;background:none;border:none;color:var(--muted);font-size:1.1rem;}
+.ps-close{position:absolute;top:.8rem;right:.8rem;background:none;border:none;color:var(--muted);font-size:1.1rem;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;}
 
 /* ══════════════ RESPONSIVE ══════════════ */
 @media(max-width:1024px){
@@ -243,6 +254,323 @@ canvas{display:block;cursor:crosshair;}
   .studio-nav-logo{display:none;}
   .canvas-area{top:calc(var(--nav) + 50px);bottom:108px;}
 }
+
+/* ══════════════════════════════════════════
+   ANIMATION SYSTEM — TIMELINE & PAGES
+══════════════════════════════════════════ */
+:root{--tl:160px;}
+
+/* Nav badge when recording/playing */
+.rec-badge{display:none;align-items:center;gap:.35rem;padding:.22rem .65rem;background:rgba(201,74,106,.15);border:1px solid rgba(201,74,106,.5);color:#f07090;font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;animation:recPulse 1s ease infinite;}
+.rec-badge.show{display:flex;}
+@keyframes recPulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* ── ANIMATE TOGGLE BTN in nav ── */
+.anim-mode-btn{background:none;border:1px solid rgba(201,168,76,.25);color:var(--muted);padding:.26rem .7rem;font-size:.57rem;letter-spacing:.14em;text-transform:uppercase;transition:all .25s;}
+.anim-mode-btn:hover,.anim-mode-btn.on{border-color:var(--violet-l);color:var(--violet-l);background:rgba(123,94,167,.12);}
+
+/* ── PAGES STRIP (top of timeline) ── */
+.pages-strip{
+  position:fixed;bottom:calc(var(--tl) + 2px);left:var(--left);right:var(--right);
+  height:32px;background:rgba(6,5,10,.98);border-top:1px solid rgba(201,168,76,.1);
+  display:none;align-items:center;gap:0;overflow-x:auto;overflow-y:hidden;z-index:395;
+  scrollbar-width:none;padding:0 .4rem;
+}
+.pages-strip::-webkit-scrollbar{display:none;}
+.pages-strip.show{display:flex;}
+.page-tab{flex-shrink:0;padding:.2rem .75rem;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);background:none;border:1px solid transparent;border-bottom:none;
+  border-radius:3px 3px 0 0;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:.35rem;}
+.page-tab:hover{color:var(--cream);background:rgba(240,234,214,.04);}
+.page-tab.active{color:var(--gold);background:rgba(15,14,20,.98);border-color:rgba(201,168,76,.2);}
+.page-tab .ptx{font-size:.78rem;}
+.page-add-btn{flex-shrink:0;width:24px;height:24px;background:none;border:1px solid rgba(201,168,76,.18);
+  color:var(--muted);font-size:.9rem;display:flex;align-items:center;justify-content:center;
+  border-radius:3px;transition:all .2s;margin-left:.3rem;}
+.page-add-btn:hover{border-color:var(--gold);color:var(--gold);}
+.page-tab .p-del{background:none;border:none;color:rgba(240,234,214,.3);font-size:.65rem;padding:0 .1rem;
+  line-height:1;transition:color .2s;}
+.page-tab .p-del:hover{color:var(--rose);}
+
+/* ── TIMELINE ── */
+.timeline{
+  position:fixed;bottom:0;left:var(--left);right:var(--right);
+  height:var(--tl);background:rgba(8,7,12,.99);
+  border-top:1px solid rgba(201,168,76,.15);
+  display:none;flex-direction:column;z-index:390;
+}
+.timeline.show{display:flex;}
+
+/* Timeline toolbar */
+.tl-toolbar{
+  height:36px;border-bottom:1px solid rgba(201,168,76,.1);
+  display:flex;align-items:center;gap:.3rem;padding:0 .8rem;flex-shrink:0;
+}
+.tl-btn{height:24px;padding:0 .55rem;background:none;border:1px solid rgba(201,168,76,.18);
+  color:var(--muted);font-size:.7rem;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;gap:.3rem;white-space:nowrap;}
+.tl-btn:hover,.tl-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.07);}
+.tl-btn.red{border-color:rgba(201,74,106,.35);color:rgba(240,112,144,.8);}
+.tl-btn.red:hover{border-color:var(--rose);color:var(--rose);background:rgba(201,74,106,.1);}
+.tl-btn.green{border-color:rgba(42,154,138,.35);color:var(--teal-l);}
+.tl-btn.green:hover,.tl-btn.green.on{background:rgba(42,154,138,.15);border-color:var(--teal);}
+.tl-sep{width:1px;height:20px;background:rgba(201,168,76,.1);margin:0 .15rem;flex-shrink:0;}
+.tl-fps-row{display:flex;align-items:center;gap:.35rem;flex-shrink:0;font-size:.52rem;color:var(--muted);letter-spacing:.1em;}
+.tl-fps-row select{background:rgba(240,234,214,.04);border:1px solid rgba(201,168,76,.18);
+  color:var(--cream);padding:.18rem .35rem;font-size:.52rem;outline:none;}
+.tl-info{margin-left:auto;font-size:.5rem;color:var(--muted);letter-spacing:.1em;flex-shrink:0;}
+
+/* Timeline frame track */
+.tl-track{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;align-items:center;
+  gap:0;padding:0 .5rem;position:relative;scrollbar-width:thin;
+  scrollbar-color:rgba(201,168,76,.2) transparent;}
+.tl-track::-webkit-scrollbar{height:5px;}
+.tl-track::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:3px;}
+
+/* Frame cell */
+.frame-cell{
+  flex-shrink:0;width:80px;height:60px;border:1px solid rgba(201,168,76,.15);
+  background:var(--surface2);position:relative;cursor:pointer;
+  transition:border-color .2s;margin-right:3px;display:flex;flex-direction:column;
+}
+.frame-cell:hover{border-color:rgba(201,168,76,.4);}
+.frame-cell.active{border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,168,76,.3);}
+.frame-cell.playing{border-color:var(--violet-l);box-shadow:0 0 6px rgba(168,127,212,.4);}
+.frame-cell canvas{width:100%;height:46px;object-fit:cover;display:block;}
+.frame-cell .fc-footer{
+  height:14px;background:rgba(6,5,10,.85);display:flex;align-items:center;
+  justify-content:space-between;padding:0 3px;flex-shrink:0;
+}
+.fc-num{font-size:.38rem;color:rgba(240,234,214,.5);letter-spacing:.06em;}
+.fc-dur{font-size:.38rem;color:rgba(201,168,76,.5);}
+.fc-del{background:none;border:none;color:rgba(240,234,214,.25);font-size:.55rem;
+  padding:0;line-height:1;transition:color .2s;}
+.fc-del:hover{color:var(--rose);}
+.frame-cell .fc-eff-badge{
+  position:absolute;top:2px;right:2px;font-size:.45rem;
+  background:rgba(123,94,167,.7);color:#fff;padding:.1rem .25rem;
+  border-radius:2px;pointer-events:none;
+}
+/* Onion skin ghost */
+.frame-cell.onion-prev{opacity:.4;border-color:rgba(201,74,106,.3);}
+.frame-cell.onion-next{opacity:.4;border-color:rgba(77,201,180,.3);}
+
+/* Add frame button in track */
+.add-frame-btn{
+  flex-shrink:0;width:50px;height:60px;border:1px dashed rgba(201,168,76,.2);
+  background:none;color:var(--muted);font-size:1.4rem;display:flex;align-items:center;
+  justify-content:center;transition:all .2s;cursor:pointer;
+}
+.add-frame-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.05);}
+
+/* Effect selector per frame */
+.frame-eff-menu{
+  position:absolute;bottom:calc(var(--tl) + 2px);background:rgba(10,9,14,.99);
+  border:1px solid rgba(201,168,76,.2);z-index:500;min-width:180px;display:none;
+  backdrop-filter:blur(10px);
+}
+.frame-eff-menu.show{display:block;}
+.fem-title{font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+  padding:.5rem .8rem;border-bottom:1px solid rgba(201,168,76,.1);}
+.fem-item{padding:.42rem .8rem;font-size:.58rem;color:rgba(240,234,214,.65);cursor:pointer;
+  transition:all .18s;display:flex;justify-content:space-between;align-items:center;}
+.fem-item:hover{color:var(--gold);background:rgba(201,168,76,.06);}
+.fem-item .fem-key{font-size:.48rem;color:rgba(240,234,214,.28);}
+
+/* Progress / scrubber */
+.tl-scrubber{
+  position:absolute;top:0;bottom:0;width:2px;background:var(--violet-l);
+  pointer-events:none;z-index:5;box-shadow:0 0 6px var(--violet-l);
+  transition:left .05s linear;
+}
+
+/* ── EXPORT MODAL ── */
+#exportModal .studio-modal{min-width:360px;}
+.export-preview{width:100%;max-height:200px;object-fit:contain;border:1px solid rgba(201,168,76,.2);display:block;margin-bottom:1rem;background:#000;}
+.export-progress{height:4px;background:rgba(201,168,76,.15);border-radius:2px;overflow:hidden;margin:.8rem 0;}
+.export-progress-fill{height:100%;background:linear-gradient(to right,var(--gold),var(--teal-l));width:0;transition:width .2s;}
+.export-status{font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:center;}
+
+/* ── PARTICLE CANVAS ── */
+#particleCanvas{position:absolute;inset:0;pointer-events:none;z-index:5;}
+
+/* ── EFFECT OVERLAY ANIMATIONS ── */
+@keyframes effectFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes effectFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes effectWipeL{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0% 0 0)}}
+@keyframes effectWipeR{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0 0 0 0%)}}
+@keyframes effectWipeU{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes effectZoomIn{from{transform:scale(0.4) var(--tw-scale);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes effectZoomOut{from{transform:scale(1.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes effectDissolve{0%{opacity:0;filter:blur(12px)}100%{opacity:1;filter:blur(0)}}
+@keyframes effectGlitch{
+  0%,100%{transform:none;filter:none}
+  15%{transform:translate(-3px,1px);filter:hue-rotate(90deg)}
+  30%{transform:translate(3px,-1px);filter:hue-rotate(-90deg)}
+  45%{transform:none;filter:none}
+}
+@keyframes effectFlash{0%{opacity:1}15%{opacity:0}30%{opacity:1}45%{opacity:.5}60%{opacity:1}}
+.canvas-wrapper.eff-fade-in{animation:effectFadeIn var(--eff-dur,0.5s) ease forwards;}
+.canvas-wrapper.eff-fade-out{animation:effectFadeOut var(--eff-dur,0.5s) ease forwards;}
+.canvas-wrapper.eff-wipe-l{animation:effectWipeL var(--eff-dur,0.5s) ease forwards;}
+.canvas-wrapper.eff-wipe-r{animation:effectWipeR var(--eff-dur,0.5s) ease forwards;}
+.canvas-wrapper.eff-wipe-u{animation:effectWipeU var(--eff-dur,0.5s) ease forwards;}
+.canvas-wrapper.eff-zoom-in{animation:effectZoomIn var(--eff-dur,0.5s) var(--ease) forwards;}
+.canvas-wrapper.eff-zoom-out{animation:effectZoomOut var(--eff-dur,0.5s) var(--ease) forwards;}
+.canvas-wrapper.eff-dissolve{animation:effectDissolve var(--eff-dur,0.6s) ease forwards;}
+.canvas-wrapper.eff-glitch{animation:effectGlitch var(--eff-dur,0.4s) ease forwards;}
+.canvas-wrapper.eff-flash{animation:effectFlash var(--eff-dur,0.4s) ease forwards;}
+.canvas-wrapper.eff-spin{animation:anim-spin var(--eff-dur,0.6s) ease forwards;}
+.canvas-wrapper.eff-bounce{animation:anim-bounce var(--eff-dur,0.8s) ease infinite;}
+.canvas-wrapper.eff-shake{animation:anim-shake var(--eff-dur,0.5s) ease infinite;}
+.canvas-wrapper.eff-pulse{animation:anim-pulse var(--eff-dur,1s) ease infinite;}
+
+/* Canvas area adjustment when timeline is shown */
+.canvas-area.tl-open{bottom:calc(var(--tl) + 34px);}
+@media(max-width:1024px){
+  :root{--tl:140px;}
+  .timeline{left:0;right:0;}
+  .pages-strip{left:0;right:0;}
+  .frame-cell{width:70px;}
+  .frame-cell canvas{height:42px;}
+}
+@media(max-width:480px){
+  :root{--tl:120px;}
+  .frame-cell{width:58px;}
+  .frame-cell canvas{height:36px;}
+  .tl-toolbar{padding:0 .4rem;gap:.2rem;}
+  .tl-btn{padding:0 .35rem;font-size:.62rem;}
+}
+
+/* ══════════════ CANVAS FAB (FLOATING ACTION BUTTON) ══════════════ */
+.canvas-fab-wrap{
+  position:fixed;
+  bottom:calc(var(--bottom) + 20px);
+  right:calc(var(--right) + 18px);
+  z-index:460;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:.5rem;
+  pointer-events:none;
+}
+.canvas-fab{
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  color:var(--bg);border:none;font-size:1.5rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 24px rgba(201,168,76,.45),0 2px 8px rgba(0,0,0,.5);
+  cursor:pointer;pointer-events:all;
+  transition:all .3s var(--ease);
+  position:relative;z-index:2;
+}
+.canvas-fab:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(201,168,76,.6);}
+.canvas-fab.open{transform:rotate(135deg);background:linear-gradient(135deg,#e07830,#c94a6a);}
+.canvas-fab-actions{
+  display:flex;flex-direction:column;gap:.35rem;align-items:flex-end;
+  pointer-events:none;
+  opacity:0;transform:translateY(16px) scale(.95);
+  transition:all .3s var(--ease);
+}
+.canvas-fab-actions.open{opacity:1;transform:none;pointer-events:all;}
+.fab-action{
+  display:flex;align-items:center;gap:.55rem;
+  background:rgba(10,9,14,.97);
+  border:1px solid rgba(201,168,76,.22);
+  color:var(--cream);padding:.55rem 1rem .55rem .7rem;
+  font-family:'Josefin Sans',sans-serif;
+  font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;
+  cursor:pointer;white-space:nowrap;
+  transition:all .2s;
+  backdrop-filter:blur(10px);
+  box-shadow:0 2px 12px rgba(0,0,0,.4);
+}
+.fab-action:hover{border-color:var(--gold);color:var(--gold);background:rgba(20,18,26,.98);}
+.fab-action .fa-icon{font-size:1rem;flex-shrink:0;width:22px;text-align:center;}
+.fab-action.danger:hover{border-color:var(--rose);color:var(--rose);}
+.fab-action.green:hover{border-color:var(--teal-l);color:var(--teal-l);}
+.fab-action.anim:hover{border-color:var(--violet-l);color:var(--violet-l);}
+.fab-divider{width:100%;height:1px;background:rgba(201,168,76,.1);margin:.1rem 0;}
+/* Stagger animations */
+.fab-action:nth-child(1){transition-delay:.05s;}
+.fab-action:nth-child(2){transition-delay:.07s;}
+.fab-action:nth-child(3){transition-delay:.09s;}
+.fab-action:nth-child(4){transition-delay:.11s;}
+.fab-action:nth-child(5){transition-delay:.13s;}
+.fab-action:nth-child(6){transition-delay:.15s;}
+
+/* Panel toggle buttons on canvas edge (tablet) */
+.panel-toggle{
+  position:fixed;z-index:420;
+  width:22px;height:60px;
+  background:rgba(10,9,14,.92);
+  border:1px solid rgba(201,168,76,.15);
+  color:var(--muted);font-size:.65rem;
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .25s;
+  writing-mode:vertical-rl;letter-spacing:.1em;
+  top:50%;transform:translateY(-50%);
+}
+.panel-toggle:hover{color:var(--gold);border-color:rgba(201,168,76,.4);}
+.panel-toggle.left-toggle{left:0;border-left:none;border-radius:0 6px 6px 0;}
+.panel-toggle.right-toggle{right:0;border-right:none;border-radius:6px 0 0 6px;}
+
+/* Tablet breakpoint — show side panels collapsed */
+@media(min-width:769px) and (max-width:1180px){
+  :root{--left:0px;--right:0px;}
+  .tool-panel{
+    transform:translateX(-100%);
+    transition:transform .3s var(--ease);
+    z-index:450;top:var(--nav);
+  }
+  .tool-panel.panel-open{transform:translateX(0);}
+  .right-panel{
+    transform:translateX(100%);
+    transition:transform .3s var(--ease);
+    z-index:450;top:var(--nav);
+  }
+  .right-panel.panel-open{transform:translateX(0);}
+  .panel-toggle{display:flex;}
+  .bottom-bar{left:0;right:0;}
+  .canvas-area{left:0;right:0;}
+  .canvas-fab-wrap{right:18px;bottom:calc(var(--bottom) + 20px);}
+}
+
+/* Mobile — FAB bigger + positioned above toolbox */
+@media(max-width:768px){
+  .canvas-fab{width:58px;height:58px;font-size:1.6rem;}
+  .canvas-fab-wrap{
+    right:14px;
+    bottom:calc(106px + 14px);
+  }
+  .fab-action{padding:.65rem 1.1rem .65rem .8rem;font-size:.62rem;}
+  .canvas-fab-wrap.tl-open-fab{bottom:calc(var(--tl) + 106px + 14px);}
+}
+
+/* Template loaded notification */
+.template-loaded-badge{
+  position:fixed;top:calc(var(--nav) + 12px);left:50%;transform:translateX(-50%);
+  background:rgba(42,154,138,.18);border:1px solid rgba(77,201,180,.4);
+  color:var(--teal-l);font-family:'Josefin Sans',sans-serif;
+  font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:.5rem 1.4rem;z-index:800;
+  animation:tlBadge 3s ease forwards;pointer-events:none;
+}
+@keyframes tlBadge{0%{opacity:0;transform:translateX(-50%) translateY(-8px)}10%{opacity:1;transform:translateX(-50%)}85%{opacity:1}100%{opacity:0;transform:translateX(-50%)}}
+
+/* Quick panel on desktop — new slide-in colour picker */
+.quick-color-fab{
+  position:fixed;
+  left:calc(var(--left) + 12px);
+  bottom:calc(var(--bottom) + 12px);
+  width:38px;height:38px;
+  border-radius:50%;
+  border:2px solid rgba(201,168,76,.4);
+  cursor:pointer;z-index:420;
+  box-shadow:0 2px 10px rgba(0,0,0,.4);
+  transition:transform .2s,box-shadow .2s;
+}
+.quick-color-fab:hover{transform:scale(1.12);box-shadow:0 4px 16px rgba(201,168,76,.35);}
 </style>
 </head>
 <body>
@@ -308,6 +636,8 @@ canvas{display:block;cursor:crosshair;}
     <button class="nav-tool-btn" onclick="undo()">↩ Undo</button>
     <button class="nav-tool-btn" onclick="redo()">↪ Redo</button>
     <span class="zoom-display" id="zoomDisp">100%</span>
+    <button class="anim-mode-btn" id="animModeBtn" onclick="toggleAnimMode()">🎬 Animate</button>
+    <span class="rec-badge" id="recBadge">● REC</span>
     <button class="nav-tool-btn" onclick="saveArtwork('png')">💾 Save</button>
   </div>
   <a href="index.html" class="nav-home">← Gallery</a>
@@ -589,6 +919,37 @@ canvas{display:block;cursor:crosshair;}
   </div>
 </div>
 
+<!-- ════════════ CANVAS FAB ════════════ -->
+<div class="canvas-fab-wrap" id="canvasFabWrap">
+  <div class="canvas-fab-actions" id="canvasFabActions">
+    <!-- Animation group -->
+    <button class="fab-action anim" onclick="fabAction('anim')"><span class="fa-icon">🎬</span>Animation Mode</button>
+    <button class="fab-action anim" onclick="fabAction('play')"><span class="fa-icon" id="fabPlayIcon">▶</span><span id="fabPlayLabel">Play Animation</span></button>
+    <button class="fab-action" onclick="fabAction('newframe')"><span class="fa-icon">➕</span>New Frame</button>
+    <button class="fab-action" onclick="fabAction('dupframe')"><span class="fa-icon">⊕</span>Duplicate Frame</button>
+    <button class="fab-action danger" onclick="fabAction('delframe')"><span class="fa-icon">🗑</span>Delete Frame</button>
+    <div class="fab-divider"></div>
+    <!-- Edit group -->
+    <button class="fab-action" onclick="fabAction('undo')"><span class="fa-icon">↩</span>Undo</button>
+    <button class="fab-action" onclick="fabAction('redo')"><span class="fa-icon">↪</span>Redo</button>
+    <button class="fab-action danger" onclick="fabAction('clear')"><span class="fa-icon">✕</span>Clear Canvas</button>
+    <div class="fab-divider"></div>
+    <!-- Save group -->
+    <button class="fab-action green" onclick="fabAction('save')"><span class="fa-icon">💾</span>Save PNG</button>
+    <button class="fab-action green" onclick="fabAction('export')"><span class="fa-icon">⬇</span>Export Video</button>
+    <div class="fab-divider"></div>
+    <!-- Tools -->
+    <button class="fab-action" onclick="fabAction('templates')"><span class="fa-icon">📋</span>Templates</button>
+    <button class="fab-action" onclick="fabAction('flip')"><span class="fa-icon">↔</span>Flip Horizontal</button>
+    <button class="fab-action" onclick="fabAction('zoom')"><span class="fa-icon">⊡</span>Fit to Screen</button>
+  </div>
+  <button class="canvas-fab" id="canvasFab" onclick="toggleCanvasFab()" title="Canvas Actions (tap to expand)">✦</button>
+</div>
+
+<!-- Panel toggles for tablet -->
+<button class="panel-toggle left-toggle" id="leftPanelToggle" onclick="toggleLeftPanel()" title="Tools">Tools</button>
+<button class="panel-toggle right-toggle" id="rightPanelToggle" onclick="toggleRightPanel()" title="Properties">Props</button>
+
 <!-- ════════════ CANVAS AREA ════════════ -->
 <div class="canvas-area" id="canvasArea">
   <div class="ruler-h" id="rulerH"></div>
@@ -596,6 +957,7 @@ canvas{display:block;cursor:crosshair;}
   <div class="canvas-wrapper" id="canvasWrapper">
     <canvas id="mainCanvas" width="900" height="650"></canvas>
     <canvas id="overlayCanvas" width="900" height="650"></canvas>
+    <canvas id="particleCanvas" width="900" height="650"></canvas>
     <input id="textInput" type="text">
   </div>
 </div>
@@ -691,6 +1053,14 @@ canvas{display:block;cursor:crosshair;}
 
 <!-- ════════════ MOBILE TOOLBOX ════════════ -->
 <div class="mobile-toolbox" id="mobileToolbox">
+  <!-- Gesture hint — shown on first visit, fades after 4s -->
+  <div class="gesture-hint" id="gestureHint" style="display:none;">
+    <span class="gh-icon">👆</span><span>Tap to select tool</span>
+    <span style="color:rgba(201,168,76,.3);margin:0 .3rem">|</span>
+    <span class="gh-icon">👉</span><span>Swipe row for more</span>
+    <span style="color:rgba(201,168,76,.3);margin:0 .3rem">|</span>
+    <span class="gh-icon">🤏</span><span>Pinch canvas to zoom</span>
+  </div>
   <div class="mtb-tabs">
     <button class="mtb-tab active" onclick="switchMtbTab('paint',this)">Paint</button>
     <button class="mtb-tab" onclick="switchMtbTab('shape',this)">Shape</button>
@@ -867,6 +1237,127 @@ canvas{display:block;cursor:crosshair;}
   </div>
 </div>
 
+<!-- ════════════ PAGES STRIP ════════════ -->
+<div class="pages-strip" id="pagesStrip">
+  <!-- built by JS -->
+</div>
+
+<!-- ════════════ TIMELINE ════════════ -->
+<div class="timeline" id="timeline">
+  <!-- Toolbar -->
+  <div class="tl-toolbar">
+    <button class="tl-btn" onclick="addFrame()" title="Add Frame (A)">＋ Frame</button>
+    <button class="tl-btn" onclick="dupFrame()" title="Duplicate">⊕ Dup</button>
+    <button class="tl-btn red" onclick="delFrame()" title="Delete">✕ Del</button>
+    <div class="tl-sep"></div>
+    <button class="tl-btn" id="playBtn" onclick="togglePlay()">▶ Play</button>
+    <button class="tl-btn" onclick="stopAnim()">⏹</button>
+    <button class="tl-btn" id="loopBtn" onclick="toggleLoop()" title="Loop">↺ Loop</button>
+    <button class="tl-btn" id="onionBtn" onclick="toggleOnion()" title="Onion Skin">◎ Onion</button>
+    <div class="tl-sep"></div>
+    <div class="tl-fps-row">
+      <span>FPS</span>
+      <select id="fpsSelect" onchange="A.fps=+this.value">
+        <option value="6">6</option>
+        <option value="8">8</option>
+        <option value="12" selected>12</option>
+        <option value="15">15</option>
+        <option value="24">24</option>
+        <option value="30">30</option>
+      </select>
+    </div>
+    <div class="tl-sep"></div>
+    <button class="tl-btn" onclick="openFrameEffMenu()" title="Transition / Effect for this frame">✨ Effect</button>
+    <div class="tl-sep"></div>
+    <button class="tl-btn green" id="recBtn" onclick="startRecord()">⏺ Record</button>
+    <button class="tl-btn green" onclick="openExport()">⬇ Export</button>
+    <div class="tl-sep"></div>
+    <button class="tl-btn" onclick="toggleAnimMode()" style="margin-left:auto;">✕ Close</button>
+    <span class="tl-info" id="tlInfo">Frame 1 / 1</span>
+  </div>
+  <!-- Frame track -->
+  <div class="tl-track" id="tlTrack">
+    <div class="tl-scrubber" id="tlScrubber" style="left:0"></div>
+    <!-- frame cells built by JS -->
+  </div>
+</div>
+
+<!-- ════════════ FRAME EFFECT MENU ════════════ -->
+<div class="frame-eff-menu" id="frameEffMenu">
+  <div class="fem-title">Transition In</div>
+  <div class="fem-item" onclick="setFrameEff('none')">None <span class="fem-key">–</span></div>
+  <div class="fem-item" onclick="setFrameEff('eff-fade-in')">Fade In <span class="fem-key">F</span></div>
+  <div class="fem-item" onclick="setFrameEff('eff-fade-out')">Fade Out</div>
+  <div class="fem-item" onclick="setFrameEff('eff-wipe-l')">Wipe Left</div>
+  <div class="fem-item" onclick="setFrameEff('eff-wipe-r')">Wipe Right</div>
+  <div class="fem-item" onclick="setFrameEff('eff-wipe-u')">Wipe Up</div>
+  <div class="fem-item" onclick="setFrameEff('eff-zoom-in')">Zoom In</div>
+  <div class="fem-item" onclick="setFrameEff('eff-zoom-out')">Zoom Out</div>
+  <div class="fem-item" onclick="setFrameEff('eff-dissolve')">Dissolve</div>
+  <div class="fem-item" onclick="setFrameEff('eff-glitch')">Glitch</div>
+  <div class="fem-item" onclick="setFrameEff('eff-flash')">Flash</div>
+  <div class="fem-item" onclick="setFrameEff('eff-spin')">Spin</div>
+  <div class="fem-item" onclick="setFrameEff('eff-bounce')">Bounce</div>
+  <div class="fem-item" onclick="setFrameEff('eff-shake')">Shake</div>
+  <div class="fem-item" onclick="setFrameEff('eff-pulse')">Pulse</div>
+  <div class="fem-title" style="margin-top:.3rem">Particle Overlay</div>
+  <div class="fem-item" onclick="setFrameParticle('none')">None</div>
+  <div class="fem-item" onclick="setFrameParticle('sparkle')">✨ Sparkle</div>
+  <div class="fem-item" onclick="setFrameParticle('fire')">🔥 Fire</div>
+  <div class="fem-item" onclick="setFrameParticle('rain')">🌧 Rain</div>
+  <div class="fem-item" onclick="setFrameParticle('snow')">❄ Snow</div>
+  <div class="fem-item" onclick="setFrameParticle('confetti')">🎊 Confetti</div>
+  <div class="fem-item" onclick="setFrameParticle('stars')">⭐ Stars</div>
+  <div class="fem-item" onclick="setFrameParticle('bubbles')">🫧 Bubbles</div>
+</div>
+
+<!-- ════════════ EXPORT MODAL ════════════ -->
+<div class="studio-modal-bg" id="exportModal">
+  <div class="studio-modal" style="min-width:380px;">
+    <h3>Export Animation</h3>
+    <canvas id="exportPreview" class="export-preview" width="360" height="202"></canvas>
+    <div class="sm-row">
+      <label>Format</label>
+      <select id="exportFormat">
+        <option value="webm">WebM Video (recommended)</option>
+        <option value="mp4">MP4 (via WebM)</option>
+        <option value="gif-frames">PNG Frames (ZIP)</option>
+      </select>
+    </div>
+    <div class="sm-row">
+      <label>Quality</label>
+      <select id="exportQuality">
+        <option value="2000000">High (2 Mbps)</option>
+        <option value="1000000" selected>Medium (1 Mbps)</option>
+        <option value="500000">Low (500 Kbps)</option>
+      </select>
+    </div>
+    <div class="sm-row">
+      <label>FPS</label>
+      <select id="exportFPS">
+        <option value="6">6 fps</option>
+        <option value="12" selected>12 fps</option>
+        <option value="24">24 fps</option>
+        <option value="30">30 fps</option>
+      </select>
+    </div>
+    <div class="sm-row">
+      <label>Scale</label>
+      <select id="exportScale">
+        <option value="0.5">50% (smaller file)</option>
+        <option value="1" selected>100% (full size)</option>
+        <option value="2">200% (large)</option>
+      </select>
+    </div>
+    <div class="export-progress"><div class="export-progress-fill" id="exportFill"></div></div>
+    <div class="export-status" id="exportStatus">Ready to export</div>
+    <div class="sm-btns" style="margin-top:.8rem">
+      <button class="sm-btn" onclick="document.getElementById('exportModal').classList.remove('open');cancelExport()">Cancel</button>
+      <button class="sm-btn primary" id="exportBtn" onclick="runExport()">Export Video</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ════════════════════════════════════════════
    STATE
@@ -969,16 +1460,32 @@ function hsvToHex(h,s,v){
   return rgbToHex(Math.round(r*255),Math.round(g*255),Math.round(b*255));
 }
 
+/* ── FIX: hexToHsv so swatches/hex input sync the wheel ── */
+function hexToHsv(hex){
+  let[r,g,b]=hexToRGB(hex);r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
+  let h=0,s=max===0?0:d/max,v=max;
+  if(d!==0){
+    if(max===r)h=((g-b)/d+6)%6;
+    else if(max===g)h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h*=60;
+  }
+  return{h,s,v};
+}
+
 function updateColorFromWheel(){
   const hex=hsvToHex(cwHueDeg,S.hsvS,S.hsvV);
-  onColorPick(hex);
+  onColorPick(hex, true);
 }
 
 function cwPickHue(e){
   const rect=cwCanvas.getBoundingClientRect();
   const src=e.touches?e.touches[0]:e;
-  const x=src.clientX-rect.left-cwCanvas.width/2;
-  const y=src.clientY-rect.top-cwCanvas.height/2;
+  const scaleX=cwCanvas.width/rect.width;
+  const scaleY=cwCanvas.height/rect.height;
+  const x=(src.clientX-rect.left)*scaleX - cwCanvas.width/2;
+  const y=(src.clientY-rect.top)*scaleY - cwCanvas.height/2;
   cwHueDeg=(Math.atan2(y,x)*180/Math.PI+360)%360;
   S.hsvH=cwHueDeg;
   drawColorWheel();drawSVBox();updateColorFromWheel();
@@ -987,8 +1494,10 @@ function cwPickHue(e){
 function svPick(e){
   const rect=svCanvas.getBoundingClientRect();
   const src=e.touches?e.touches[0]:e;
-  const x=Math.max(0,Math.min(svCanvas.width,(src.clientX-rect.left)*(svCanvas.width/rect.width)));
-  const y=Math.max(0,Math.min(svCanvas.height,(src.clientY-rect.top)*(svCanvas.height/rect.height)));
+  const scaleX=svCanvas.width/rect.width;
+  const scaleY=svCanvas.height/rect.height;
+  const x=Math.max(0,Math.min(svCanvas.width,(src.clientX-rect.left)*scaleX));
+  const y=Math.max(0,Math.min(svCanvas.height,(src.clientY-rect.top)*scaleY));
   S.hsvS=x/svCanvas.width;
   S.hsvV=1-y/svCanvas.height;
   drawSVBox();updateColorFromWheel();
@@ -997,24 +1506,31 @@ function svPick(e){
 function cwIsInRing(e){
   const rect=cwCanvas.getBoundingClientRect();
   const src=e.touches?e.touches[0]:e;
-  const x=src.clientX-rect.left-cwCanvas.width/2;
-  const y=src.clientY-rect.top-cwCanvas.height/2;
+  const scaleX=cwCanvas.width/rect.width;
+  const scaleY=cwCanvas.height/rect.height;
+  const x=(src.clientX-rect.left)*scaleX-cwCanvas.width/2;
+  const y=(src.clientY-rect.top)*scaleY-cwCanvas.height/2;
   const r=Math.hypot(x,y);
   const innerR=cwCanvas.width/2-32, outerR=cwCanvas.width/2-2;
   return r>=innerR&&r<=outerR;
 }
 
-cwCanvas.addEventListener('mousedown',e=>{cwDragging=true;cwPickHue(e);});
+/* ── FIX: only pick hue when clicking the ring, not the SV box ── */
+cwCanvas.addEventListener('mousedown',e=>{if(cwIsInRing(e)){cwDragging=true;cwPickHue(e);}});
 window.addEventListener('mousemove',e=>{if(cwDragging)cwPickHue(e);});
-window.addEventListener('mouseup',()=>{cwDragging=false;});
-cwCanvas.addEventListener('touchstart',e=>{cwDragging=true;cwPickHue(e);},{passive:true});
-window.addEventListener('touchmove',e=>{if(cwDragging)cwPickHue(e);},{passive:true});
-window.addEventListener('touchend',()=>{cwDragging=false;});
+/* ── FIX: unified mouseup resets both drag states ── */
+window.addEventListener('mouseup',()=>{cwDragging=false;svDragging=false;});
+cwCanvas.addEventListener('touchstart',e=>{if(cwIsInRing(e)){cwDragging=true;cwPickHue(e);}},{passive:true});
+window.addEventListener('touchmove',e=>{
+  if(cwDragging)cwPickHue(e);
+  if(svDragging)svPick(e);
+},{passive:true});
+/* ── FIX: touchend resets both drag states ── */
+window.addEventListener('touchend',()=>{cwDragging=false;svDragging=false;});
 
-svCanvas.addEventListener('mousedown',e=>{svDragging=true;svPick(e);});
+svCanvas.addEventListener('mousedown',e=>{e.stopPropagation();svDragging=true;svPick(e);});
 window.addEventListener('mousemove',e=>{if(svDragging)svPick(e);});
-svCanvas.addEventListener('touchstart',e=>{svDragging=true;svPick(e);},{passive:true});
-window.addEventListener('touchmove',e=>{if(svDragging)svPick(e);},{passive:true});
+svCanvas.addEventListener('touchstart',e=>{e.stopPropagation();svDragging=true;svPick(e);},{passive:true});
 
 /* ════════════════════════════════════════════
    SWATCHES
@@ -1035,8 +1551,13 @@ buildSwatches('shSwatchGrid');
 /* ════════════════════════════════════════════
    COLOUR
 ════════════════════════════════════════════ */
-function onColorPick(hex){
+function onColorPick(hex, fromWheel=false){
   S.color=hex;
+  // Sync wheel cursors when picking from swatch / hex input / eyedropper
+  if(!fromWheel){
+    const hsv=hexToHsv(hex);
+    cwHueDeg=hsv.h; S.hsvH=hsv.h; S.hsvS=hsv.s; S.hsvV=hsv.v;
+  }
   ['colorPreview','shColorPreview'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.background=hex;});
   const cp=document.getElementById('colorPicker');if(cp)cp.value=hex;
   const shcp=document.getElementById('shColorPicker');if(shcp)shcp.value=hex;
@@ -1624,7 +2145,7 @@ function saveArtwork(format){
   const link=document.createElement('a');
   link.download=`luminary-${Date.now()}.${format==='jpeg'?'jpg':'png'}`;
   link.href=out.toDataURL(format==='jpeg'?'image/jpeg':undefined,format==='jpeg'?.92:undefined);
-  link.click();toast('Saved!');
+  link.click();syncArtworkToState(prompt('Name this artwork (optional):','Untitled')||'Untitled',url);toast('Saved!');
 }
 
 /* ════════════════════════════════════════════
@@ -1782,8 +2303,693 @@ window.addEventListener('load',()=>{
     zoomFit();
     drawColorWheel();
     drawSVBox();
+    // Init animation system with one default page and one frame
+    initAnimSystem();
   },100);
 });
+
+/* ══════════════════════════════════════════════════════════════
+   ██████  ANIMATION SYSTEM  (multi-page, timeline, video export)
+══════════════════════════════════════════════════════════════ */
+
+const A = {
+  active: false,
+  pages: [],           // [{name, frames:[{data, effect, particle}]}]
+  currentPage: 0,
+  currentFrame: 0,
+  fps: 12,
+  loop: true,
+  onion: false,
+  playing: false,
+  playTimer: null,
+  _frameSaveTimer: null,
+  recording: false,
+  mediaRecorder: null,
+  recordChunks: [],
+};
+
+/* ── Init ── */
+function initAnimSystem(){
+  A.pages = [{name:'Scene 1', frames:[]}];
+  captureCurrentFrame();
+}
+
+/* ════════════ PAGE MANAGEMENT ════════════ */
+function addPage(){
+  if(!A.active)toggleAnimMode();
+  updateCurrentFrameData();
+  const idx = A.pages.length+1;
+  A.pages.push({name:'Scene '+idx, frames:[]});
+  A.currentPage = A.pages.length-1;
+  A.currentFrame = 0;
+  getActiveCtx().clearRect(0,0,mainC.width,mainC.height);
+  renderLayers();
+  captureCurrentFrame();
+  renderPageStrip();
+  renderTimeline();
+  toast('Scene '+idx+' added');
+}
+function switchPage(idx){
+  if(idx===A.currentPage)return;
+  updateCurrentFrameData();
+  A.currentPage=idx; A.currentFrame=0;
+  const frames=getFrames();
+  if(frames.length>0) loadFrame(frames[0]);
+  else {getActiveCtx().clearRect(0,0,mainC.width,mainC.height);renderLayers();}
+  renderPageStrip();renderTimeline();
+}
+function deletePage(idx){
+  if(A.pages.length===1){toast('Cannot delete the only scene');return;}
+  A.pages.splice(idx,1);
+  A.currentPage=Math.min(A.currentPage,A.pages.length-1);
+  A.currentFrame=0;
+  const frames=getFrames();
+  if(frames.length>0)loadFrame(frames[0]);
+  renderPageStrip();renderTimeline();
+  toast('Scene deleted');
+}
+function renderPageStrip(){
+  const strip=document.getElementById('pagesStrip');
+  if(!strip)return;
+  strip.innerHTML = A.pages.map((p,i)=>`
+    <button class="page-tab${i===A.currentPage?' active':''}" onclick="switchPage(${i})">
+      <span class="ptx">🎬</span> S${i+1}
+      ${A.pages.length>1?`<button class="p-del" onclick="event.stopPropagation();deletePage(${i})">✕</button>`:''}
+    </button>
+  `).join('') +
+  `<button class="page-add-btn" onclick="addPage()" title="Add scene">＋</button>`;
+}
+
+/* ════════════ FRAME HELPERS ════════════ */
+function getFrames(){ return A.pages[A.currentPage]?.frames||[]; }
+
+function captureCurrentFrame(){
+  const snap=document.createElement('canvas');
+  snap.width=mainC.width; snap.height=mainC.height;
+  const ctx=snap.getContext('2d');
+  S.layers.forEach(l=>{if(l.visible)ctx.drawImage(l.canvas,0,0);});
+  const data=snap.toDataURL();
+  const frames=getFrames();
+  if(frames[A.currentFrame]){
+    frames[A.currentFrame].data=data;
+  } else {
+    frames.push({data, effect:'none', particle:'none'});
+    A.currentFrame=frames.length-1;
+  }
+}
+function updateCurrentFrameData(){
+  const frames=getFrames();
+  if(!frames.length)return;
+  const snap=document.createElement('canvas');
+  snap.width=mainC.width; snap.height=mainC.height;
+  snap.getContext('2d').drawImage(mainC,0,0);
+  frames[A.currentFrame].data=snap.toDataURL();
+}
+function loadFrame(frame){
+  if(!frame?.data)return;
+  const img=new Image();
+  img.onload=()=>{
+    getActiveCtx().clearRect(0,0,mainC.width,mainC.height);
+    getActiveCtx().drawImage(img,0,0);
+    renderLayers();
+    if(A.onion)drawOnionSkin();
+  };
+  img.src=frame.data;
+}
+
+/* ════════════ FRAME ADD / DUPE / DEL ════════════ */
+function addFrame(){
+  if(!A.active)toggleAnimMode();
+  updateCurrentFrameData();
+  const frames=getFrames();
+  const blank=document.createElement('canvas');
+  blank.width=mainC.width; blank.height=mainC.height;
+  frames.splice(A.currentFrame+1,0,{data:blank.toDataURL(),effect:'none',particle:'none'});
+  A.currentFrame++;
+  getActiveCtx().clearRect(0,0,mainC.width,mainC.height);
+  renderLayers();
+  renderTimeline();
+  toast('Frame '+(A.currentFrame+1)+' added — draw on it!');
+}
+function dupFrame(){
+  if(!A.active)toggleAnimMode();
+  updateCurrentFrameData();
+  const frames=getFrames();
+  if(!frames.length)return;
+  const src=frames[A.currentFrame];
+  frames.splice(A.currentFrame+1,0,{data:src.data,effect:src.effect,particle:src.particle});
+  A.currentFrame++;
+  loadFrame(frames[A.currentFrame]);
+  renderTimeline();
+  toast('Frame duplicated');
+}
+function delFrame(){
+  const frames=getFrames();
+  if(frames.length<=1){toast('Cannot delete the only frame');return;}
+  frames.splice(A.currentFrame,1);
+  A.currentFrame=Math.max(0,A.currentFrame-1);
+  loadFrame(frames[A.currentFrame]);
+  renderTimeline();
+  toast('Frame deleted');
+}
+function switchFrame(idx){
+  if(idx===A.currentFrame&&!A.playing)return;
+  updateCurrentFrameData();
+  A.currentFrame=idx;
+  loadFrame(getFrames()[idx]);
+  renderTimeline();
+}
+
+/* ════════════ ONION SKIN ════════════ */
+function drawOnionSkin(){
+  const pc=document.getElementById('particleCanvas');
+  if(!pc||!A.onion)return;
+  const pctx=pc.getContext('2d');
+  pctx.clearRect(0,0,pc.width,pc.height);
+  const frames=getFrames();
+  const prev=frames[A.currentFrame-1];
+  const next=frames[A.currentFrame+1];
+  if(prev){const i=new Image();i.onload=()=>{pctx.globalAlpha=.25;pctx.drawImage(i,0,0);pctx.globalAlpha=1;};i.src=prev.data;}
+  if(next){const i=new Image();i.onload=()=>{pctx.globalAlpha=.18;pctx.drawImage(i,0,0);pctx.globalAlpha=1;};i.src=next.data;}
+}
+function toggleOnion(){
+  A.onion=!A.onion;
+  document.getElementById('onionBtn')?.classList.toggle('on',A.onion);
+  drawOnionSkin();
+  toast('Onion skin '+(A.onion?'ON':'OFF'));
+}
+function toggleLoop(){
+  A.loop=!A.loop;
+  document.getElementById('loopBtn')?.classList.toggle('on',A.loop);
+  toast('Loop '+(A.loop?'ON':'OFF'));
+}
+
+/* ════════════ PLAYBACK ════════════ */
+function togglePlay(){
+  if(A.playing)stopAnim(); else playAnim();
+}
+function playAnim(){
+  const frames=getFrames();
+  if(frames.length<2){toast('Add more frames first!');return;}
+  updateCurrentFrameData();
+  A.playing=true;
+  document.getElementById('playBtn').textContent='⏹ Stop';
+  let fi=A.currentFrame;
+  function step(){
+    if(!A.playing)return;
+    // Apply per-frame transition effect
+    const frame=frames[fi];
+    applyFrameEffect(frame);
+    loadFrame(frame);
+    A.currentFrame=fi;
+    updateTLScrubber();
+    document.getElementById('tlInfo').textContent=`Frame ${fi+1} / ${frames.length}`;
+    fi++;
+    if(fi>=frames.length){
+      if(!A.loop){stopAnim();return;}
+      fi=0;
+    }
+    A.playTimer=setTimeout(step,1000/A.fps);
+  }
+  step();
+}
+function stopAnim(){
+  A.playing=false;
+  clearTimeout(A.playTimer);A.playTimer=null;
+  document.getElementById('playBtn').textContent='▶ Play';
+  clearFrameEffect();
+  // Clear particle loop
+  if(A._particleLoop){cancelAnimationFrame(A._particleLoop);A._particleLoop=null;}
+  const pc=document.getElementById('particleCanvas');
+  if(pc)pc.getContext('2d').clearRect(0,0,pc.width,pc.height);
+}
+
+/* ════════════ TIMELINE RENDERING ════════════ */
+function renderTimeline(){
+  const track=document.getElementById('tlTrack');
+  if(!track)return;
+  const frames=getFrames();
+  let html=frames.map((f,i)=>`
+    <div class="frame-cell${i===A.currentFrame?' active':''}" id="tfc-${i}" onclick="switchFrame(${i})">
+      <canvas id="tfthumb-${i}" width="80" height="46"></canvas>
+      <div class="fc-footer">
+        <span class="fc-num">F${i+1}</span>
+        <button class="fc-del" onclick="event.stopPropagation();A.currentFrame=${i};delFrame()">✕</button>
+      </div>
+      ${f.effect&&f.effect!=='none'?`<span class="fc-eff-badge">FX</span>`:''}
+      ${f.particle&&f.particle!=='none'?`<span class="fc-eff-badge" style="right:24px;background:rgba(42,154,138,.7)">✨</span>`:''}
+    </div>
+  `).join('');
+  html += `<button class="add-frame-btn" onclick="addFrame()">＋</button>`;
+  track.innerHTML = html;
+  // Draw thumbnails
+  frames.forEach((f,i)=>{
+    const tc=document.getElementById(`tfthumb-${i}`);
+    if(!tc||!f.data)return;
+    const img=new Image();
+    img.onload=()=>{const ctx=tc.getContext('2d');ctx.clearRect(0,0,80,46);ctx.drawImage(img,0,0,80,46);};
+    img.src=f.data;
+  });
+  document.getElementById('tlInfo').textContent=`Frame ${A.currentFrame+1} / ${frames.length}`;
+  updateTLScrubber();
+  // Scroll active frame into view
+  setTimeout(()=>{document.getElementById(`tfc-${A.currentFrame}`)?.scrollIntoView({behavior:'smooth',inline:'nearest',block:'nearest'});},60);
+}
+function updateTLScrubber(){
+  const frames=getFrames();
+  const track=document.getElementById('tlTrack');
+  const scrubber=document.getElementById('tlScrubber');
+  if(!track||!scrubber||!frames.length)return;
+  const pct=frames.length>1?A.currentFrame/(frames.length-1):0;
+  const trackW=track.scrollWidth;
+  scrubber.style.left=(pct*(trackW-2))+'px';
+}
+
+/* ════════════ TOGGLE ANIMATE MODE ════════════ */
+function toggleAnimMode(){
+  A.active=!A.active;
+  const btn=document.getElementById('animModeBtn');
+  const tl=document.getElementById('timeline');
+  const ps=document.getElementById('pagesStrip');
+  const ca=document.getElementById('canvasArea');
+  if(A.active){
+    btn.classList.add('on');
+    tl.classList.add('show');
+    ps.classList.add('show');
+    ca.classList.add('tl-open');
+    const frames=getFrames();
+    if(frames.length===0)captureCurrentFrame();
+    renderPageStrip();renderTimeline();
+    toast('Animation mode ON — add frames and draw!');
+  } else {
+    stopAnim();
+    btn.classList.remove('on');
+    tl.classList.remove('show');
+    ps.classList.remove('show');
+    ca.classList.remove('tl-open');
+    toast('Animation mode OFF');
+  }
+}
+
+// Auto-save frame when user finishes a stroke in animate mode
+const _origEndDraw=endDraw;
+endDraw=function(e){
+  _origEndDraw(e);
+  if(A.active&&!A.playing){
+    clearTimeout(A._frameSaveTimer);
+    A._frameSaveTimer=setTimeout(()=>{updateCurrentFrameData();renderTimeline();},350);
+  }
+};
+
+/* ════════════ FRAME EFFECTS ════════════ */
+function openFrameEffMenu(){
+  const menu=document.getElementById('frameEffMenu');
+  menu.classList.toggle('show');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#frameEffMenu')&&!e.target.closest('[onclick*="openFrameEffMenu"]'))
+    document.getElementById('frameEffMenu')?.classList.remove('show');
+});
+function setFrameEff(cls){
+  const frames=getFrames();
+  if(!frames[A.currentFrame])return;
+  frames[A.currentFrame].effect=cls;
+  renderTimeline();
+  toast('Effect: '+cls.replace('eff-',''));
+  document.getElementById('frameEffMenu').classList.remove('show');
+}
+function setFrameParticle(type){
+  const frames=getFrames();
+  if(!frames[A.currentFrame])return;
+  frames[A.currentFrame].particle=type;
+  renderTimeline();
+  toast('Particle: '+type);
+  document.getElementById('frameEffMenu').classList.remove('show');
+}
+function applyFrameEffect(frame){
+  const w=document.getElementById('canvasWrapper');
+  clearFrameEffect();
+  if(!frame||!frame.effect||frame.effect==='none')return;
+  const spd=Math.round(1000/A.fps*0.9)+'ms';
+  w.style.setProperty('--eff-dur',spd);
+  w.classList.add(frame.effect);
+  // Start particle overlay if set
+  if(frame.particle&&frame.particle!=='none')runParticleOverlay(frame.particle);
+}
+function clearFrameEffect(){
+  const w=document.getElementById('canvasWrapper');
+  ['eff-fade-in','eff-fade-out','eff-wipe-l','eff-wipe-r','eff-wipe-u',
+   'eff-zoom-in','eff-zoom-out','eff-dissolve','eff-glitch','eff-flash',
+   'eff-spin','eff-bounce','eff-shake','eff-pulse'].forEach(c=>w.classList.remove(c));
+}
+
+/* ════════════ PARTICLE OVERLAY DURING PLAYBACK ════════════ */
+let liveParticles=[];
+function runParticleOverlay(type){
+  const pc=document.getElementById('particleCanvas');
+  if(!pc)return;
+  pc.width=mainC.width; pc.height=mainC.height;
+  const ctx=pc.getContext('2d');
+  liveParticles=[];
+
+  function spawnBatch(){
+    const n=20;
+    for(let i=0;i<n;i++){
+      const p={x:Math.random()*pc.width,y:0,life:1,type};
+      if(type==='sparkle'){p.y=Math.random()*pc.height;p.vx=(Math.random()-.5)*3;p.vy=(Math.random()-.5)*3;p.r=Math.random()*4+1;p.col=`hsl(${40+Math.random()*20},100%,${70+Math.random()*20}%)`;}
+      else if(type==='fire'){p.y=pc.height;p.vx=(Math.random()-.5)*2;p.vy=-(Math.random()*4+2);p.r=Math.random()*6+2;p.hue=Math.random()*40+10;}
+      else if(type==='rain'){p.y=-10;p.vx=0;p.vy=Math.random()*8+6;p.len=Math.random()*12+6;}
+      else if(type==='snow'){p.y=-5;p.vx=(Math.random()-.5)*.8;p.vy=Math.random()*1.5+.5;p.r=Math.random()*3+1;}
+      else if(type==='confetti'){p.y=-5;p.vx=(Math.random()-.5)*4;p.vy=Math.random()*3+2;p.r=Math.random()*5+3;p.hue=Math.random()*360;p.rot=0;p.rotV=(Math.random()-.5)*.2;}
+      else if(type==='stars'){const a=Math.random()*Math.PI*2;const sp=Math.random()*5+2;p.vx=Math.cos(a)*sp;p.vy=Math.sin(a)*sp;p.y=Math.random()*pc.height;p.r=Math.random()*2+1;p.col=`hsl(${Math.random()*360},100%,80%)`;}
+      else if(type==='bubbles'){p.y=pc.height;p.vx=(Math.random()-.5)*.5;p.vy=-(Math.random()*2+1);p.r=Math.random()*12+4;p.col=`hsla(${180+Math.random()*40},70%,75%,`;}
+      p.decay=type==='rain'?0.08:type==='confetti'?0.012:0.025;
+      liveParticles.push(p);
+    }
+  }
+  spawnBatch();
+
+  function frame(){
+    ctx.clearRect(0,0,pc.width,pc.height);
+    if(liveParticles.length<60)spawnBatch();
+    liveParticles=liveParticles.filter(p=>p.life>0);
+    liveParticles.forEach(p=>{
+      p.x+=p.vx||0; p.y+=p.vy||0; p.life-=p.decay;
+      ctx.globalAlpha=Math.max(0,p.life);
+      if(type==='sparkle'){ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
+      else if(type==='fire'){const rg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);rg.addColorStop(0,`hsl(${p.hue},100%,90%)`);rg.addColorStop(1,'transparent');ctx.fillStyle=rg;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
+      else if(type==='rain'){ctx.strokeStyle='rgba(180,220,255,.6)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+1,p.y+p.len);ctx.stroke();}
+      else if(type==='snow'){ctx.fillStyle='rgba(220,240,255,.9)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
+      else if(type==='confetti'){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot||0);ctx.fillStyle=`hsl(${p.hue},90%,65%)`;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);ctx.restore();p.rot=(p.rot||0)+(p.rotV||0);}
+      else if(type==='stars'){ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
+      else if(type==='bubbles'){ctx.strokeStyle=p.col+'.6)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();}
+      ctx.globalAlpha=1;
+    });
+    if(A.playing)A._particleLoop=requestAnimationFrame(frame);
+    else ctx.clearRect(0,0,pc.width,pc.height);
+  }
+  A._particleLoop=requestAnimationFrame(frame);
+}
+
+/* ════════════ RECORDING (live canvas capture) ════════════ */
+function startRecord(){
+  if(A.recording){stopRecord();return;}
+  const stream=mainC.captureStream(A.fps||12);
+  const bps=2000000;
+  let mime='video/webm;codecs=vp9';
+  if(!MediaRecorder.isTypeSupported(mime))mime='video/webm';
+  try{
+    A.mediaRecorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:bps});
+  }catch(e){A.mediaRecorder=new MediaRecorder(stream);}
+  A.recordChunks=[];
+  A.mediaRecorder.ondataavailable=e=>{if(e.data.size>0)A.recordChunks.push(e.data);};
+  A.mediaRecorder.onstop=()=>{
+    const blob=new Blob(A.recordChunks,{type:'video/webm'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='luminary-recording-'+Date.now()+'.webm'; a.click();
+    URL.revokeObjectURL(url);
+    toast('Recording saved!');
+    document.getElementById('recBadge').classList.remove('show');
+    document.getElementById('recBtn').textContent='⏺ Record';
+    A.recording=false;
+  };
+  A.mediaRecorder.start(100);
+  A.recording=true;
+  document.getElementById('recBadge').classList.add('show');
+  document.getElementById('recBtn').textContent='⏹ Stop Rec';
+  toast('Recording started — draw or play animation!');
+}
+function stopRecord(){
+  if(A.mediaRecorder&&A.mediaRecorder.state!=='inactive')A.mediaRecorder.stop();
+}
+
+/* ════════════ EXPORT (render-to-video) ════════════ */
+function openExport(){
+  const frames=getFrames();
+  if(!frames.length){toast('No frames to export');return;}
+  // Preview first frame
+  const prev=document.getElementById('exportPreview');
+  if(prev&&frames[0]?.data){const img=new Image();img.onload=()=>{const ctx=prev.getContext('2d');ctx.clearRect(0,0,prev.width,prev.height);ctx.drawImage(img,0,0,prev.width,prev.height);};img.src=frames[0].data;}
+  document.getElementById('exportModal').classList.add('open');
+}
+let exportCancelFlag=false;
+function cancelExport(){
+  exportCancelFlag=true;
+  document.getElementById('exportModal').classList.remove('open');
+  toast('Export cancelled');
+}
+async function runExport(){
+  const format=document.getElementById('exportFormat').value;
+  const fps=+document.getElementById('exportFPS').value||12;
+  const scale=+document.getElementById('exportScale').value||1;
+  const bitrate=+document.getElementById('exportQuality').value||1000000;
+  const btn=document.getElementById('exportBtn');
+  btn.textContent='Exporting…'; btn.disabled=true;
+  exportCancelFlag=false;
+
+  // Collect ALL frames from ALL pages
+  const allFrames=[];
+  A.pages.forEach(p=>p.frames.forEach(f=>allFrames.push(f)));
+  if(!allFrames.length){toast('No frames found');btn.textContent='Export Video';btn.disabled=false;return;}
+
+  if(format==='gif-frames'){
+    await exportAsPNGFrames(allFrames,fps,scale);
+  } else {
+    await exportAsWebM(allFrames,fps,scale,bitrate);
+  }
+  btn.textContent='Export Video'; btn.disabled=false;
+  document.getElementById('exportModal').classList.remove('open');
+}
+
+async function exportAsWebM(allFrames,fps,scale,bitrate){
+  const W=Math.round(mainC.width*scale);
+  const H=Math.round(mainC.height*scale);
+  const oc=document.createElement('canvas');oc.width=W;oc.height=H;
+  const octx=oc.getContext('2d');
+
+  let mime='video/webm;codecs=vp9';
+  if(!MediaRecorder.isTypeSupported(mime))mime='video/webm';
+  let recorder;
+  try{recorder=new MediaRecorder(oc.captureStream(fps),{mimeType:mime,videoBitsPerSecond:bitrate});}
+  catch(e){recorder=new MediaRecorder(oc.captureStream(fps));}
+
+  const chunks=[];
+  recorder.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  recorder.onstop=()=>{
+    document.getElementById('exportStatus').textContent='Saving file…';
+    const blob=new Blob(chunks,{type:'video/webm'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='luminary-animation-'+Date.now()+'.webm';a.click();
+    URL.revokeObjectURL(url);
+    toast('Video exported! ✓');
+  };
+  recorder.start();
+  const msPerFrame=Math.round(1000/fps);
+  for(let i=0;i<allFrames.length;i++){
+    if(exportCancelFlag)break;
+    const pct=Math.round((i/allFrames.length)*100);
+    document.getElementById('exportFill').style.width=pct+'%';
+    document.getElementById('exportStatus').textContent=`Rendering frame ${i+1} of ${allFrames.length}…`;
+    await new Promise(resolve=>{
+      const img=new Image();
+      img.onload=()=>{octx.clearRect(0,0,W,H);octx.drawImage(img,0,0,W,H);setTimeout(resolve,msPerFrame);};
+      img.src=allFrames[i].data;
+    });
+  }
+  recorder.stop();
+  document.getElementById('exportFill').style.width='100%';
+}
+
+async function exportAsPNGFrames(allFrames,fps,scale){
+  const W=Math.round(mainC.width*scale);
+  const H=Math.round(mainC.height*scale);
+  const oc=document.createElement('canvas');oc.width=W;oc.height=H;
+  const octx=oc.getContext('2d');
+  for(let i=0;i<allFrames.length;i++){
+    if(exportCancelFlag)break;
+    document.getElementById('exportFill').style.width=Math.round((i/allFrames.length)*100)+'%';
+    document.getElementById('exportStatus').textContent=`Saving frame ${i+1} of ${allFrames.length}…`;
+    await new Promise(resolve=>{
+      const img=new Image();
+      img.onload=()=>{
+        octx.clearRect(0,0,W,H);octx.drawImage(img,0,0,W,H);
+        const a=document.createElement('a');
+        a.href=oc.toDataURL('image/png');
+        a.download=`frame-${String(i+1).padStart(3,'0')}.png`;
+        a.click();
+        setTimeout(resolve,80);
+      };
+      img.src=allFrames[i].data;
+    });
+  }
+  toast(`${allFrames.length} frames exported!`);
+}
+
+// Stub functions that were referenced elsewhere
+function showExportMenu(){openExport();}
+function exportVideo(){openExport();}
+function exportGIF(){openExport();}
+function exportFramesPNG(){document.getElementById('exportFormat').value='gif-frames';openExport();}
+function startExport(){runExport();}
+function setExportProgress(pct,status){document.getElementById('exportFill').style.width=pct+'%';document.getElementById('exportStatus').textContent=status||'';}
+function getAllFramesAcrossPages(){const all=[];A.pages.forEach(p=>p.frames.forEach(f=>all.push(f)));return all;}
+function dupCurrentFrame(){dupFrame();}// alias
+
+/* ══════════════════════════════════════════
+   CANVAS FAB
+══════════════════════════════════════════ */
+let fabOpen=false;
+function toggleCanvasFab(){
+  fabOpen=!fabOpen;
+  document.getElementById('canvasFab').classList.toggle('open',fabOpen);
+  document.getElementById('canvasFabActions').classList.toggle('open',fabOpen);
+}
+function closeFab(){
+  fabOpen=false;
+  document.getElementById('canvasFab').classList.remove('open');
+  document.getElementById('canvasFabActions').classList.remove('open');
+}
+function fabAction(action){
+  closeFab();
+  switch(action){
+    case 'anim': toggleAnimMode(); break;
+    case 'play': togglePlay(); syncFabPlay(); break;
+    case 'newframe': addFrame(); break;
+    case 'dupframe': dupCurrentFrame(); break;
+    case 'delframe': delFrame(); break;
+    case 'undo': undo(); break;
+    case 'redo': redo(); break;
+    case 'clear': clearCanvas(); break;
+    case 'save': saveArtwork('png'); break;
+    case 'export': openExport(); break;
+    case 'templates': openTemplates(); break;
+    case 'flip': flipH(); break;
+    case 'zoom': zoomFit(); break;
+  }
+}
+function syncFabPlay(){
+  const icon=document.getElementById('fabPlayIcon');
+  const label=document.getElementById('fabPlayLabel');
+  if(!icon||!label)return;
+  if(A.playing){icon.textContent='⏸';label.textContent='Pause Animation';}
+  else{icon.textContent='▶';label.textContent='Play Animation';}
+}
+// Close FAB when clicking outside
+document.addEventListener('click',e=>{
+  if(fabOpen&&!e.target.closest('.canvas-fab-wrap'))closeFab();
+});
+// Sync FAB play state
+document.addEventListener('keydown',e=>{
+  if(e.key===' '&&!e.target.matches('input,textarea,select'))setTimeout(syncFabPlay,50);
+});
+// Update FAB position when timeline opens
+const origToggleAnimMode=typeof toggleAnimMode==='function'?toggleAnimMode:()=>{};
+// FAB position sync with timeline
+function syncFabPos(){
+  const wrap=document.getElementById('canvasFabWrap');
+  if(!wrap)return;
+  const tl=document.querySelector('.timeline.show');
+  if(tl&&window.innerWidth<=768){wrap.classList.add('tl-open-fab');}
+  else{wrap.classList.remove('tl-open-fab');}
+}
+// Panel toggles for tablet
+function toggleLeftPanel(){
+  const p=document.getElementById('toolPanel');
+  if(!p)return;
+  p.classList.toggle('panel-open');
+  document.getElementById('leftPanelToggle').style.left=p.classList.contains('panel-open')?'var(--left)':'0';
+}
+function toggleRightPanel(){
+  const p=document.querySelector('.right-panel');
+  if(!p)return;
+  p.classList.toggle('panel-open');
+}
+
+/* ══════════════════════════════════════════
+   LOAD TEMPLATE FROM sessionStorage
+   (when coming from templates.html)
+══════════════════════════════════════════ */
+(function loadTemplateFromSession(){
+  const raw=sessionStorage.getItem('luminary_template');
+  if(!raw)return;
+  sessionStorage.removeItem('luminary_template');
+  let tData;
+  try{tData=JSON.parse(raw);}catch(e){return;}
+  // Wait for canvas + layers to be ready
+  setTimeout(()=>{
+    try{
+      saveUndo();
+      const ctx=getActiveCtx();
+      ctx.clearRect(0,0,mainC.width,mainC.height);
+      // Try matching by name in internal TEMPLATES
+      const internal=typeof TEMPLATES!=='undefined'?TEMPLATES.find(t=>t.name===tData.name):null;
+      if(internal&&typeof internal.draw==='function'){
+        internal.draw(ctx,mainC.width,mainC.height);
+        renderLayers();
+        showTemplateBadge(tData.name+' template applied ✓');
+        return;
+      }
+      // Fallback: draw from palette
+      const palette=tData.palette||['#0f0e12','#c9a84c'];
+      ctx.fillStyle=palette[0];
+      ctx.fillRect(0,0,mainC.width,mainC.height);
+      palette.slice(1).forEach((c,i)=>{
+        ctx.globalAlpha=0.25+i*0.08;
+        const x=mainC.width*0.2+i*mainC.width*0.15;
+        const y=mainC.height*0.5+Math.sin(i*1.2)*mainC.height*0.2;
+        const rg=ctx.createRadialGradient(x,y,0,x,y,mainC.width*0.3);
+        rg.addColorStop(0,c);rg.addColorStop(1,'transparent');
+        ctx.fillStyle=rg;ctx.fillRect(0,0,mainC.width,mainC.height);
+      });
+      ctx.globalAlpha=1;
+      // Name watermark hint
+      ctx.fillStyle=palette[1]||'#c9a84c';
+      ctx.font=`600 ${Math.round(mainC.width*0.018)}px Josefin Sans, sans-serif`;
+      ctx.globalAlpha=0.12;
+      ctx.fillText(tData.name.toUpperCase(),mainC.width*0.04,mainC.height*0.96);
+      ctx.globalAlpha=1;
+      renderLayers();
+      showTemplateBadge(tData.name+' canvas loaded ✓');
+    }catch(err){console.warn('Template load error:',err);}
+  },380);
+})();
+
+function showTemplateBadge(msg){
+  const b=document.createElement('div');
+  b.className='template-loaded-badge';
+  b.textContent=msg;
+  document.body.appendChild(b);
+  setTimeout(()=>b.remove(),3200);
+}
+
+/* ── GESTURE HINTS (show once on first mobile visit) ── */
+(function(){
+  if(window.innerWidth<=1024 && !localStorage.getItem('lum_gesture_seen')){
+    const hint=document.getElementById('gestureHint');
+    if(hint){hint.style.display='flex';localStorage.setItem('lum_gesture_seen','1');}
+  }
+})();
+/* ── PINCH-TO-ZOOM (mobile canvas) ── */
+(function(){
+  let lastDist=0;
+  const cv=document.getElementById('mainCanvas');
+  if(!cv)return;
+  cv.addEventListener('touchstart',function(e){
+    if(e.touches.length===2){
+      lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    }
+  },{passive:true});
+  cv.addEventListener('touchmove',function(e){
+    if(e.touches.length===2){
+      e.preventDefault();
+      const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      const delta=dist-lastDist;lastDist=dist;
+      if(Math.abs(delta)>2){if(delta>0)zoomIn();else zoomOut();}
+    }
+  },{passive:false});
+})();
+
 </script>
 </body>
 </html>

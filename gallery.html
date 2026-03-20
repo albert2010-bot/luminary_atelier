@@ -131,7 +131,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
     <li><a href="gallery.html" class="active">Gallery</a></li>
     <li><a href="learn.html">Learn</a></li>
     <li><a href="about.html">About</a></li>
-    <li><a href="howto.html">How to Use</a></li>
+    <li><a href="howto.html">How to Use</a><a href="challenges.html">Challenges</a><a href="submit.html">Submit</a><a href="profile.html">Profile</a></li>
     <li><a href="contact.html">Contact</a></li>
     <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
   </ul>
@@ -311,6 +311,28 @@ document.addEventListener('keydown',e=>{
 });
 
 renderGallery();
+
+/* ── SHARED STATE INTEGRATION ── */
+const _LS='luminary_state_v2';
+function _getState(){try{return JSON.parse(localStorage.getItem(_LS))||{};}catch{return{};}}
+function _setState(p){const s=Object.assign({},_getState(),p);localStorage.setItem(_LS,JSON.stringify(s));return s;}
+function toggleLike_shared(id,el){
+  let likes=_getState().likes||[];
+  if(likes.includes(id+''))likes=likes.filter(l=>l!==id+'');
+  else{likes=[...likes,id+''];_setState({likes});if(el)el.textContent='❤️';}
+  _setState({likes});
+  if(el)el.textContent=likes.includes(id+'')?'❤️':'♡';
+}
+function bookmark_shared(item){
+  let bm=_getState().bookmarks||[];
+  const exists=bm.find(b=>b.id===item.id+'');
+  if(!exists){bm=[{id:item.id+'',name:item.title||'Artwork',artist:item.artist||'',thumb:item.src||'',movement:item.movement||''},...bm].slice(0,40);_setState({bookmarks:bm});}
+  // toast
+  let t=document.getElementById('sharedToast');
+  if(!t){t=document.createElement('div');t.id='sharedToast';t.style.cssText='position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(15,14,18,.98);border:1px solid rgba(42,154,138,.3);color:var(--teal-l);font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;padding:.5rem 1.4rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;';document.body.appendChild(t);}
+  t.textContent=exists?'Already bookmarked':'Bookmarked ✓';t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2000);
+}
+
 </script>
 </body>
 </html>
