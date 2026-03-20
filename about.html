@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>About — Luminary Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--surface:#0f0e12;--surface2:#18161e;--surface3:#201d28;--gold:#c9a84c;--gold-l:#e8c97e;--gold-d:#7a6130;--cream:#f0ead6;--muted:#5a5040;--violet:#7b5ea7;--violet-l:#a87fd4;--teal:#2a9a8a;--teal-l:#4dc9b4;--nav:58px;--ease:cubic-bezier(.25,.46,.45,.94);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}body{background:var(--bg);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.8;overflow-x:hidden;}a{text-decoration:none;color:inherit;}button{cursor:pointer;font-family:inherit;}img{display:block;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:2px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes revealScale{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:none}}
+@keyframes revealLeft{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
+@keyframes revealRight{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+.rev{opacity:0}.rev.in{animation:fadeUp .75s var(--ease) forwards;}
+.rev-s{opacity:0}.rev-s.in{animation:revealScale .65s var(--ease) forwards;}
+.rev-l{opacity:0}.rev-l.in{animation:revealLeft .7s var(--ease) forwards;}
+.rev-r{opacity:0}.rev-r.in{animation:revealRight .7s var(--ease) forwards;}
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.4s}.d5{animation-delay:.5s}.d6{animation-delay:.6s}
+.section-label{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.45em;text-transform:uppercase;color:var(--gold);opacity:.9;}
+.gold-line{width:48px;height:1px;background:linear-gradient(to right,var(--gold),transparent);margin:1rem 0;}
+.btn{display:inline-flex;align-items:center;font-family:'Josefin Sans',sans-serif;font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;padding:.85rem 2.2rem;border:1px solid var(--gold);color:var(--gold);background:transparent;transition:all .3s;white-space:nowrap;cursor:pointer;}.btn:hover{background:var(--gold);color:var(--bg);}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 3rem;background:rgba(6,6,10,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,168,76,.12);}
+.nav-logo{font-family:'Playfair Display SC',serif;font-size:.88rem;letter-spacing:.38em;color:var(--gold);}.nav-logo span{color:var(--cream);}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center;}
+.nav-links a{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(240,234,214,.5);transition:color .25s;position:relative;padding-bottom:3px;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.nav-cta{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;padding:.5rem 1.2rem;border:1px solid rgba(201,168,76,.4);color:var(--gold);transition:all .3s;background:rgba(201,168,76,.06);}.nav-cta:hover{background:var(--gold);color:var(--bg);}
+.nav-hamburger{display:none;flex-direction:column;justify-content:space-between;width:26px;height:18px;background:none;border:none;cursor:pointer;padding:0;}
+.nav-hamburger span{display:block;width:100%;height:2px;background:var(--gold);border-radius:1px;transition:all .3s;}
+.nav-hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg);}.nav-hamburger.open span:nth-child(2){opacity:0;}.nav-hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(6,6,10,.7);z-index:490;backdrop-filter:blur(2px);}.nav-overlay.open{display:block;}
+.nav-studio-mobile{display:none;}
+
+/* HERO */
+.about-hero{min-height:68vh;display:flex;align-items:flex-end;padding:0 4rem 6rem;position:relative;overflow:hidden;}
+.about-hero-bg{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,6,10,.2),rgba(6,6,10,.55) 40%,rgba(6,6,10,.98) 100%),url('https://picsum.photos/seed/about-lum/1600/900') center/cover no-repeat;filter:saturate(.5);}
+.about-hero .inner{position:relative;z-index:2;max-width:720px;}
+.about-hero h1{font-family:'Playfair Display SC',serif;font-size:clamp(2.5rem,5vw,4.5rem);color:var(--cream);line-height:1.15;animation:fadeUp .9s ease .15s forwards;opacity:0;}
+.about-hero .tagline{font-size:1.1rem;font-style:italic;color:rgba(240,234,214,.5);margin-top:1rem;animation:fadeUp .9s ease .3s forwards;opacity:0;}
+
+/* MISSION */
+.about-mission{padding:8rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:7rem;align-items:center;}
+.mission-text h2{font-family:'Playfair Display SC',serif;font-size:2.2rem;font-weight:400;color:var(--cream);margin-bottom:1.4rem;}
+.mission-text p{font-size:1rem;color:rgba(240,234,214,.65);line-height:1.9;margin-bottom:1.3rem;}
+.mission-text p strong{color:var(--gold);font-weight:600;}
+.mission-visual{position:relative;}
+.mission-visual img{width:100%;display:block;filter:brightness(.65) saturate(.75);}
+.mission-frame{position:absolute;top:1.5rem;left:1.5rem;right:-1.5rem;bottom:-1.5rem;border:1px solid rgba(201,168,76,.2);pointer-events:none;}
+
+/* VALUES */
+.values-section{padding:7rem 4rem;background:var(--surface);}
+.values-section h2{font-family:'Playfair Display SC',serif;font-size:2.2rem;font-weight:400;color:var(--cream);margin-bottom:4rem;}
+.values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;}
+.value-card{padding:2.5rem 2rem;border-top:2px solid rgba(201,168,76,.15);transition:border-color .3s;}
+.value-card:hover{border-top-color:var(--gold);}
+.value-num{font-family:'Playfair Display SC',serif;font-size:3rem;color:rgba(201,168,76,.12);line-height:1;margin-bottom:1rem;}
+.value-card h3{font-family:'Playfair Display SC',serif;font-size:1.15rem;color:var(--gold);margin-bottom:.6rem;}
+.value-card p{font-size:.9rem;color:rgba(240,234,214,.45);line-height:1.75;}
+
+/* TEAM */
+.team-section{padding:7rem 4rem;}
+.team-section h2{font-family:'Playfair Display SC',serif;font-size:2.2rem;font-weight:400;color:var(--cream);margin-bottom:4rem;}
+.team-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.4rem;}
+.team-card{text-align:center;cursor:pointer;}
+.team-card img{width:100%;aspect-ratio:1;object-fit:cover;filter:brightness(.7) saturate(.6) grayscale(.3);margin-bottom:1rem;transition:filter .4s,transform .4s;}
+.team-card:hover img{filter:brightness(.9) saturate(.9) grayscale(0);transform:scale(1.03);}
+.team-name{font-family:'Playfair Display SC',serif;font-size:.95rem;color:var(--cream);margin-bottom:.18rem;}
+.team-role{font-family:'Josefin Sans',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+
+/* TIMELINE */
+.timeline-section{padding:7rem 4rem;background:var(--surface);}
+.timeline-section h2{font-family:'Playfair Display SC',serif;font-size:2.2rem;font-weight:400;color:var(--cream);margin-bottom:4rem;}
+.timeline{display:grid;grid-template-columns:repeat(2,1fr);}
+.tl-item{padding:2.5rem;border:1px solid rgba(201,168,76,.07);position:relative;transition:background .3s;}
+.tl-item:hover{background:rgba(201,168,76,.03);}
+.tl-year{font-family:'Playfair Display SC',serif;font-size:2.5rem;color:rgba(201,168,76,.18);line-height:1;margin-bottom:.7rem;}
+.tl-item h3{font-family:'Playfair Display SC',serif;font-size:1rem;color:var(--cream);margin-bottom:.4rem;}
+.tl-item p{font-size:.88rem;color:rgba(240,234,214,.42);line-height:1.7;}
+
+/* QUOTE */
+.about-quote{padding:7rem 4rem;text-align:center;background:linear-gradient(135deg,rgba(123,94,167,.06),rgba(42,154,138,.04));}
+.about-quote blockquote{font-family:'Playfair Display SC',serif;font-size:clamp(1.3rem,2.5vw,1.9rem);color:var(--cream);max-width:760px;margin:0 auto 1.5rem;line-height:1.5;}
+.about-quote cite{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);}
+
+footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5rem 4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:'Playfair Display SC',serif;font-size:1rem;letter-spacing:.38em;color:var(--gold);}
+.footer-links-row{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.footer-links-row a{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .25s;}.footer-links-row a:hover{color:var(--gold);}
+.footer-copy{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:#2a2420;}
+
+@media(max-width:1024px){
+  nav{padding:0 1.8rem;}.nav-cta{display:none;}.nav-hamburger{display:flex;}.nav-studio-mobile{display:block;}
+  .nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:rgba(10,9,14,.98);backdrop-filter:blur(16px);flex-direction:column;padding:5rem 2rem 2rem;gap:0;border-left:1px solid rgba(201,168,76,.15);z-index:495;transition:right .35s var(--ease);align-items:flex-start;}.nav-links.open{right:0;}
+  .nav-links li{width:100%;border-bottom:1px solid rgba(201,168,76,.08);}.nav-links a{display:block;padding:.9rem 0;}
+  .about-mission{grid-template-columns:1fr;gap:3rem;padding:5rem 2rem;}.mission-visual{display:none;}
+  .values-section,.team-section,.timeline-section{padding:5rem 2rem;}.about-hero{padding:0 2rem 4rem;}
+  .values-grid{grid-template-columns:1fr 1fr;}.team-grid{grid-template-columns:repeat(3,1fr);}
+  .timeline{grid-template-columns:1fr;}.about-quote{padding:5rem 2rem;}
+}
+@media(max-width:640px){
+  :root{--nav:52px;}nav{padding:0 1.2rem;}
+  .about-hero{padding:0 1.2rem 3rem;}.about-mission,.values-section,.team-section,.timeline-section,.about-quote{padding:3.5rem 1.2rem;}
+  .values-grid{grid-template-columns:1fr;}.team-grid{grid-template-columns:1fr 1fr;}
+  footer{padding:2rem 1.2rem;flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">Luminary <span>Atelier</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li><li><a href="artists.html">Artists</a></li><li><a href="gallery.html">Gallery</a></li>
+    <li><a href="learn.html">Learn</a></li><li><a href="about.html" class="active">About</a></li>
+    <li><a href="howto.html">How to Use</a></li><li><a href="contact.html">Contact</a></li>
+    <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
+  </ul>
+  <a href="studio.html" class="nav-cta">Open Studio →</a>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+
+<section class="about-hero">
+  <div class="about-hero-bg"></div>
+  <div class="inner">
+    <p class="section-label">Our Story</p>
+    <div class="gold-line"></div>
+    <h1>Art Is a Way<br>of Knowing</h1>
+    <p class="tagline">Luminary Atelier was founded on a single conviction: that art history deserves to be experienced, not merely studied.</p>
+  </div>
+</section>
+
+<section class="about-mission">
+  <div class="mission-text rev-l">
+    <p class="section-label">Our Mission</p>
+    <div class="gold-line"></div>
+    <h2>Bringing Masterworks to Everyone</h2>
+    <p>Luminary Atelier began as a personal archive and grew into something larger — a curated digital gallery dedicated to presenting the greatest works in art history with the depth they deserve.</p>
+    <p>We believe that <strong>understanding an artwork</strong> — its context, its creator's life, the movement it came from — transforms how you see it. A painting is not simply an image; it is a moment of history made visible.</p>
+    <p>From <strong>Leonardo da Vinci's</strong> notebooks to <strong>Yayoi Kusama's</strong> infinite mirrors, our collection spans five centuries, presented with the care of a private library and the openness of the web.</p>
+    <a href="gallery.html" class="btn" style="margin-top:1rem;">Enter the Gallery</a>
+  </div>
+  <div class="mission-visual rev-r">
+    <img src="https://picsum.photos/seed/about-mis-lum/600/700" alt="Gallery">
+    <div class="mission-frame"></div>
+  </div>
+</section>
+
+<section class="values-section">
+  <p class="section-label rev">What We Stand For</p>
+  <div class="gold-line"></div>
+  <h2 class="rev d1">Our Values</h2>
+  <div class="values-grid">
+    <div class="value-card rev-s"><div class="value-num">01</div><h3>Historical Depth</h3><p>Every artist and work is presented in full context — biographical, historical, and cultural. Art without context is decoration; art with context is understanding.</p></div>
+    <div class="value-card rev-s d1"><div class="value-num">02</div><h3>Radical Accessibility</h3><p>The greatest art in the world belongs to everyone. Luminary Atelier is free, open, and designed to welcome a first-time visitor and a seasoned scholar equally.</p></div>
+    <div class="value-card rev-s d2"><div class="value-num">03</div><h3>Creative Participation</h3><p>Art should inspire making. Our Studio invites every visitor to pick up a brush — because understanding creativity begins with practising it yourself.</p></div>
+    <div class="value-card rev-s"><div class="value-num">04</div><h3>Curation with Purpose</h3><p>We do not try to include everything. We choose what is genuinely significant — works that changed the course of history or deserve to be far better known.</p></div>
+    <div class="value-card rev-s d1"><div class="value-num">05</div><h3>Beauty as Standard</h3><p>A gallery that presents art badly does it a disservice. We hold our design to the same standard as the works we present — because presentation shapes perception.</p></div>
+    <div class="value-card rev-s d2"><div class="value-num">06</div><h3>Ongoing Discovery</h3><p>The collection grows. New artists, movements, and perspectives are added regularly — because art history is never finished being written.</p></div>
+  </div>
+</section>
+
+<section class="team-section">
+  <p class="section-label rev">Behind the Gallery</p>
+  <div class="gold-line"></div>
+  <h2 class="rev d1">The Curatorial Team</h2>
+  <div class="team-grid">
+    <div class="team-card rev-s"><img src="https://picsum.photos/seed/team1-lum/300/300" alt="Eleanor"><p class="team-name">Eleanor Voss</p><p class="team-role">Gallery Director</p></div>
+    <div class="team-card rev-s d1"><img src="https://picsum.photos/seed/team2-lum/300/300" alt="Marcus"><p class="team-name">Marcus Theron</p><p class="team-role">Head Curator</p></div>
+    <div class="team-card rev-s d2"><img src="https://picsum.photos/seed/team3-lum/300/300" alt="Isabelle"><p class="team-name">Isabelle Demont</p><p class="team-role">Art Historian</p></div>
+    <div class="team-card rev-s d3"><img src="https://picsum.photos/seed/team4-lum/300/300" alt="Kai"><p class="team-name">Kai Nakamura</p><p class="team-role">Digital Director</p></div>
+    <div class="team-card rev-s d4"><img src="https://picsum.photos/seed/team5-lum/300/300" alt="Sofia"><p class="team-name">Sofia Reyes</p><p class="team-role">Education Lead</p></div>
+  </div>
+</section>
+
+<section class="timeline-section">
+  <p class="section-label rev">Our History</p>
+  <div class="gold-line"></div>
+  <h2 class="rev d1">The Gallery's Story</h2>
+  <div class="timeline">
+    <div class="tl-item rev-s"><div class="tl-year">2019</div><h3>Founded</h3><p>Luminary Atelier began as a personal archive of curated notes, images, and essays about artworks that had profoundly shaped one person's understanding of the world.</p></div>
+    <div class="tl-item rev-s d1"><div class="tl-year">2020</div><h3>First Public Collection</h3><p>During lockdown, the archive went online. Five artists, thirty works — shared as a resource for those seeking connection through culture in difficult times.</p></div>
+    <div class="tl-item rev-s"><div class="tl-year">2021</div><h3>Expanded to 10 Artists</h3><p>The collection grew to include major 20th-century movements. A curatorial team formed, and the gallery's voice — scholarly but accessible — took shape.</p></div>
+    <div class="tl-item rev-s d1"><div class="tl-year">2022</div><h3>Interactive Studio Launched</h3><p>The Creative Studio was added — enabling visitors to draw and paint in the gallery. Over 50,000 artworks have been created by visitors since launch.</p></div>
+    <div class="tl-item rev-s"><div class="tl-year">2023</div><h3>Movement Encyclopaedia</h3><p>A full encyclopaedia of art movements published — tracing Western art from the Renaissance to the present day in accessible, narrative form.</p></div>
+    <div class="tl-item rev-s d1"><div class="tl-year">2024</div><h3>Learn Platform</h3><p>Structured lessons and tutorials were added, covering technique, art history, and digital art — making Luminary Atelier a complete art education platform.</p></div>
+    <div class="tl-item rev-s"><div class="tl-year">2025</div><h3>Global Expansion</h3><p>The collection expanded beyond Western art — African, Asian, and Indigenous art movements joined the gallery. The team grew to five curators.</p></div>
+    <div class="tl-item rev-s d1"><div class="tl-year">Today</div><h3>120+ Works, 18 Artists</h3><p>Luminary Atelier is now a complete art platform: gallery, studio, learning hub, and community — continuing to grow with purpose and care.</p></div>
+  </div>
+</section>
+
+<section class="about-quote">
+  <div class="gold-line center"></div>
+  <blockquote class="rev">"The purpose of art is washing the dust of daily life off our souls."</blockquote>
+  <cite class="rev d2">— Pablo Picasso</cite>
+</section>
+
+<footer>
+  <div class="footer-logo">Luminary Atelier</div>
+  <div class="footer-links-row"><a href="index.html">Home</a><a href="gallery.html">Gallery</a><a href="studio.html">Studio</a><a href="contact.html">Contact</a></div>
+  <p class="footer-copy">© 2025 Luminary Atelier</p>
+</footer>
+
+<script>
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navOverlay').classList.toggle('open');}
+function closeNav(){['navLinks','navHamburger','navOverlay'].forEach(id=>document.getElementById(id).classList.remove('open'));}
+const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rev,.rev-s,.rev-l,.rev-r').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

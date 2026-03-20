@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Learn — Luminary Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--surface:#0f0e12;--surface2:#18161e;--surface3:#201d28;--gold:#c9a84c;--gold-l:#e8c97e;--gold-d:#7a6130;--cream:#f0ead6;--muted:#5a5040;--violet:#7b5ea7;--violet-l:#a87fd4;--teal:#2a9a8a;--teal-l:#4dc9b4;--rose:#c94a6a;--nav:58px;--ease:cubic-bezier(.25,.46,.45,.94);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}body{background:var(--bg);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.8;overflow-x:hidden;}a{text-decoration:none;color:inherit;}button{cursor:pointer;font-family:inherit;}img{display:block;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:2px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes revealScale{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:none}}
+@keyframes progressFill{from{width:0}to{width:var(--pct)}}
+@keyframes badgePop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+
+.rev{opacity:0}.rev.in{animation:fadeUp .7s var(--ease) forwards;}
+.rev-s{opacity:0}.rev-s.in{animation:revealScale .65s var(--ease) forwards;}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}.d4{animation-delay:.32s}.d5{animation-delay:.4s}.d6{animation-delay:.48s}
+
+.section-label{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.45em;text-transform:uppercase;color:var(--gold);opacity:.9;}
+.gold-line{width:48px;height:1px;background:linear-gradient(to right,var(--gold),transparent);margin:1rem 0;}
+.btn{display:inline-flex;align-items:center;font-family:'Josefin Sans',sans-serif;font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;padding:.85rem 2.2rem;border:1px solid var(--gold);color:var(--gold);background:transparent;transition:all .3s;white-space:nowrap;cursor:pointer;}.btn:hover{background:var(--gold);color:var(--bg);}
+.btn-solid{background:var(--gold);color:var(--bg);}.btn-solid:hover{background:var(--gold-l);border-color:var(--gold-l);}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 3rem;background:rgba(6,6,10,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,168,76,.12);}
+.nav-logo{font-family:'Playfair Display SC',serif;font-size:.88rem;letter-spacing:.38em;color:var(--gold);}.nav-logo span{color:var(--cream);}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center;}
+.nav-links a{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(240,234,214,.5);transition:color .25s;position:relative;padding-bottom:3px;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.nav-cta{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;padding:.5rem 1.2rem;border:1px solid rgba(201,168,76,.4);color:var(--gold);transition:all .3s;background:rgba(201,168,76,.06);}.nav-cta:hover{background:var(--gold);color:var(--bg);}
+.nav-hamburger{display:none;flex-direction:column;justify-content:space-between;width:26px;height:18px;background:none;border:none;cursor:pointer;padding:0;}
+.nav-hamburger span{display:block;width:100%;height:2px;background:var(--gold);border-radius:1px;transition:all .3s;}
+.nav-hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg);}.nav-hamburger.open span:nth-child(2){opacity:0;}.nav-hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(6,6,10,.7);z-index:490;backdrop-filter:blur(2px);}.nav-overlay.open{display:block;}
+.nav-studio-mobile{display:none;}
+
+.page-hero{padding:12rem 4rem 5rem;position:relative;overflow:hidden;}
+.page-hero::after{content:'';position:absolute;bottom:0;left:4rem;right:4rem;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);}
+.page-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 75% 30%,rgba(42,154,138,.06) 0%,transparent 60%);}
+.page-hero h1{font-family:'Playfair Display SC',serif;font-size:clamp(2.5rem,5.5vw,5rem);font-weight:400;color:var(--cream);position:relative;z-index:2;animation:fadeUp .9s ease forwards;}
+.page-hero p.sub{font-size:1.05rem;font-style:italic;color:rgba(240,234,214,.45);max-width:520px;margin-top:.9rem;position:relative;z-index:2;animation:fadeUp .9s ease .2s forwards;opacity:0;}
+
+/* TABS */
+.learn-tabs{display:flex;gap:0;border-bottom:1px solid rgba(201,168,76,.1);padding:0 4rem;background:var(--surface);position:sticky;top:var(--nav);z-index:100;overflow-x:auto;scrollbar-width:none;}
+.learn-tabs::-webkit-scrollbar{display:none;}
+.learn-tab{font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;padding:1rem 1.5rem;border-bottom:2px solid transparent;color:var(--muted);background:none;border-top:none;border-left:none;border-right:none;transition:all .25s;white-space:nowrap;}
+.learn-tab.active,.learn-tab:hover{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* FEATURED PATH */
+.learning-path{padding:5rem 4rem;background:var(--surface);display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:center;}
+.path-text h2{font-family:'Playfair Display SC',serif;font-size:2rem;color:var(--cream);margin-bottom:1rem;}
+.path-text p{color:rgba(240,234,214,.6);line-height:1.85;margin-bottom:1.5rem;}
+.path-steps{display:flex;flex-direction:column;gap:.8rem;}
+.path-step{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.1);transition:border-color .3s;}
+.path-step:hover{border-color:rgba(201,168,76,.3);}
+.path-step-num{font-family:'Playfair Display SC',serif;font-size:1.6rem;color:rgba(201,168,76,.2);line-height:1;flex-shrink:0;width:36px;}
+.path-step-info h4{font-family:'Playfair Display SC',serif;font-size:.95rem;color:var(--cream);margin-bottom:.15rem;}
+.path-step-info p{font-family:'Josefin Sans',sans-serif;font-size:.54rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
+.path-progress{margin-top:1.5rem;}
+.progress-bar-wrap{height:3px;background:rgba(201,168,76,.12);border-radius:2px;margin-top:.4rem;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(to right,var(--gold),var(--teal-l));width:0;transition:width 1.2s var(--ease);}
+
+/* LESSONS */
+.lessons-header{padding:3rem 4rem 1.5rem;display:flex;align-items:center;justify-content:space-between;}
+.lessons-header h2{font-family:'Playfair Display SC',serif;font-size:2rem;color:var(--cream);}
+.lessons-grid{padding:0 4rem 5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+.lesson-card{background:var(--surface2);border:1px solid rgba(201,168,76,.1);overflow:hidden;transition:border-color .3s,transform .3s;cursor:pointer;position:relative;}
+.lesson-card:hover{border-color:rgba(201,168,76,.35);transform:translateY(-4px);}
+.lesson-thumb{width:100%;height:180px;object-fit:cover;filter:brightness(.6) saturate(.7);transition:filter .4s,transform .5s var(--ease);}
+.lesson-card:hover .lesson-thumb{filter:brightness(.8) saturate(.9);transform:scale(1.03);}
+.lesson-thumb-wrap{overflow:hidden;}
+.lesson-body{padding:1.5rem;}
+.lesson-tag-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;}
+.lesson-tag{font-family:'Josefin Sans',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--violet-l);}
+.lesson-level-badge{font-family:'Josefin Sans',sans-serif;font-size:.48rem;letter-spacing:.16em;text-transform:uppercase;padding:.18rem .5rem;border:1px solid;border-radius:20px;}
+.level-beginner{color:var(--teal-l);border-color:rgba(77,201,180,.3);}
+.level-intermediate{color:var(--gold);border-color:rgba(201,168,76,.3);}
+.level-advanced{color:var(--rose);border-color:rgba(201,74,106,.3);}
+.lesson-title{font-family:'Playfair Display SC',serif;font-size:1.05rem;color:var(--cream);margin-bottom:.5rem;line-height:1.3;}
+.lesson-desc{font-size:.88rem;color:rgba(240,234,214,.45);line-height:1.65;margin-bottom:1rem;}
+.lesson-meta{display:flex;gap:1rem;font-family:'Josefin Sans',sans-serif;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.lesson-card .start-btn{position:absolute;bottom:1.5rem;right:1.5rem;font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);opacity:0;transform:translateX(8px);transition:all .3s;}
+.lesson-card:hover .start-btn{opacity:1;transform:none;}
+
+/* STAT STRIP */
+.learn-stats{background:var(--surface2);border-top:1px solid rgba(201,168,76,.1);border-bottom:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(4,1fr);}
+.ls-item{padding:2.2rem;text-align:center;border-right:1px solid rgba(201,168,76,.08);}
+.ls-item:last-child{border-right:none;}
+.ls-item h3{font-family:'Playfair Display SC',serif;font-size:2.4rem;color:var(--gold);line-height:1;}
+.ls-item p{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;}
+
+/* LESSON MODAL */
+.lesson-modal{position:fixed;inset:0;background:rgba(6,6,10,.92);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(10px);}
+.lesson-modal.open{opacity:1;pointer-events:all;}
+.lm-box{background:var(--surface);max-width:700px;width:92%;max-height:88vh;overflow-y:auto;position:relative;}
+.lm-img{width:100%;height:220px;object-fit:cover;filter:brightness(.65);}
+.lm-body{padding:2.2rem;}
+.lm-tag-row{display:flex;gap:.6rem;align-items:center;margin-bottom:.8rem;}
+.lm-title{font-family:'Playfair Display SC',serif;font-size:1.8rem;color:var(--cream);margin-bottom:.5rem;}
+.lm-meta{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;}
+.lm-desc{color:rgba(240,234,214,.65);line-height:1.85;font-size:.95rem;margin-bottom:1.5rem;}
+.lm-topics h4{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;}
+.lm-topic{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid rgba(201,168,76,.07);font-size:.9rem;color:rgba(240,234,214,.6);}
+.lm-topic::before{content:'→';color:var(--gold);font-size:.7rem;}
+.lm-close{position:absolute;top:1rem;right:1rem;width:36px;height:36px;border:1px solid rgba(201,168,76,.3);background:rgba(6,6,10,.8);color:var(--gold);font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;}.lm-close:hover{background:var(--gold);color:var(--bg);}
+
+footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5rem 4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:'Playfair Display SC',serif;font-size:1rem;letter-spacing:.38em;color:var(--gold);}
+.footer-links-row{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.footer-links-row a{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .25s;}.footer-links-row a:hover{color:var(--gold);}
+.footer-copy{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:#2a2420;}
+
+@media(max-width:1024px){
+  nav{padding:0 1.8rem;}.nav-cta{display:none;}.nav-hamburger{display:flex;}.nav-studio-mobile{display:block;}
+  .nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:rgba(10,9,14,.98);backdrop-filter:blur(16px);flex-direction:column;padding:5rem 2rem 2rem;gap:0;border-left:1px solid rgba(201,168,76,.15);z-index:495;transition:right .35s var(--ease);align-items:flex-start;}.nav-links.open{right:0;}
+  .nav-links li{width:100%;border-bottom:1px solid rgba(201,168,76,.08);}.nav-links a{display:block;padding:.9rem 0;}
+  .lessons-grid{grid-template-columns:repeat(2,1fr);padding:0 2rem 4rem;}
+  .lessons-header{padding:3rem 2rem 1.5rem;}.learning-path{grid-template-columns:1fr;gap:2rem;padding:4rem 2rem;}
+  .learn-stats{grid-template-columns:1fr 1fr;}
+  .learn-tabs{padding:0 2rem;}.page-hero{padding:9rem 2rem 4rem;}
+}
+@media(max-width:640px){
+  :root{--nav:52px;}nav{padding:0 1.2rem;}
+  .page-hero{padding:7.5rem 1.2rem 3rem;}.learn-tabs{padding:0 1rem;}
+  .lessons-grid{grid-template-columns:1fr;padding:0 1.2rem 3rem;}
+  .lessons-header{padding:2rem 1.2rem 1rem;}.learning-path{padding:3rem 1.2rem;}
+  footer{padding:2rem 1.2rem;flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">Luminary <span>Atelier</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li><li><a href="artists.html">Artists</a></li><li><a href="gallery.html">Gallery</a></li>
+    <li><a href="learn.html" class="active">Learn</a></li><li><a href="about.html">About</a></li>
+    <li><a href="howto.html">How to Use</a></li><li><a href="contact.html">Contact</a></li>
+    <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
+  </ul>
+  <a href="studio.html" class="nav-cta">Open Studio →</a>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <p class="section-label" style="position:relative;z-index:2;">Art Education</p>
+  <div class="gold-line"></div>
+  <h1>Learn</h1>
+  <p class="sub">From brushstroke to movement — guided lessons for every level of artist and enthusiast.</p>
+</div>
+
+<div class="learn-tabs">
+  <button class="learn-tab active" onclick="filterLessons('all',this)">All Lessons</button>
+  <button class="learn-tab" onclick="filterLessons('beginner',this)">Beginner</button>
+  <button class="learn-tab" onclick="filterLessons('intermediate',this)">Intermediate</button>
+  <button class="learn-tab" onclick="filterLessons('advanced',this)">Advanced</button>
+  <button class="learn-tab" onclick="filterLessons('history',this)">Art History</button>
+  <button class="learn-tab" onclick="filterLessons('technique',this)">Technique</button>
+  <button class="learn-tab" onclick="filterLessons('digital',this)">Digital Art</button>
+</div>
+
+<section class="learning-path rev">
+  <div class="path-text">
+    <p class="section-label">Recommended Path</p>
+    <div class="gold-line"></div>
+    <h2>Start Your Journey</h2>
+    <p>New to art? Follow our curated learning path — from the fundamentals of colour and form all the way to creating your first digital masterwork in the Studio.</p>
+    <a href="studio.html" class="btn btn-solid" style="margin-top:1rem;">Open Studio</a>
+  </div>
+  <div class="path-steps">
+    <div class="path-step"><div class="path-step-num">01</div><div class="path-step-info"><h4>Art History Foundations</h4><p>History · 30 min · Beginner</p></div></div>
+    <div class="path-step"><div class="path-step-num">02</div><div class="path-step-info"><h4>Colour Theory Basics</h4><p>Technique · 45 min · Beginner</p></div></div>
+    <div class="path-step"><div class="path-step-num">03</div><div class="path-step-info"><h4>Light & Shadow</h4><p>Technique · 60 min · Intermediate</p></div></div>
+    <div class="path-step"><div class="path-step-num">04</div><div class="path-step-info"><h4>Digital Painting Basics</h4><p>Digital · 50 min · Beginner</p></div></div>
+    <div class="path-step"><div class="path-step-num">05</div><div class="path-step-info"><h4>Paint Like the Masters</h4><p>Technique · 90 min · Advanced</p></div></div>
+    <div class="path-progress">
+      <div style="font-family:'Josefin Sans',sans-serif;font-size:.54rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;"><span>Your Progress</span><span>0 / 5 Complete</span></div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="--pct:0%"></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="learn-stats">
+  <div class="ls-item"><h3>24</h3><p>Lessons</p></div>
+  <div class="ls-item"><h3>3</h3><p>Levels</p></div>
+  <div class="ls-item"><h3>18h+</h3><p>Content</p></div>
+  <div class="ls-item"><h3>Free</h3><p>All Access</p></div>
+</div>
+
+<div class="lessons-header rev">
+  <div><p class="section-label">Browse</p><div class="gold-line"></div><h2>All Lessons</h2></div>
+</div>
+<div class="lessons-grid" id="lessonsGrid"></div>
+
+<!-- Lesson Modal -->
+<div class="lesson-modal" id="lessonModal" onclick="handleLMClick(event)">
+  <div class="lm-box" id="lmBox">
+    <button class="lm-close" onclick="closeLM()">✕</button>
+    <img class="lm-img" id="lmImg" src="" alt="">
+    <div class="lm-body">
+      <div class="lm-tag-row" id="lmTagRow"></div>
+      <p class="lm-title" id="lmTitle"></p>
+      <p class="lm-meta" id="lmMeta"></p>
+      <p class="lm-desc" id="lmDesc"></p>
+      <div class="lm-topics"><h4>What You'll Learn</h4><div id="lmTopics"></div></div>
+      <div style="margin-top:2rem;display:flex;gap:1rem;">
+        <button class="btn btn-solid" onclick="closeLM();window.location.href='studio.html'">Open in Studio</button>
+        <button class="btn" onclick="closeLM()">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Luminary Atelier</div>
+  <div class="footer-links-row"><a href="index.html">Home</a><a href="gallery.html">Gallery</a><a href="studio.html">Studio</a><a href="contact.html">Contact</a></div>
+  <p class="footer-copy">© 2025 Luminary Atelier</p>
+</footer>
+
+<script>
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navOverlay').classList.toggle('open');}
+function closeNav(){['navLinks','navHamburger','navOverlay'].forEach(id=>document.getElementById(id).classList.remove('open'));}
+
+const LESSONS=[
+  {id:1,tag:'history',level:'beginner',title:'Art History Foundations',desc:'Start here — a sweeping tour from cave paintings to the Renaissance, covering the big ideas that shaped Western art.',time:'30 min',seed:'ls-h1',topics:['Prehistoric and ancient art','Egyptian and Greek traditions','The meaning of style and period','How to read historical context']},
+  {id:2,tag:'technique',level:'beginner',title:'Colour Theory for Artists',desc:'The colour wheel, complementary pairs, and warm/cool contrasts — a practical guide to using colour intentionally.',time:'45 min',seed:'ls-t1',topics:['Primary, secondary, tertiary colours','Complementary and analogous palettes','Warm vs cool temperature','Colour psychology and mood']},
+  {id:3,tag:'technique',level:'intermediate',title:'Mastering Light and Shadow',desc:'Chiaroscuro techniques from Caravaggio to Rembrandt — and how to apply them in your own work.',time:'60 min',seed:'ls-t2',topics:['Light source and direction','Core shadow and reflected light','Cast shadows and ambient occlusion','Painting dramatic contrast']},
+  {id:4,tag:'digital',level:'beginner',title:'Digital Painting Foundations',desc:'Using the Luminary Studio to build up a digital painting from sketch to finished artwork, step by step.',time:'50 min',seed:'ls-d1',topics:['Navigating the Studio interface','Choosing and configuring brushes','Working with layers','Saving and exporting your work']},
+  {id:5,tag:'history',level:'beginner',title:'The Impressionist Revolution',desc:'How a group of rejected artists changed painting forever. From the Salon des Refusés to modern art.',time:'30 min',seed:'ls-h2',topics:['The birth of Impressionism 1874','Monet, Renoir, Degas, and Pissarro','En plein air painting','Legacy and influence on modern art']},
+  {id:6,tag:'history',level:'beginner',title:'Understanding Cubism',desc:'Why did Picasso and Braque shatter the picture plane? The intellectual and philosophical roots of Cubism.',time:'25 min',seed:'ls-h3',topics:['Analytical vs Synthetic Cubism','Picasso and Braque\'s collaboration','Multiple viewpoints on one plane','Influence on architecture and design']},
+  {id:7,tag:'technique',level:'advanced',title:'Oil Painting: Layer by Layer',desc:'Glazing, scumbling, and imprimatura — the Old Masters\' techniques for building luminous depth.',time:'120 min',seed:'ls-t3',topics:['Imprimatura ground preparation','Dead colouring (grisaille)','Glazing for luminosity','Scumbling for texture']},
+  {id:8,tag:'history',level:'beginner',title:'Women Who Changed Art History',desc:'From Artemisia Gentileschi to Frida Kahlo to Yayoi Kusama — the women who shaped art against all odds.',time:'40 min',seed:'ls-h4',topics:['Gentileschi and Baroque drama','Berthe Morisot and Impressionism','Georgia O\'Keeffe and American Modernism','Contemporary women in art']},
+  {id:9,tag:'technique',level:'intermediate',title:'Life Drawing Essentials',desc:'Proportion, gesture, and the human figure — foundational skills every artist needs.',time:'70 min',seed:'ls-t4',topics:['Gesture drawing fundamentals','Proportions of the figure','Construction from simple shapes','Foreshortening and perspective']},
+  {id:10,tag:'digital',level:'intermediate',title:'Abstract Art in the Studio',desc:'Using layers, blend modes, and digital brushes to create richly textured abstract compositions.',time:'60 min',seed:'ls-d2',topics:['Expressionistic mark-making','Exploring blend modes','Building texture with layers','Creating compositional balance']},
+  {id:11,tag:'technique',level:'advanced',title:'Painting Like Van Gogh',desc:'Impasto technique, circular brushstrokes, and emotional colour — recreating the energy of Post-Impressionism.',time:'90 min',seed:'ls-t5',topics:['Van Gogh\'s unique brushwork','Impasto and thick paint application','Emotional use of colour','Compositional energy and movement']},
+  {id:12,tag:'history',level:'beginner',title:'Contemporary Art Since 1960',desc:'Pop, Conceptualism, Street Art, and the digital frontier — making sense of art in the age of everything.',time:'35 min',seed:'ls-h5',topics:['Pop Art and consumer culture','Conceptual art and ideas','Street art and Banksy','Digital and NFT art today']},
+  {id:13,tag:'digital',level:'beginner',title:'Character Design Basics',desc:'From thumbnail sketches to fully rendered characters — a complete digital character design workflow.',time:'55 min',seed:'ls-d3',topics:['Silhouette and readability','Proportion and personality','Colour palette for characters','Final rendering techniques']},
+  {id:14,tag:'technique',level:'intermediate',title:'Watercolour Techniques',desc:'Wet-on-wet, wet-on-dry, granulation, and blooms — mastering the beautiful unpredictability of watercolour.',time:'65 min',seed:'ls-t6',topics:['Paper, pigment, and water ratios','Wet-on-wet soft edges','Wet-on-dry hard edges','Masking fluid and resists']},
+  {id:15,tag:'history',level:'intermediate',title:'Surrealism and the Unconscious',desc:'Dalí, Kahlo, Magritte — how artists dived into dreams, desire, and the strange logic of the inner mind.',time:'40 min',seed:'ls-h6',topics:['Freud\'s influence on Surrealism','Automatism and chance','Key works and their symbolism','Surrealism today and beyond']},
+];
+
+let activeTag='all';
+function filterLessons(tag,btn){
+  activeTag=tag;
+  document.querySelectorAll('.learn-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderLessons();
+}
+function renderLessons(){
+  const filtered=activeTag==='all'?LESSONS:LESSONS.filter(l=>l.tag===activeTag||l.level===activeTag);
+  const grid=document.getElementById('lessonsGrid');
+  grid.innerHTML=filtered.map((l,i)=>`
+    <div class="lesson-card rev-s" style="animation-delay:${(i%3)*.08}s" onclick="openLesson(${l.id})">
+      <div class="lesson-thumb-wrap"><img class="lesson-thumb" src="https://picsum.photos/seed/${l.seed}/500/180" alt="${l.title}" loading="lazy"></div>
+      <div class="lesson-body">
+        <div class="lesson-tag-row">
+          <span class="lesson-tag">${l.tag}</span>
+          <span class="lesson-level-badge level-${l.level}">${l.level}</span>
+        </div>
+        <h3 class="lesson-title">${l.title}</h3>
+        <p class="lesson-desc">${l.desc.substring(0,95)}…</p>
+        <div class="lesson-meta"><span>⏱ ${l.time}</span></div>
+      </div>
+      <span class="start-btn">Start →</span>
+    </div>
+  `).join('');
+  setTimeout(()=>{
+    const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.06});
+    document.querySelectorAll('.rev-s:not(.in)').forEach(el=>io.observe(el));
+  },30);
+}
+function openLesson(id){
+  const l=LESSONS.find(x=>x.id===id);if(!l)return;
+  document.getElementById('lmImg').src=`https://picsum.photos/seed/${l.seed}-full/700/220`;
+  document.getElementById('lmTitle').textContent=l.title;
+  document.getElementById('lmMeta').textContent=`${l.level} · ${l.tag} · ⏱ ${l.time}`;
+  document.getElementById('lmDesc').textContent=l.desc;
+  document.getElementById('lmTagRow').innerHTML=`<span class="lesson-tag">${l.tag}</span><span class="lesson-level-badge level-${l.level}">${l.level}</span>`;
+  document.getElementById('lmTopics').innerHTML=l.topics.map(t=>`<div class="lm-topic">${t}</div>`).join('');
+  document.getElementById('lessonModal').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeLM(){document.getElementById('lessonModal').classList.remove('open');document.body.style.overflow='';}
+function handleLMClick(e){if(e.target===document.getElementById('lessonModal'))closeLM();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLM();});
+
+// Reveal
+const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.1,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.rev,.rev-s').forEach(el=>io.observe(el));
+// Progress bar animate
+setTimeout(()=>{document.getElementById('progressFill').style.width='0%';},600);
+
+renderLessons();
+</script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Artists — Luminary Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--surface:#0f0e12;--surface2:#18161e;--surface3:#201d28;--gold:#c9a84c;--gold-l:#e8c97e;--gold-d:#7a6130;--cream:#f0ead6;--muted:#5a5040;--violet:#7b5ea7;--violet-l:#a87fd4;--teal:#2a9a8a;--teal-l:#4dc9b4;--nav:58px;--ease:cubic-bezier(.25,.46,.45,.94);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.8;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}button{cursor:pointer;font-family:inherit;}img{display:block;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:2px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes revealScale{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:none}}
+@keyframes textShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(20px)}to{opacity:1;transform:none}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+
+.rev{opacity:0}.rev.in{animation:fadeUp .7s var(--ease) forwards;}
+.rev-s{opacity:0}.rev-s.in{animation:revealScale .65s var(--ease) forwards;}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}.d4{animation-delay:.32s}.d5{animation-delay:.4s}.d6{animation-delay:.48s}
+
+.shimmer-text{background:linear-gradient(90deg,var(--gold),var(--violet-l),var(--gold-l),var(--teal-l),var(--gold));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:textShimmer 5s ease infinite;}
+.section-label{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.45em;text-transform:uppercase;color:var(--gold);opacity:.9;}
+.gold-line{width:48px;height:1px;background:linear-gradient(to right,var(--gold),transparent);margin:1rem 0;}
+.btn{display:inline-flex;align-items:center;font-family:'Josefin Sans',sans-serif;font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;padding:.85rem 2.2rem;border:1px solid var(--gold);color:var(--gold);background:transparent;transition:all .3s;white-space:nowrap;cursor:pointer;}
+.btn:hover{background:var(--gold);color:var(--bg);}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 3rem;background:rgba(6,6,10,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,168,76,.12);}
+.nav-logo{font-family:'Playfair Display SC',serif;font-size:.88rem;letter-spacing:.38em;color:var(--gold);}
+.nav-logo span{color:var(--cream);}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center;}
+.nav-links a{font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(240,234,214,.5);transition:color .25s;position:relative;padding-bottom:3px;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.nav-cta{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;padding:.5rem 1.2rem;border:1px solid rgba(201,168,76,.4);color:var(--gold);transition:all .3s;background:rgba(201,168,76,.06);}
+.nav-cta:hover{background:var(--gold);color:var(--bg);}
+.nav-hamburger{display:none;flex-direction:column;justify-content:space-between;width:26px;height:18px;background:none;border:none;cursor:pointer;padding:0;}
+.nav-hamburger span{display:block;width:100%;height:2px;background:var(--gold);border-radius:1px;transition:all .3s;}
+.nav-hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg);}
+.nav-hamburger.open span:nth-child(2){opacity:0;}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(6,6,10,.7);z-index:490;backdrop-filter:blur(2px);}
+.nav-overlay.open{display:block;}
+.nav-studio-mobile{display:none;}
+
+/* PAGE HERO */
+.page-hero{padding:12rem 4rem 5rem;position:relative;overflow:hidden;}
+.page-hero::after{content:'';position:absolute;bottom:0;left:4rem;right:4rem;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);}
+.page-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 75% 30%,rgba(123,94,167,.07) 0%,transparent 60%);}
+.page-hero h1{font-family:'Playfair Display SC',serif;font-size:clamp(2.5rem,5.5vw,5rem);font-weight:400;color:var(--cream);position:relative;z-index:2;animation:fadeUp .9s ease forwards;}
+.page-hero p.sub{font-size:1.05rem;font-style:italic;color:rgba(240,234,214,.45);max-width:520px;margin-top:.9rem;position:relative;z-index:2;animation:fadeUp .9s ease .2s forwards;opacity:0;}
+
+/* FILTER */
+.filter-bar{padding:2rem 4rem;display:flex;gap:.6rem;flex-wrap:wrap;border-bottom:1px solid rgba(201,168,76,.1);background:var(--surface);position:sticky;top:var(--nav);z-index:100;}
+.filter-btn{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;padding:.5rem 1.1rem;border:1px solid rgba(201,168,76,.2);color:var(--muted);background:transparent;transition:all .25s;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08);}
+
+/* GRID */
+.artists-grid{padding:4rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem;}
+.artist-card{position:relative;overflow:hidden;background:var(--surface2);cursor:pointer;transition:transform .3s var(--ease);}
+.artist-card:hover{transform:translateY(-4px);}
+.artist-card img{width:100%;height:320px;object-fit:cover;filter:brightness(.65) saturate(.75);transition:transform .6s var(--ease),filter .4s;}
+.artist-card:hover img{transform:scale(1.06);filter:brightness(.88) saturate(1);}
+.artist-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,10,.97) 0%,rgba(6,6,10,.05) 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:1.5rem;}
+.afc-movement{font-family:'Josefin Sans',sans-serif;font-size:.54rem;letter-spacing:.25em;text-transform:uppercase;color:var(--violet-l);margin-bottom:.3rem;}
+.afc-name{font-family:'Playfair Display SC',serif;font-size:1.2rem;color:var(--cream);margin-bottom:.15rem;}
+.afc-years{font-family:'Josefin Sans',sans-serif;font-size:.56rem;letter-spacing:.14em;color:rgba(240,234,214,.4);}
+.afc-bio{font-size:.86rem;font-style:italic;color:rgba(240,234,214,.4);line-height:1.55;margin-top:.5rem;opacity:0;transform:translateY(8px);transition:all .35s;}
+.artist-card:hover .afc-bio{opacity:1;transform:none;}
+.afc-btn{margin-top:.8rem;font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);opacity:0;transition:opacity .3s;}
+.artist-card:hover .afc-btn{opacity:1;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(6,6,10,.9);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;backdrop-filter:blur(10px);}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.artist-modal{background:var(--surface);max-width:940px;width:92%;max-height:88vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;position:relative;animation:modalIn .4s ease;}
+.modal-img{height:100%;min-height:500px;object-fit:cover;filter:brightness(.75) saturate(.8);}
+.modal-body{padding:2.5rem 2.2rem;overflow-y:auto;}
+.modal-close{position:absolute;top:1rem;right:1rem;width:38px;height:38px;border:1px solid rgba(201,168,76,.3);background:rgba(6,6,10,.85);color:var(--gold);font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:all .25s;}
+.modal-close:hover{background:var(--gold);color:var(--bg);}
+.modal-movement{font-family:'Josefin Sans',sans-serif;font-size:.56rem;letter-spacing:.28em;text-transform:uppercase;color:var(--violet-l);}
+.modal-name{font-family:'Playfair Display SC',serif;font-size:2rem;color:var(--cream);margin:.4rem 0 .2rem;}
+.modal-dates{font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+.modal-bio{font-size:.95rem;color:rgba(240,234,214,.65);line-height:1.85;margin-top:1.2rem;}
+.modal-works{margin-top:1.5rem;}
+.modal-works h4{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;}
+.modal-works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;}
+.modal-works-grid img{width:100%;height:72px;object-fit:cover;filter:brightness(.7);transition:filter .3s;}
+.modal-works-grid img:hover{filter:brightness(1);}
+.modal-fact{margin-top:1rem;padding:.6rem 1rem;background:rgba(201,168,76,.06);border-left:2px solid var(--gold);font-size:.85rem;color:rgba(240,234,214,.55);font-style:italic;}
+
+/* FOOTER */
+footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5rem 4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:'Playfair Display SC',serif;font-size:1rem;letter-spacing:.38em;color:var(--gold);}
+.footer-links-row{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.footer-links-row a{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .25s;}
+.footer-links-row a:hover{color:var(--gold);}
+.footer-copy{font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:#2a2420;}
+
+@media(max-width:1024px){
+  nav{padding:0 1.8rem;}.nav-cta{display:none;}.nav-hamburger{display:flex;}.nav-studio-mobile{display:block;}
+  .nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:rgba(10,9,14,.98);backdrop-filter:blur(16px);flex-direction:column;padding:5rem 2rem 2rem;gap:0;border-left:1px solid rgba(201,168,76,.15);z-index:495;transition:right .35s var(--ease);align-items:flex-start;}
+  .nav-links.open{right:0;}.nav-links li{width:100%;border-bottom:1px solid rgba(201,168,76,.08);}
+  .nav-links a{display:block;padding:.9rem 0;}
+  .artists-grid{grid-template-columns:repeat(3,1fr);padding:3rem 2rem;}
+  .page-hero{padding:10rem 2rem 4rem;}.filter-bar{padding:1.5rem 2rem;}
+  .artist-modal{grid-template-columns:1fr;max-height:92vh;}.modal-img{height:240px;min-height:unset;}
+}
+@media(max-width:640px){
+  :root{--nav:52px;}nav{padding:0 1.2rem;}
+  .page-hero{padding:8rem 1.2rem 3rem;}.filter-bar{padding:1rem 1.2rem;}
+  .artists-grid{grid-template-columns:1fr 1fr;padding:1.5rem 1.2rem;gap:1rem;}
+  .artist-card img{height:200px;}
+  footer{padding:2rem 1.2rem;flex-direction:column;align-items:flex-start;}
+}
+@media(hover:none){.afc-bio{opacity:1;transform:none;}.afc-btn{opacity:1;}}
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">Luminary <span>Atelier</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="artists.html" class="active">Artists</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="learn.html">Learn</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="howto.html">How to Use</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
+  </ul>
+  <a href="studio.html" class="nav-cta">Open Studio →</a>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <p class="section-label" style="position:relative;z-index:2;">The Creators</p>
+  <div class="gold-line"></div>
+  <h1>Artists</h1>
+  <p class="sub">From Renaissance masters to contemporary visionaries — the artists who shaped how we see the world.</p>
+</div>
+
+<div class="filter-bar" id="filterBar">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="renaissance">Renaissance</button>
+  <button class="filter-btn" data-filter="baroque">Baroque</button>
+  <button class="filter-btn" data-filter="impressionism">Impressionism</button>
+  <button class="filter-btn" data-filter="post-impressionism">Post-Impressionism</button>
+  <button class="filter-btn" data-filter="art-nouveau">Art Nouveau</button>
+  <button class="filter-btn" data-filter="cubism">Cubism</button>
+  <button class="filter-btn" data-filter="surrealism">Surrealism</button>
+  <button class="filter-btn" data-filter="expressionism">Expressionism</button>
+  <button class="filter-btn" data-filter="abstract">Abstract</button>
+  <button class="filter-btn" data-filter="pop">Pop Art</button>
+  <button class="filter-btn" data-filter="contemporary">Contemporary</button>
+</div>
+
+<div class="artists-grid" id="artistsGrid"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="artistModal" onclick="handleModalClick(event)">
+  <div class="artist-modal" id="modalBox">
+    <img class="modal-img" id="modalImg" src="" alt="">
+    <div class="modal-body">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <p class="modal-movement" id="modalMovement"></p>
+      <div class="gold-line"></div>
+      <p class="modal-name" id="modalName"></p>
+      <p class="modal-dates" id="modalDates"></p>
+      <p class="modal-bio" id="modalBio"></p>
+      <p class="modal-fact" id="modalFact"></p>
+      <div class="modal-works">
+        <h4>Notable Works</h4>
+        <div class="modal-works-grid" id="modalWorksGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Luminary Atelier</div>
+  <div class="footer-links-row">
+    <a href="index.html">Home</a><a href="gallery.html">Gallery</a><a href="studio.html">Studio</a><a href="contact.html">Contact</a>
+  </div>
+  <p class="footer-copy">© 2025 Luminary Atelier</p>
+</footer>
+
+<script>
+/* ── NAV ── */
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navOverlay').classList.toggle('open');}
+function closeNav(){document.getElementById('navLinks').classList.remove('open');document.getElementById('navHamburger').classList.remove('open');document.getElementById('navOverlay').classList.remove('open');}
+
+/* ── DATA ── */
+const ARTISTS = [
+  {id:'davinci',name:'Leonardo da Vinci',years:'1452–1519',nat:'Italian',movement:'Renaissance',tag:'renaissance',seed:'davinci-p',bio:'The ultimate Renaissance polymath — painter, scientist, engineer, and philosopher. Creator of the Mona Lisa and The Last Supper, da Vinci explored the boundaries of art and science with inexhaustible curiosity.',fact:'Da Vinci kept detailed notebooks with over 13,000 pages of notes and drawings.',works:['mono-a','lastsupper-a','vitruvian-a']},
+  {id:'michelangelo',name:'Michelangelo',years:'1475–1564',nat:'Italian',movement:'Renaissance',tag:'renaissance',seed:'mich-p',bio:'Sculptor, painter, architect, and poet — Michelangelo created the Sistine Chapel ceiling and the sculpture of David, establishing the ideals of the High Renaissance.',fact:'Michelangelo painted the Sistine Chapel ceiling lying on his back over four years.',works:['sistine-a','david-a','pieta-a']},
+  {id:'raphael',name:'Raphael',years:'1483–1520',nat:'Italian',movement:'Renaissance',tag:'renaissance',seed:'raph-p',bio:'Master of balance, harmony, and beauty. Raphael\'s Madonnas and the School of Athens set the standard for High Renaissance painting.',fact:'Raphael completed over 300 works in just 37 years of life.',works:['athens-a','madon-a','transfig-a']},
+  {id:'rembrandt',name:'Rembrandt van Rijn',years:'1606–1669',nat:'Dutch',movement:'Baroque',tag:'baroque',seed:'remb-p',bio:'The master of light and shadow. Rembrandt\'s portraits and biblical scenes achieve a psychological depth unrivalled in Western painting.',fact:'Rembrandt created over 90 self-portraits throughout his life.',works:['nightwatch-a','selfrembr-a','anatomy-a']},
+  {id:'vermeer',name:'Johannes Vermeer',years:'1632–1675',nat:'Dutch',movement:'Baroque',tag:'baroque',seed:'verm-p',bio:'Vermeer painted domestic interiors with extraordinary luminosity and calm. His Girl with a Pearl Earring remains one of the most enigmatic images in art history.',fact:'Only 34–36 paintings are firmly attributed to Vermeer.',works:['pearl-a','milkmaid-a','allegory-a']},
+  {id:'caravaggio',name:'Caravaggio',years:'1571–1610',nat:'Italian',movement:'Baroque',tag:'baroque',seed:'cara-p',bio:'The master of tenebrism — extreme contrast between light and dark. Caravaggio\'s brutal realism transformed religious painting forever.',fact:'Caravaggio killed a man in a brawl and spent his final years fleeing justice.',works:['judith-a','calling-a','supper-a']},
+  {id:'monet',name:'Claude Monet',years:'1840–1926',nat:'French',movement:'Impressionism',tag:'impressionism',seed:'monet-p',bio:'Father of Impressionism. Monet devoted his career to capturing light in constant motion — from lily ponds at Giverny to cathedrals of Rouen.',fact:'Monet painted his Water Lilies series while nearly completely blind.',works:['waterlilies-a','haystacks-a','cathedral-a']},
+  {id:'renoir',name:'Pierre-Auguste Renoir',years:'1841–1919',nat:'French',movement:'Impressionism',tag:'impressionism',seed:'renoir-p',bio:'Renoir brought warmth and sensuality to Impressionism, celebrating the pleasures of modern Parisian life in shimmering light-filled canvases.',fact:'Renoir continued painting even when arthritis forced him to strap brushes to his arms.',works:['moulin-a','luncheon-a','bathers-a']},
+  {id:'degas',name:'Edgar Degas',years:'1834–1917',nat:'French',movement:'Impressionism',tag:'impressionism',seed:'degas-p',bio:'Degas captured movement with unparalleled skill — his ballet dancers, racehorses, and café scenes defined modern subject matter in art.',fact:'Degas preferred to call himself a Realist rather than an Impressionist.',works:['dancers-a','absinthe-a','tub-a']},
+  {id:'vangogh',name:'Vincent van Gogh',years:'1853–1890',nat:'Dutch',movement:'Post-Impressionism',tag:'post-impressionism',seed:'vangogh-p',bio:'Van Gogh\'s turbulent emotional life produced some of the most recognisable works in art history. His expressive brushwork and vivid colour influenced modern art immeasurably.',fact:'Van Gogh sold only one painting during his lifetime.',works:['starry-a','sunflowers-a','selfvg-a']},
+  {id:'cezanne',name:'Paul Cézanne',years:'1839–1906',nat:'French',movement:'Post-Impressionism',tag:'post-impressionism',seed:'cez-p',bio:'Cézanne\'s structural approach to landscape and still life bridged Impressionism and Cubism. Both Picasso and Matisse called him the father of modern art.',fact:'Cézanne painted Mont Sainte-Victoire over 60 times.',works:['mtsv-a','cardplayers-a','bathers2-a']},
+  {id:'klimt',name:'Gustav Klimt',years:'1862–1918',nat:'Austrian',movement:'Art Nouveau',tag:'art-nouveau',seed:'klimt-p',bio:'Vienna\'s most celebrated Symbolist. Klimt fused fine art with gold-leaf ornamentation, creating some of the most sensuous images in Western art.',fact:'Klimt applied real gold leaf to many of his paintings.',works:['kiss-a','judith2-a','beethoven-a']},
+  {id:'munch',name:'Edvard Munch',years:'1863–1944',nat:'Norwegian',movement:'Expressionism',tag:'expressionism',seed:'munch-p',bio:'The Scream made anguish visible. Munch\'s raw, psychologically charged canvases pioneered Expressionism and continue to resonate with primal force.',fact:'The Scream was stolen twice from Oslo museums.',works:['scream-a','madonna-a','vampire-a']},
+  {id:'picasso',name:'Pablo Picasso',years:'1881–1973',nat:'Spanish',movement:'Cubism',tag:'cubism',seed:'picasso-p',bio:'The most influential artist of the 20th century. Picasso co-invented Cubism, created Guernica — the defining anti-war painting of the modern era.',fact:'Picasso created over 20,000 works across painting, sculpture, printmaking, and ceramics.',works:['guernica-a','demoiselles-a','weeping-a']},
+  {id:'dali',name:'Salvador Dalí',years:'1904–1989',nat:'Spanish',movement:'Surrealism',tag:'surrealism',seed:'dali-p',bio:'Master showman and visionary. Dalí painted the unconscious with photographic precision, creating impossible dreamscapes of unforgettable strangeness.',fact:'Dalí claimed his vivid paintings were inspired by hypnagogic hallucinations.',works:['persistence-a','dream-a','temptation-a']},
+  {id:'kahlo',name:'Frida Kahlo',years:'1907–1954',nat:'Mexican',movement:'Surrealism',tag:'surrealism',seed:'kahlo-p',bio:'Kahlo\'s unflinching self-portraits explore pain, identity, and Mexican culture with raw courage — feminist, postcolonial, and deeply personal.',fact:'Kahlo suffered 35 surgeries after a near-fatal bus accident at age 18.',works:['twofridas-a','selfkahlo-a','deer-a']},
+  {id:'pollock',name:'Jackson Pollock',years:'1912–1956',nat:'American',movement:'Abstract Expressionism',tag:'abstract',seed:'pollock-p',bio:'Pollock\'s drip technique revolutionised painting, eliminating the boundary between artist and canvas. His all-over compositions introduced pure gesture as subject.',fact:'Pollock laid his canvases on the floor and moved around them while dripping paint.',works:['number31-a','lavender-a','bluepoles-a']},
+  {id:'warhol',name:'Andy Warhol',years:'1928–1987',nat:'American',movement:'Pop Art',tag:'pop',seed:'warhol-p',bio:'The pope of Pop. Warhol collapsed the distinction between fine art and commercial culture with his iconic silkscreens of Marilyn, soup cans, and Mao.',fact:'Warhol\'s Factory studio was a legendary meeting place for artists, celebrities, and socialites.',works:['marilyn-a','soup-a','mao-a']},
+];
+
+let currentFilter = 'all';
+
+function renderArtists(){
+  const grid = document.getElementById('artistsGrid');
+  const filtered = currentFilter === 'all' ? ARTISTS : ARTISTS.filter(a=>a.tag===currentFilter);
+  grid.innerHTML = filtered.map((a,i)=>`
+    <div class="artist-card rev-s" style="animation-delay:${(i%4)*.08}s" onclick="openModal('${a.id}')">
+      <img src="https://picsum.photos/seed/${a.seed}/420/320" alt="${a.name}" loading="lazy">
+      <div class="artist-card-overlay">
+        <p class="afc-movement">${a.movement}</p>
+        <p class="afc-name">${a.name}</p>
+        <p class="afc-years">${a.years} · ${a.nat}</p>
+        <p class="afc-bio">${a.bio.substring(0,88)}…</p>
+        <p class="afc-btn">View Profile →</p>
+      </div>
+    </div>
+  `).join('');
+  setTimeout(initReveal, 50);
+}
+
+function openModal(id){
+  const a = ARTISTS.find(x=>x.id===id);
+  if(!a) return;
+  document.getElementById('modalImg').src = `https://picsum.photos/seed/${a.seed}-full/500/540`;
+  document.getElementById('modalMovement').textContent = a.movement;
+  document.getElementById('modalName').textContent = a.name;
+  document.getElementById('modalDates').textContent = `${a.years} · ${a.nat}`;
+  document.getElementById('modalBio').textContent = a.bio;
+  document.getElementById('modalFact').textContent = `💡 ${a.fact}`;
+  document.getElementById('modalWorksGrid').innerHTML = a.works.map(w=>`<img src="https://picsum.photos/seed/${w}/120/72" alt="" loading="lazy">`).join('');
+  document.getElementById('artistModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('artistModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function handleModalClick(e){if(e.target===document.getElementById('artistModal'))closeModal();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ── FILTER ── */
+document.getElementById('filterBar').addEventListener('click',e=>{
+  const btn=e.target.closest('.filter-btn');
+  if(!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter=btn.dataset.filter;
+  renderArtists();
+});
+
+/* ── REVEAL ── */
+function initReveal(){
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+  document.querySelectorAll('.rev,.rev-s').forEach(el=>{if(!el.classList.contains('in'))io.observe(el);});
+}
+
+/* ── NAV ── */
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navOverlay').classList.toggle('open');}
+function closeNav(){document.getElementById('navLinks').classList.remove('open');document.getElementById('navHamburger').classList.remove('open');document.getElementById('navOverlay').classList.remove('open');}
+
+renderArtists();
+initReveal();
+</script>
+</body>
+</html>
