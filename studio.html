@@ -297,8 +297,8 @@ canvas{display:block;cursor:crosshair;}
       <button class="menu-btn">Gallery</button>
       <div class="menu-dropdown">
         <button class="menu-dd-item" onclick="window.location.href='studio-gallery.html'">Community Gallery</button>
-        <button class="menu-dd-item" onclick="()">Templates</button>
-        <button class="menu-dd-item" onclick="window.location.href='templates.html'">More templates</button></button>
+        <button class="menu-dd-item" onclick="openTemplates()">Templates</button>
+        <button class="menu-dd-item" onclick="window.location.href='templates.html'">More templates</button>
         <div class="menu-dd-sep"></div>
         <button class="menu-dd-item" onclick="window.location.href='gallery.html'">Art Gallery</button>
       </div>
@@ -748,7 +748,7 @@ canvas{display:block;cursor:crosshair;}
     <button class="mtb-tool" onclick="clearCanvas()">🗑️<span>Clear</span></button>
     <button class="mtb-tool" onclick="flipH()">↔<span>FlipH</span></button>
     <button class="mtb-tool" onclick="flipV()">↕<span>FlipV</span></button>
-    <button class="mtb-tool" onclick="()">📋<span>Tmplt</span></button>
+    <button class="mtb-tool" onclick="openTemplates()">📋<span>Tmplt</span></button>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ function drawTplWatercolour(ctx,w,h){
   for(let i=0;i<12;i++){const x=Math.random()*w,y=Math.random()*h;for(let j=0;j<5;j++){ctx.beginPath();ctx.arc(x+(Math.random()-.5)*60,y+(Math.random()-.5)*60,30+Math.random()*60,0,Math.PI*2);ctx.fillStyle=cols[i%cols.length]+(Math.floor(Math.random()*30+10).toString(16));ctx.fill();}}
 }
 
-function (){
+function openTemplates(){
   const grid=document.getElementById('templateGrid');
   grid.innerHTML='';
   TEMPLATES.forEach((t,i)=>{
