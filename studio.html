@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Studio — Luminary Atelier</title>
+<title>Studio — Luminary Atelier | Complete Edition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&family=Playfair+Display+SC:wght@400&display=swap" rel="stylesheet">
 <style>
@@ -770,6 +770,22 @@ canvas{display:block;cursor:crosshair;}
       <div class="rp-slider-row"><input type="range" id="jitterSlider" min="0" max="60" value="0" oninput="S.jitter=+this.value;document.getElementById('jitterVal').textContent=this.value"><span class="rp-slider-val" id="jitterVal">0</span></div>
       <span class="rp-label">Stroke Weight</span>
       <div class="rp-slider-row"><input type="range" id="strokeWSlider" min="1" max="20" value="2" oninput="S.strokeW=+this.value;document.getElementById('strokeWVal').textContent=this.value+'px'"><span class="rp-slider-val" id="strokeWVal">2px</span></div>
+      <span class="rp-label">Text Font</span>
+      <div class="font-family-row" id="fontFamilyRow">
+        <button class="font-btn active" onclick="setFontFamily('Josefin Sans',this)">Sans</button>
+        <button class="font-btn" onclick="setFontFamily('Playfair Display SC',this)">Serif</button>
+        <button class="font-btn" onclick="setFontFamily('Georgia',this)">Georgia</button>
+        <button class="font-btn" onclick="setFontFamily('monospace',this)">Mono</button>
+        <button class="font-btn" onclick="setFontFamily('cursive',this)">Script</button>
+      </div>
+      <span class="rp-label">Text Size</span>
+      <div class="rp-slider-row"><input type="range" id="fontSizeSlider" min="8" max="120" value="18" oninput="S.fontSize=+this.value;document.getElementById('fontSizeVal').textContent=this.value+'px'"><span class="rp-slider-val" id="fontSizeVal">18px</span></div>
+      <span class="rp-label">Text Style</span>
+      <div class="shape-fill-row">
+        <button class="fill-opt" id="fontBoldBtn" onclick="toggleFontStyle('bold',this)">Bold</button>
+        <button class="fill-opt" id="fontItalicBtn" onclick="toggleFontStyle('italic',this)">Italic</button>
+        <button class="fill-opt" id="fontUnderBtn" onclick="toggleFontStyle('underline',this)">Under</button>
+      </div>
       <span class="rp-label">Shape Fill</span>
       <div class="shape-fill-row">
         <button class="fill-opt active" onclick="setFill('both',this)">Both</button>
@@ -916,6 +932,79 @@ canvas{display:block;cursor:crosshair;}
       <div class="adjust-row"><label>Blur</label><div class="rp-slider-row"><input type="range" min="0" max="20" value="0" oninput="S.blur=+this.value;document.getElementById('blurVal').textContent=this.value+'px';applyAdjust()"><span class="rp-slider-val" id="blurVal">0px</span></div></div>
       <button class="layer-btn" style="width:100%;margin-top:.6rem;" onclick="resetAdjust()">Reset Adjustments</button>
     </div>
+
+    <!-- CANVAS SETTINGS -->
+    <div class="rp-panel" id="panel-canvas">
+      <span class="rp-label" style="margin-top:0">Background</span>
+      <div class="bg-presets-grid" id="bgPresetsGrid"></div>
+      <span class="rp-label">Canvas Presets</span>
+      <div class="canvas-preset-grid">
+        <button class="canvas-preset-btn" onclick="applyCanvasPreset(800,600)">800 × 600 — Standard</button>
+        <button class="canvas-preset-btn" onclick="applyCanvasPreset(1024,768)">1024 × 768 — XGA</button>
+        <button class="canvas-preset-btn" onclick="applyCanvasPreset(1280,720)">1280 × 720 — HD</button>
+        <button class="canvas-preset-btn" onclick="applyCanvasPreset(1920,1080)">1920 × 1080 — Full HD</button>
+        <button class="canvas-preset-btn" onclick="applyCanvasPreset(600,600)">600 × 600 — Square</button>
+        <button class="canvas-preset-btn" onclick="applyCanvasPreset(800,1100)">800 × 1100 — Portrait</button>
+        <button class="canvas-preset-btn" onclick="applyCanvasPreset(2048,1536)">2048 × 1536 — 2K</button>
+      </div>
+      <span class="rp-label">View</span>
+      <div class="shape-fill-row">
+        <button class="fill-opt" onclick="toggleRulers()">Rulers</button>
+        <button class="fill-opt" onclick="toggleGrid()">Grid</button>
+        <button class="fill-opt" onclick="zoomFit()">Fit</button>
+      </div>
+      <span class="rp-label">Image Import</span>
+      <div class="shape-fill-row">
+        <label class="fill-opt" style="cursor:pointer;text-align:center;" for="imgImportInput">📂 Load</label>
+        <input type="file" id="imgImportInput" accept="image/*" style="display:none" onchange="importImage(this)">
+        <button class="fill-opt" onclick="rotateCanvas(90)">↻ Rotate 90°</button>
+      </div>
+    </div>
+
+    <!-- GUIDE PANEL -->
+    <div class="rp-panel" id="panel-guide">
+      <span class="rp-label" style="margin-top:0">Keyboard Shortcuts</span>
+      <table class="sc-mini-table">
+        <tr><td>B</td><td>Brush</td></tr>
+        <tr><td>P</td><td>Pencil</td></tr>
+        <tr><td>E</td><td>Eraser</td></tr>
+        <tr><td>I</td><td>Eyedropper</td></tr>
+        <tr><td>G</td><td>Fill</td></tr>
+        <tr><td>T</td><td>Text</td></tr>
+        <tr><td>V</td><td>Move</td></tr>
+        <tr><td>[ / ]</td><td>Size −/+</td></tr>
+        <tr><td>Ctrl+Z/Y</td><td>Undo/Redo</td></tr>
+        <tr><td>Ctrl+S</td><td>Save PNG</td></tr>
+        <tr><td>Ctrl+0</td><td>Fit to Screen</td></tr>
+        <tr><td>Ctrl+M</td><td>Symmetry</td></tr>
+      </table>
+      <span class="rp-label">Tutorials</span>
+      <div class="guide-entry" onclick="openGuideModal('start')">
+        <div class="guide-entry-title">Getting Started <span class="ge-tag beg">Beginner</span></div>
+        <div class="guide-entry-desc">Tools, colour, canvas — your first strokes explained.</div>
+      </div>
+      <div class="guide-entry" onclick="openGuideModal('brush')">
+        <div class="guide-entry-title">Brush Mastery <span class="ge-tag int">Inter.</span></div>
+        <div class="guide-entry-desc">Size, hardness, flow, opacity, jitter and spacing.</div>
+      </div>
+      <div class="guide-entry" onclick="openGuideModal('layers')">
+        <div class="guide-entry-title">Working with Layers <span class="ge-tag int">Inter.</span></div>
+        <div class="guide-entry-desc">Add, duplicate, blend modes, and merge layers.</div>
+      </div>
+      <div class="guide-entry" onclick="openGuideModal('effects')">
+        <div class="guide-entry-title">Effects & Filters <span class="ge-tag int">Inter.</span></div>
+        <div class="guide-entry-desc">Drop shadow, glow, vignette, grain, sepia and more.</div>
+      </div>
+      <div class="guide-entry" onclick="openGuideModal('animation')">
+        <div class="guide-entry-title">Frame Animation <span class="ge-tag adv">Advanced</span></div>
+        <div class="guide-entry-desc">Timeline, scenes, transitions, particles, export.</div>
+      </div>
+      <div class="guide-entry" onclick="openGuideModal('symmetry')">
+        <div class="guide-entry-title">Symmetry & Shapes <span class="ge-tag beg">Beginner</span></div>
+        <div class="guide-entry-desc">Mirror painting, shapes, fill/stroke control.</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1358,6 +1447,18 @@ canvas{display:block;cursor:crosshair;}
   </div>
 </div>
 
+
+<!-- ════════════ GUIDE MODAL ════════════ -->
+<div class="studio-modal-bg" id="guideModal">
+  <div class="studio-modal" style="min-width:360px;max-width:560px;">
+    <h3 id="guideModalTitle">Getting Started</h3>
+    <div id="guideModalBody" style="font-size:.78rem;color:rgba(240,234,214,.65);line-height:1.7;"></div>
+    <div class="sm-btns" style="margin-top:1rem;">
+      <button class="sm-btn primary" onclick="document.getElementById('guideModal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ════════════════════════════════════════════
    STATE
@@ -1566,6 +1667,7 @@ function onColorPick(hex, fromWheel=false){
   const bb=document.getElementById('bbColor');if(bb)bb.value=hex;
   const mts=document.getElementById('mtsColor');if(mts)mts.value=hex;
   drawColorWheel();drawSVBox();
+  addRecentColor(hex);
 }
 function onHexInput(v){if(/^#[0-9A-Fa-f]{6}$/.test(v))onColorPick(v);}
 function hexToRGB(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return[r,g,b];}
@@ -1584,6 +1686,7 @@ function setTool(btn){
   const cursors={eyedrop:'crosshair',fill:'cell',text:'text',move:'move'};
   mainC.style.cursor=cursors[S.tool]||'crosshair';
   toast(S.tool.charAt(0).toUpperCase()+S.tool.slice(1));
+  const ts=document.getElementById('canvasToolStatus');if(ts)ts.textContent='🖌 '+S.tool.charAt(0).toUpperCase()+S.tool.slice(1);
 }
 function switchRPanel(id,btn){
   document.querySelectorAll('.rp-tab').forEach(t=>t.classList.remove('active'));
@@ -1908,7 +2011,7 @@ function pickColor(x,y){const d=getActiveCtx().getImageData(Math.round(x),Math.r
 /* ── text ── */
 let textPending=false;
 function placeText(x,y){const ti=document.getElementById('textInput');const scaleX=mainC.offsetWidth/mainC.width;ti.style.left=x*scaleX+'px';ti.style.top=y*scaleX+'px';ti.style.display='block';ti.style.color=S.color;ti.style.fontSize='18px';ti.value='';ti.focus();textPending=true;}
-function commitText(){if(!textPending)return;const ti=document.getElementById('textInput');const txt=ti.value.trim();if(txt){const ctx=getActiveCtx();const scaleX=mainC.width/mainC.offsetWidth;ctx.font=`18px 'Josefin Sans',sans-serif`;ctx.fillStyle=S.color;ctx.globalAlpha=S.opacity;ctx.fillText(txt,parseFloat(ti.style.left)*scaleX,parseFloat(ti.style.top)*scaleX+18);renderLayers();}ti.style.display='none';textPending=false;}
+function commitText(){if(!textPending)return;const ti=document.getElementById('textInput');const txt=ti.value.trim();if(txt){const ctx=getActiveCtx();const scaleX=mainC.width/mainC.offsetWidth;ctx.font=getFont();ctx.fillStyle=S.color;ctx.globalAlpha=S.opacity;ctx.fillText(txt,parseFloat(ti.style.left)*scaleX,parseFloat(ti.style.top)*scaleX+18);renderLayers();}ti.style.display='none';textPending=false;}
 document.getElementById('textInput').addEventListener('keydown',e=>{if(e.key==='Enter')commitText();if(e.key==='Escape'){document.getElementById('textInput').style.display='none';textPending=false;}});
 
 /* ── gradient ── */
@@ -2135,6 +2238,7 @@ function createNewCanvas(){
   renderLayers();renderLayerList();
   document.getElementById('newCanvasModal').classList.remove('open');
   toast(`New canvas: ${w}×${h}`);
+  const ds=document.getElementById('canvasDimStatus');if(ds)ds.textContent=w+' × '+h;
 }
 
 /* Save */
@@ -2295,6 +2399,276 @@ function toast(msg){
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1600);
 }
 
+
+/* ════════════════════════════════════════════
+   RECENT COLORS
+════════════════════════════════════════════ */
+const recentColors = [];
+function addRecentColor(hex) {
+  if (recentColors[0] === hex) return;
+  const idx = recentColors.indexOf(hex);
+  if (idx > -1) recentColors.splice(idx, 1);
+  recentColors.unshift(hex);
+  if (recentColors.length > 10) recentColors.pop();
+  renderRecentColors();
+}
+function renderRecentColors() {
+  const row = document.getElementById('recentColorsRow');
+  if (!row) return;
+  row.innerHTML = '<span class="rc-label">Recent</span>';
+  recentColors.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'recent-color';
+    s.style.background = c;
+    s.title = c;
+    s.onclick = () => onColorPick(c);
+    row.appendChild(s);
+  });
+}
+
+/* ════════════════════════════════════════════
+   FONT CONTROLS
+════════════════════════════════════════════ */
+S.fontFamily = "'Josefin Sans', sans-serif";
+S.fontSize = 18;
+S.fontBold = false;
+S.fontItalic = false;
+S.fontUnderline = false;
+
+function setFontFamily(family, btn) {
+  S.fontFamily = "'" + family + "', sans-serif";
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  toast('Font: ' + family);
+}
+function toggleFontStyle(style, btn) {
+  if (style === 'bold') S.fontBold = !S.fontBold;
+  else if (style === 'italic') S.fontItalic = !S.fontItalic;
+  else if (style === 'underline') S.fontUnderline = !S.fontUnderline;
+  btn.classList.toggle('active',
+    style === 'bold' ? S.fontBold : style === 'italic' ? S.fontItalic : S.fontUnderline
+  );
+}
+function getFont() {
+  let font = '';
+  if (S.fontItalic) font += 'italic ';
+  if (S.fontBold) font += 'bold ';
+  font += S.fontSize + 'px ';
+  font += S.fontFamily;
+  return font;
+}
+
+/* ════════════════════════════════════════════
+   BACKGROUND PRESETS
+════════════════════════════════════════════ */
+const BG_PRESETS = [
+  '#111018','#080808','#1a1510','#0a1020','#0f1a10',
+  '#1a0f0f','#ffffff','#f5f0e8','#1a1510','#0d1117',
+  '#06060a','#2c1810'
+];
+let activeBgPreset = '#111018';
+function buildBgPresets() {
+  const grid = document.getElementById('bgPresetsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  BG_PRESETS.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'bg-preset-swatch' + (c === activeBgPreset ? ' active' : '');
+    s.style.background = c;
+    s.title = c;
+    s.onclick = () => {
+      activeBgPreset = c;
+      document.getElementById('canvasArea').style.background = c;
+      document.querySelectorAll('.bg-preset-swatch').forEach(x => x.classList.remove('active'));
+      s.classList.add('active');
+      toast('Background set');
+    };
+    grid.appendChild(s);
+  });
+}
+
+/* ════════════════════════════════════════════
+   CANVAS PRESETS
+════════════════════════════════════════════ */
+function applyCanvasPreset(w, h) {
+  resizeCanvas(w, h);
+  document.getElementById('canvasDimStatus').textContent = w + ' × ' + h;
+}
+
+/* ════════════════════════════════════════════
+   GRID OVERLAY
+════════════════════════════════════════════ */
+let gridVisible = false;
+function toggleGrid() {
+  gridVisible = !gridVisible;
+  const gc = document.getElementById('gridCanvas');
+  if (!gc) return;
+  if (gridVisible) {
+    gc.style.display = 'block';
+    gc.width = mainC.width; gc.height = mainC.height;
+    const ctx = gc.getContext('2d');
+    ctx.clearRect(0, 0, gc.width, gc.height);
+    const step = 40;
+    ctx.strokeStyle = 'rgba(201,168,76,.12)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= gc.width; x += step) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, gc.height); ctx.stroke();
+    }
+    for (let y = 0; y <= gc.height; y += step) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(gc.width, y); ctx.stroke();
+    }
+    toast('Grid on');
+  } else {
+    gc.style.display = 'none';
+    toast('Grid off');
+  }
+}
+
+/* ════════════════════════════════════════════
+   CANVAS COORDINATE DISPLAY
+════════════════════════════════════════════ */
+mainC.addEventListener('mousemove', e => {
+  const pos = getPos(e);
+  const cd = document.getElementById('canvasCoords');
+  if (cd) cd.textContent = Math.round(pos.x) + ', ' + Math.round(pos.y);
+});
+mainC.addEventListener('mouseleave', () => {
+  const cd = document.getElementById('canvasCoords');
+  if (cd) cd.textContent = '–, –';
+});
+
+/* ════════════════════════════════════════════
+   IMAGE IMPORT
+════════════════════════════════════════════ */
+function importImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      saveUndo();
+      const ctx = getActiveCtx();
+      ctx.drawImage(img, 0, 0, mainC.width, mainC.height);
+      renderLayers();
+      toast('Image imported');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+/* ════════════════════════════════════════════
+   CANVAS ROTATION
+════════════════════════════════════════════ */
+function rotateCanvas(deg) {
+  saveUndo();
+  const w = mainC.width, h = mainC.height;
+  const tmp = document.createElement('canvas');
+  const rad = deg === 90 ? Math.PI / 2 : deg === -90 ? -Math.PI / 2 : Math.PI;
+  const nw = (deg === 90 || deg === -90) ? h : w;
+  const nh = (deg === 90 || deg === -90) ? w : h;
+  tmp.width = nw; tmp.height = nh;
+  const tc = tmp.getContext('2d');
+  tc.translate(nw / 2, nh / 2);
+  tc.rotate(rad);
+  tc.drawImage(S.layers[S.activeLayer].canvas, -w / 2, -h / 2);
+  S.layers.forEach(l => {
+    const lt = document.createElement('canvas');
+    lt.width = nw; lt.height = nh;
+    lt.getContext('2d').drawImage(l.canvas, 0, 0);
+    l.canvas.width = nw; l.canvas.height = nh;
+    l.ctx.clearRect(0, 0, nw, nh);
+  });
+  getActiveCtx().drawImage(tmp, 0, 0);
+  mainC.width = overlayC.width = nw;
+  mainC.height = overlayC.height = nh;
+  renderLayers();
+  toast('Rotated ' + deg + '°');
+}
+
+/* ════════════════════════════════════════════
+   GUIDE MODAL
+════════════════════════════════════════════ */
+const GUIDE_CONTENT = {
+  start: {
+    title: 'Getting Started',
+    body: `<b>1. Pick a tool</b> from the left panel (or press a keyboard shortcut).<br><br>
+<b>2. Choose a colour</b> — click the colour wheel ring to set the hue, then click inside the square to set brightness and saturation. Or type a hex code directly.<br><br>
+<b>3. Adjust brush size</b> using the Size slider in the Brush tab, or press <b>[</b> to decrease and <b>]</b> to increase.<br><br>
+<b>4. Draw</b> — click and drag on the canvas. Hold <b>Ctrl+Z</b> to undo at any time.<br><br>
+<b>5. Save your work</b> using <b>Ctrl+S</b> or the 💾 Save button in the nav bar.<br><br>
+<i>Tip: Use the Canvas → Guide tab to find shortcuts whenever you need them.</i>`
+  },
+  brush: {
+    title: 'Brush Mastery',
+    body: `<b>Size</b> — Diameter of the brush tip. Keyboard: <b>[</b> / <b>]</b><br><br>
+<b>Hardness</b> — 100% = sharp crisp edge. 0% = soft feathered gradient.<br><br>
+<b>Flow</b> — How much paint is applied per step. Lower flow lets you build up slowly.<br><br>
+<b>Spacing</b> — Distance between brush stamps. Higher spacing = dotted effect.<br><br>
+<b>Jitter</b> — Random offset of each stamp, giving a natural scattered look.<br><br>
+<b>Special brushes:</b> Watercolour builds translucent washes. Oil gives textured blobs. Chalk scatters tiny dust particles. Neon paints with a glow effect. Spray/Splatter for distressed textures.<br><br>
+<i>Tip: Combine low opacity + multiple passes for glazing effects.</i>`
+  },
+  layers: {
+    title: 'Working with Layers',
+    body: `<b>Add Layer</b> — Click "+ Add" to paint on a new transparent layer above all others.<br><br>
+<b>Visibility</b> — Click the 👁 eye icon to hide/show a layer without deleting it.<br><br>
+<b>Blend Modes</b> — In the Colour tab, change the blend mode to control how your layer combines with layers below. "Multiply" darkens, "Screen" brightens, "Overlay" increases contrast.<br><br>
+<b>Duplicate</b> — Copies the active layer. Useful before applying destructive edits.<br><br>
+<b>Delete</b> — Permanently removes the active layer. Cannot be undone beyond the undo stack.<br><br>
+<i>Tip: Paint shadows on a "Multiply" layer and highlights on a "Screen" layer for non-destructive painting.</i>`
+  },
+  effects: {
+    title: 'Effects & Filters',
+    body: `Open the <b>Effects</b> tab in the right panel to toggle per-layer effects.<br><br>
+<b>Drop Shadow</b> — Adds a soft shadow offset behind the canvas content.<br>
+<b>Outer Glow</b> — A colour bloom radiating outward.<br>
+<b>Vignette</b> — Darkens canvas corners for a cinematic feel.<br>
+<b>Film Grain</b> — Adds photographic noise texture.<br>
+<b>Vintage / Sepia</b> — Warm, aged colour tone.<br>
+<b>Pixelate</b> — Chunky pixel blocks for a retro look.<br>
+<b>Chromatic Aberration</b> — Red/blue channel split for a glitchy feel.<br><br>
+The <b>Adjust</b> tab controls Brightness, Contrast, Saturation, Hue Rotation, and Blur globally.<br><br>
+<i>Tip: Combine Vignette + Film Grain + Vintage for an instant analogue photo look.</i>`
+  },
+  animation: {
+    title: 'Frame Animation',
+    body: `Click <b>🎬 Animate</b> in the nav bar to open the Timeline.<br><br>
+<b>Frames</b> — Click "+ Frame" to add new frames. Draw on each frame independently.<br>
+<b>Scenes</b> — Use the scene strip to organise long animations into acts.<br>
+<b>Onion Skin</b> — Shows ghost of previous/next frames so you can trace motion.<br>
+<b>Loop / FPS</b> — Set playback speed (6–30 FPS) and enable looping.<br><br>
+<b>Transitions (✨ Effect)</b> — Each frame can have its own entry effect: Fade, Wipe, Zoom, Dissolve, Glitch, Flash, and more.<br><br>
+<b>Particle Overlays</b> — Add Sparkle, Fire, Rain, Snow, Confetti, Stars, or Bubbles effects per frame during playback.<br><br>
+<b>Export</b> — Click ⬇ Export to save as WebM video or a sequence of PNG frames.<br>
+<b>Record</b> — Click ⏺ Record to capture live drawing as a WebM video.<br><br>
+<i>Tip: Duplicate a frame, make small changes, and repeat for smooth cel animation.</i>`
+  },
+  symmetry: {
+    title: 'Symmetry & Shapes',
+    body: `<b>Symmetry</b> — In the Brush tab, choose H (horizontal mirror), V (vertical mirror), or Quad (all four quadrants) to paint symmetrically. Every stroke is mirrored instantly.<br><br>
+<b>Shapes</b> — Click any shape tool (Rect, Ellipse, Star, Heart, etc.) then click-drag on canvas to draw it. Use the Shape Fill options to set Fill only, Stroke only, or Both.<br><br>
+<b>Stroke Weight</b> — Controls the outline thickness for shapes drawn with Stroke mode.<br><br>
+<b>Rounded Rect</b> — Automatically rounds corners proportionally.<br>
+<b>Polygon shapes</b> — Pentagon and Hexagon are regular polygons. Star and Star6 have alternating inner/outer radii.<br><br>
+<i>Tip: Draw a mandala-style pattern by combining Quad symmetry with the Brush or Neon tool.</i>`
+  }
+};
+function openGuideModal(key) {
+  const g = GUIDE_CONTENT[key];
+  if (!g) return;
+  document.getElementById('guideModalTitle').textContent = g.title;
+  document.getElementById('guideModalBody').innerHTML = g.body;
+  document.getElementById('guideModal').classList.add('open');
+}
+
+/* ════════════════════════════════════════════
+   EXTENDED onColorPick to track recent colors
+════════════════════════════════════════════ */
+const _origOnColorPick = onColorPick;
+
 /* ════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════ */
@@ -2305,6 +2679,8 @@ window.addEventListener('load',()=>{
     drawSVBox();
     // Init animation system with one default page and one frame
     initAnimSystem();
+    buildBgPresets();
+    renderRecentColors();
   },100);
 });
 
