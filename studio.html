@@ -129,9 +129,15 @@ button,select,input{font-family:'Josefin Sans',sans-serif;cursor:pointer;}
 .anim-type-btn.active,.anim-type-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.07);}
 
 /* ══════════════ CANVAS AREA ══════════════ */
-.canvas-area{position:fixed;top:var(--nav);left:var(--left);right:var(--right);bottom:var(--bottom);overflow:hidden;background:#111018;display:flex;align-items:center;justify-content:center;}
-.canvas-wrapper{position:relative;transform-origin:center center;transition:transform .05s;}
-canvas{display:block;cursor:crosshair;}
+.canvas-area{position:fixed;top:var(--nav);left:var(--left);right:var(--right);bottom:var(--bottom);overflow:hidden;background:#111018;display:flex;align-items:center;justify-content:center;touch-action:none;}
+.canvas-wrapper{position:relative;transform-origin:center center;transition:transform .05s;touch-action:none;}
+/* On mobile/tablet the canvas wrapper fills the full drawing zone
+   so every touch anywhere draws — not just on the canvas element itself */
+@media(max-width:1024px){
+  .canvas-wrapper{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+  .canvas-wrapper canvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+}
+canvas{display:block;cursor:crosshair;touch-action:none;}
 #overlayCanvas{position:absolute;inset:0;pointer-events:none;}
 #textInput{position:absolute;background:transparent;border:1px dashed rgba(201,168,76,.5);color:inherit;font-family:'Josefin Sans',sans-serif;font-size:16px;outline:none;display:none;min-width:80px;padding:2px 4px;z-index:10;}
 .ruler-h{position:absolute;top:0;left:0;right:0;height:18px;background:rgba(8,7,12,.9);border-bottom:1px solid rgba(201,168,76,.12);pointer-events:none;display:none;}
@@ -189,9 +195,10 @@ canvas{display:block;cursor:crosshair;}
 
 /* Templates Grid */
 .tmpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.5rem;}
-.tmpl-card{background:var(--surface2);border:1px solid rgba(201,168,76,.12);padding:.6rem;cursor:pointer;transition:all .2s;text-align:center;}
-.tmpl-card:hover{border-color:var(--gold);background:rgba(201,168,76,.05);}
-.tmpl-card canvas{display:block;width:100%;margin-bottom:.4rem;border:1px solid rgba(201,168,76,.08);}
+@media(min-width:600px){.tmpl-grid{grid-template-columns:repeat(4,1fr);}}
+.tmpl-card{background:var(--surface2);border:1px solid rgba(201,168,76,.12);padding:.6rem;cursor:pointer;transition:all .2s;text-align:center;border-radius:4px;}
+.tmpl-card:hover,.tmpl-card:active{border-color:var(--gold);background:rgba(201,168,76,.07);transform:scale(1.03);}
+.tmpl-card canvas{display:block;width:100%;margin-bottom:.4rem;border:1px solid rgba(201,168,76,.08);border-radius:2px;}
 .tmpl-card span{font-size:.48rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
 
 /* ══════════════ MOBILE TOP STRIP ══════════════ */
@@ -391,6 +398,57 @@ canvas{display:block;cursor:crosshair;}
 .export-progress-fill{height:100%;background:linear-gradient(to right,var(--gold),var(--teal-l));width:0;transition:width .2s;}
 .export-status{font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:center;}
 
+/* ══════════════ MISSING / BUG-FIX CSS ══════════════ */
+.font-btn{padding:.3rem .5rem;font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(240,234,214,.04);border:1px solid rgba(201,168,76,.15);color:var(--muted);transition:all .2s;cursor:pointer;}
+.font-btn.active,.font-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.07);}
+.font-family-row{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.5rem;}
+.sc-mini-table{width:100%;border-collapse:collapse;font-size:.58rem;color:rgba(240,234,214,.6);}
+.sc-mini-table td{padding:.28rem .35rem;border-bottom:1px solid rgba(201,168,76,.06);}
+.sc-mini-table td:first-child{color:var(--gold);font-family:monospace;width:90px;}
+.guide-entry{background:rgba(240,234,214,.03);border:1px solid rgba(201,168,76,.1);padding:.55rem .65rem;margin-bottom:.35rem;cursor:pointer;transition:all .2s;}
+.guide-entry:hover{border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.05);}
+.guide-entry-title{font-size:.58rem;letter-spacing:.1em;color:var(--cream);margin-bottom:.2rem;display:flex;align-items:center;gap:.4rem;}
+.guide-entry-desc{font-size:.52rem;color:var(--muted);}
+.ge-tag{font-size:.42rem;letter-spacing:.12em;padding:.1rem .35rem;border-radius:2px;}
+.ge-tag.beg{background:rgba(42,154,138,.2);color:var(--teal-l);}
+.ge-tag.int{background:rgba(201,168,76,.2);color:var(--gold);}
+.ge-tag.adv{background:rgba(201,74,106,.2);color:#f07090;}
+.bg-presets-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:.6rem;}
+.bg-preset-swatch{aspect-ratio:1;border:1px solid rgba(201,168,76,.1);cursor:pointer;transition:transform .15s;border-radius:2px;}
+.bg-preset-swatch:hover,.bg-preset-swatch.active{transform:scale(1.15);border-color:var(--gold);z-index:1;position:relative;}
+.canvas-preset-grid{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.5rem;}
+.canvas-preset-btn{padding:.38rem .55rem;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;background:rgba(240,234,214,.04);border:1px solid rgba(201,168,76,.15);color:var(--muted);text-align:left;transition:all .2s;cursor:pointer;}
+.canvas-preset-btn:hover{border-color:var(--gold);color:var(--gold);}
+.sh-tab{display:block;}
+/* ── Canvas status bar ── */
+.canvas-status-bar{
+  position:fixed;bottom:calc(var(--bottom) + 2px);left:calc(var(--left) + 8px);
+  display:flex;align-items:center;gap:.7rem;z-index:420;pointer-events:none;
+}
+.canvas-status-bar span{
+  font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(201,168,76,.35);background:rgba(8,7,12,.7);padding:.1rem .4rem;
+  border-radius:2px;
+}
+@media(max-width:1024px){.canvas-status-bar{display:none;}}
+/* ── "active shape" multiple instances indicator ── */
+.multi-shape-badge{
+  display:inline-block;background:rgba(42,154,138,.18);
+  border:1px solid rgba(77,201,180,.3);color:var(--teal-l);
+  font-size:.46rem;letter-spacing:.1em;padding:.1rem .45rem;border-radius:2px;
+}
+/* ── Improved mobile touch hitboxes ── */
+@media(max-width:1024px){
+  .mtb-tool{min-width:60px;min-height:60px;}
+  .mts-btn{min-width:40px;min-height:40px;}
+  .mtb-tab{min-height:46px;font-size:.54rem;}
+}
+/* Stops iOS/Android from treating a draw gesture as a page scroll      */
+.canvas-area,.canvas-wrapper,#mainCanvas,#overlayCanvas,#particleCanvas{
+  -webkit-user-select:none;user-select:none;
+  overscroll-behavior:none;
+}
+
 /* ── PARTICLE CANVAS ── */
 #particleCanvas{position:absolute;inset:0;pointer-events:none;z-index:5;}
 
@@ -571,6 +629,128 @@ canvas{display:block;cursor:crosshair;}
   transition:transform .2s,box-shadow .2s;
 }
 .quick-color-fab:hover{transform:scale(1.12);box-shadow:0 4px 16px rgba(201,168,76,.35);}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE / TABLET — VERTICAL COLOR STRIP (right edge)
+   Always visible, no tap-to-open native picker required.
+══════════════════════════════════════════════════════════ */
+.mob-color-strip{
+  display:none;
+  position:fixed;top:var(--nav);right:0;
+  width:52px;bottom:110px;z-index:370;
+  flex-direction:column;align-items:center;gap:0;
+  background:rgba(8,7,12,.97);
+  border-left:1px solid rgba(201,168,76,.18);
+  overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
+  touch-action:pan-y;
+}
+.mob-color-strip::-webkit-scrollbar{display:none;}
+
+.mcs-target{
+  display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:.5rem .2rem .35rem;
+  border-bottom:1px solid rgba(201,168,76,.12);
+  width:100%;flex-shrink:0;
+}
+.mcs-target-btn{
+  width:38px;height:24px;font-size:.4rem;letter-spacing:.08em;
+  text-transform:uppercase;background:rgba(240,234,214,.05);
+  border:1px solid rgba(201,168,76,.2);color:var(--muted);
+  transition:all .2s;cursor:pointer;border-radius:2px;
+}
+.mcs-target-btn.active{
+  background:rgba(201,168,76,.2);border-color:var(--gold);color:var(--gold);
+}
+
+.mcs-current{
+  width:40px;height:40px;flex-shrink:0;
+  border:2px solid rgba(201,168,76,.55);
+  position:relative;cursor:pointer;margin:.5rem 0 .25rem;
+  border-radius:3px;
+}
+.mcs-current input[type=color]{
+  position:absolute;inset:0;opacity:0;
+  width:100%;height:100%;cursor:pointer;
+}
+
+.mcs-hex{
+  width:42px;height:20px;background:rgba(240,234,214,.05);
+  border:1px solid rgba(201,168,76,.15);color:var(--gold);
+  font-size:.44rem;letter-spacing:.04em;text-align:center;
+  outline:none;padding:0;text-transform:uppercase;border-radius:2px;
+}
+.mcs-hex:focus{border-color:var(--gold);}
+
+.mcs-label{
+  font-size:.36rem;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(201,168,76,.4);padding:.3rem 0 .1rem;
+  border-top:1px solid rgba(201,168,76,.08);
+  width:100%;text-align:center;flex-shrink:0;
+}
+
+.mcs-hue-bar{
+  width:30px;height:170px;flex-shrink:0;border-radius:4px;
+  cursor:pointer;border:1px solid rgba(201,168,76,.2);
+  position:relative;touch-action:none;margin:.15rem 0;
+  background:linear-gradient(to bottom,
+    hsl(0,100%,50%),hsl(30,100%,50%),hsl(60,100%,50%),
+    hsl(90,100%,50%),hsl(120,100%,50%),hsl(150,100%,50%),
+    hsl(180,100%,50%),hsl(210,100%,50%),hsl(240,100%,50%),
+    hsl(270,100%,50%),hsl(300,100%,50%),hsl(330,100%,50%),
+    hsl(360,100%,50%));
+}
+.mcs-sl-bar{
+  width:30px;height:110px;flex-shrink:0;border-radius:4px;
+  cursor:pointer;border:1px solid rgba(201,168,76,.2);
+  position:relative;touch-action:none;margin:.15rem 0;
+}
+.mcs-v-bar{
+  width:30px;height:80px;flex-shrink:0;border-radius:4px;
+  cursor:pointer;border:1px solid rgba(201,168,76,.2);
+  position:relative;touch-action:none;margin:.15rem 0;
+}
+.mcs-bar-thumb{
+  position:absolute;left:-3px;right:-3px;height:4px;
+  background:#fff;border-radius:2px;pointer-events:none;
+  box-shadow:0 0 5px rgba(0,0,0,.9);
+  transform:translateY(-50%);top:0;
+}
+
+.mcs-swatches{
+  display:flex;flex-direction:column;gap:2px;
+  align-items:center;padding:.25rem 0;width:100%;flex-shrink:0;
+}
+.mcs-swatch{
+  width:36px;height:20px;flex-shrink:0;cursor:pointer;
+  border:1px solid rgba(255,255,255,.07);border-radius:2px;
+  transition:transform .12s;
+}
+.mcs-swatch:active{transform:scaleX(1.08);}
+.mcs-swatch.active-swatch{outline:2px solid var(--gold);outline-offset:1px;}
+
+/* Canvas area & UI elements shift left to give strip room */
+@media(max-width:1024px){
+  .mob-color-strip{display:flex;}
+  .canvas-area{right:52px !important;}
+  .mobile-top-strip{right:52px !important;}
+  .mobile-toolbox{right:52px !important;}
+  .props-sheet{right:52px !important;}
+  .studio-toast{right:62px;}
+  .props-fab{right:62px !important;}
+  .canvas-fab-wrap{right:70px !important;}
+}
+@media(max-width:480px){
+  .mob-color-strip{width:46px;bottom:108px;}
+  .mcs-hue-bar,.mcs-sl-bar,.mcs-v-bar,.mcs-swatch{width:28px;}
+  .mcs-current{width:34px;height:34px;}
+  .mcs-hex{width:36px;}
+  .canvas-area{right:46px !important;}
+  .mobile-top-strip{right:46px !important;}
+  .mobile-toolbox{right:46px !important;}
+  .props-sheet{right:46px !important;}
+  .props-fab{right:56px !important;}
+  .canvas-fab-wrap{right:60px !important;}
+}
 </style>
 </head>
 <body>
@@ -599,6 +779,15 @@ canvas{display:block;cursor:crosshair;}
         <button class="menu-dd-item" onclick="selectAll()">Select All<span class="dd-key">Ctrl+A</span></button>
         <button class="menu-dd-item" onclick="flipH()">Flip Horizontal</button>
         <button class="menu-dd-item" onclick="flipV()">Flip Vertical</button>
+        <div class="menu-dd-sep"></div>
+        <button class="menu-dd-item" onclick="toggleAnimMode()">🎬 Animation Mode<span class="dd-key">Ctrl+Shift+A</span></button>
+        <button class="menu-dd-item" onclick="addFrame()">➕ New Frame</button>
+        <button class="menu-dd-item" onclick="dupFrame()">⊕ Duplicate Frame</button>
+        <button class="menu-dd-item" onclick="delFrame()">✕ Delete Frame</button>
+        <div class="menu-dd-sep"></div>
+        <button class="menu-dd-item" onclick="togglePlay()">▶ Play / Stop</button>
+        <button class="menu-dd-item" onclick="toggleOnion()">◎ Onion Skin</button>
+        <button class="menu-dd-item" onclick="openExport()">⬇ Export Animation</button>
       </div>
     </div>
     <div class="menu-item">
@@ -690,6 +879,14 @@ canvas{display:block;cursor:crosshair;}
     <button class="tool-btn" data-tool="star6" onclick="setTool(this)">✶<span class="tool-label">Star6</span><span class="tt">6-Point Star</span></button>
     <button class="tool-btn" data-tool="heart" onclick="setTool(this)">♡<span class="tool-label">Heart</span><span class="tt">Heart</span></button>
     <button class="tool-btn" data-tool="cross" onclick="setTool(this)">✚<span class="tool-label">Cross</span><span class="tt">Cross</span></button>
+    <button class="tool-btn" data-tool="octagon" onclick="setTool(this)">⯃<span class="tool-label">Oct</span><span class="tt">Octagon</span></button>
+    <button class="tool-btn" data-tool="parallelogram" onclick="setTool(this)">▱<span class="tool-label">Para</span><span class="tt">Parallelogram</span></button>
+    <button class="tool-btn" data-tool="semicircle" onclick="setTool(this)">◗<span class="tool-label">Semi</span><span class="tt">Semicircle</span></button>
+    <button class="tool-btn" data-tool="cloud" onclick="setTool(this)">☁<span class="tool-label">Cloud</span><span class="tt">Cloud</span></button>
+    <button class="tool-btn" data-tool="speech" onclick="setTool(this)">💬<span class="tool-label">Speech</span><span class="tt">Speech Bubble</span></button>
+    <button class="tool-btn" data-tool="lightning" onclick="setTool(this)">⚡<span class="tool-label">Bolt</span><span class="tt">Lightning Bolt</span></button>
+    <button class="tool-btn" data-tool="crescent" onclick="setTool(this)">☽<span class="tool-label">Moon</span><span class="tt">Crescent</span></button>
+    <button class="tool-btn" data-tool="donut" onclick="setTool(this)">◎<span class="tool-label">Donut</span><span class="tt">Donut/Ring</span></button>
   </div>
   <!-- More -->
   <div class="tool-group">
@@ -698,6 +895,8 @@ canvas{display:block;cursor:crosshair;}
     <button class="tool-btn" data-tool="gradient" onclick="setTool(this)">🌈<span class="tool-label">Grad</span><span class="tt">Gradient</span></button>
     <button class="tool-btn" data-tool="move" onclick="setTool(this)">✥<span class="tool-label">Move</span><span class="tt">Move (V)</span></button>
     <button class="tool-btn" data-tool="crop" onclick="setTool(this)">⊡<span class="tool-label">Crop</span><span class="tt">Crop</span></button>
+    <button class="tool-btn" data-tool="ruler-tool" onclick="setTool(this)">📏<span class="tool-label">Ruler</span><span class="tt">Ruler / Guide</span></button>
+    <button class="tool-btn" data-tool="symmetry-tool" onclick="setTool(this)">🔀<span class="tool-label">Symm</span><span class="tt">Symmetry Paint</span></button>
   </div>
 </div>
 
@@ -1039,6 +1238,48 @@ canvas{display:block;cursor:crosshair;}
 <button class="panel-toggle left-toggle" id="leftPanelToggle" onclick="toggleLeftPanel()" title="Tools">Tools</button>
 <button class="panel-toggle right-toggle" id="rightPanelToggle" onclick="toggleRightPanel()" title="Properties">Props</button>
 
+<!-- ════════════ MOBILE VERTICAL COLOR STRIP ════════════ -->
+<!-- Visible on mobile/tablet only. Replaces the inaccessible native picker.  -->
+<div class="mob-color-strip" id="mobColorStrip">
+
+  <!-- Target: Brush colour or Canvas Background -->
+  <div class="mcs-target">
+    <button class="mcs-target-btn active" id="mcsTargetBrush" onclick="setMcsTarget('brush')">Brush</button>
+    <button class="mcs-target-btn" id="mcsTargetBg" onclick="setMcsTarget('bg')">BG</button>
+  </div>
+
+  <!-- Big current colour swatch — tap to open native picker as fallback -->
+  <div class="mcs-current" id="mcsCurrent" style="background:#c9a84c;">
+    <input type="color" id="mcsNativePicker" value="#c9a84c" oninput="mcsNativePick(this.value)">
+  </div>
+
+  <!-- Hex readout -->
+  <input class="mcs-hex" id="mcsHex" value="#C9A84C" maxlength="7" oninput="mcsHexInput(this.value)">
+
+  <!-- HUE bar -->
+  <span class="mcs-label">Hue</span>
+  <div class="mcs-hue-bar" id="mcsHueBar">
+    <div class="mcs-hue-thumb" id="mcsHueThumb"></div>
+  </div>
+
+  <!-- SATURATION bar -->
+  <span class="mcs-label">Sat</span>
+  <div class="mcs-sl-bar" id="mcsSatBar">
+    <div class="mcs-sl-thumb" id="mcsSatThumb"></div>
+  </div>
+
+  <!-- BRIGHTNESS bar -->
+  <span class="mcs-label">Brt</span>
+  <div class="mcs-v-bar" id="mcsBrtBar">
+    <div class="mcs-v-thumb" id="mcsBrtThumb"></div>
+  </div>
+
+  <!-- Quick-access swatches -->
+  <span class="mcs-label">Quick</span>
+  <div class="mcs-swatches" id="mcsSwatches"></div>
+
+</div>
+
 <!-- ════════════ CANVAS AREA ════════════ -->
 <div class="canvas-area" id="canvasArea">
   <div class="ruler-h" id="rulerH"></div>
@@ -1046,9 +1287,17 @@ canvas{display:block;cursor:crosshair;}
   <div class="canvas-wrapper" id="canvasWrapper">
     <canvas id="mainCanvas" width="900" height="650"></canvas>
     <canvas id="overlayCanvas" width="900" height="650"></canvas>
+    <canvas id="gridCanvas" width="900" height="650" style="position:absolute;inset:0;pointer-events:none;display:none;z-index:3;"></canvas>
     <canvas id="particleCanvas" width="900" height="650"></canvas>
     <input id="textInput" type="text">
   </div>
+</div>
+
+<!-- Canvas coordinate / tool status bar (desktop) -->
+<div class="canvas-status-bar">
+  <span id="canvasCoords">–, –</span>
+  <span id="canvasToolStatus">🖌 Brush</span>
+  <span id="canvasDimStatus">900 × 650</span>
 </div>
 
 <!-- ════════════ DESKTOP BOTTOM BAR ════════════ -->
@@ -1097,9 +1346,9 @@ canvas{display:block;cursor:crosshair;}
 <!-- ════════════ MOBILE TOP STRIP ════════════ -->
 <div class="mobile-top-strip" id="mobileTopStrip">
   <div class="mts-item">
-    <div class="mts-swatch" id="mtsSwatch" style="background:#c9a84c;">
-      <input type="color" id="mtsColor" value="#c9a84c" oninput="onColorPick(this.value)">
+    <div class="mts-swatch" id="mtsSwatch" style="background:#c9a84c;" onclick="setMcsTarget(mcsTarget==='brush'?'bg':'brush');toast('Color target: '+(mcsTarget==='bg'?'Background':'Brush'))" title="Tap to switch color target (Brush / BG)">
     </div>
+    <span class="mts-label" id="mtsTargetLabel" style="font-size:.42rem;">Brush</span>
   </div>
   <div class="mts-sep"></div>
   <div class="mts-item">
@@ -1155,6 +1404,7 @@ canvas{display:block;cursor:crosshair;}
     <button class="mtb-tab" onclick="switchMtbTab('shape',this)">Shape</button>
     <button class="mtb-tab" onclick="switchMtbTab('edit',this)">Edit</button>
     <button class="mtb-tab" onclick="switchMtbTab('more',this)">More</button>
+    <button class="mtb-tab" onclick="switchMtbTab('anim',this)">🎬</button>
   </div>
   <!-- Paint -->
   <div class="mtb-panel active" id="mtb-paint">
@@ -1186,6 +1436,14 @@ canvas{display:block;cursor:crosshair;}
     <button class="mtb-tool" data-tool="star6" onclick="setTool(this)">✶<span>Star6</span></button>
     <button class="mtb-tool" data-tool="heart" onclick="setTool(this)">♡<span>Heart</span></button>
     <button class="mtb-tool" data-tool="cross" onclick="setTool(this)">✚<span>Cross</span></button>
+    <button class="mtb-tool" data-tool="octagon" onclick="setTool(this)">⯃<span>Oct</span></button>
+    <button class="mtb-tool" data-tool="parallelogram" onclick="setTool(this)">▱<span>Para</span></button>
+    <button class="mtb-tool" data-tool="semicircle" onclick="setTool(this)">◗<span>Semi</span></button>
+    <button class="mtb-tool" data-tool="cloud" onclick="setTool(this)">☁<span>Cloud</span></button>
+    <button class="mtb-tool" data-tool="speech" onclick="setTool(this)">💬<span>Speech</span></button>
+    <button class="mtb-tool" data-tool="lightning" onclick="setTool(this)">⚡<span>Bolt</span></button>
+    <button class="mtb-tool" data-tool="crescent" onclick="setTool(this)">☽<span>Moon</span></button>
+    <button class="mtb-tool" data-tool="donut" onclick="setTool(this)">◎<span>Donut</span></button>
   </div>
   <!-- Edit -->
   <div class="mtb-panel" id="mtb-edit">
@@ -1208,6 +1466,19 @@ canvas{display:block;cursor:crosshair;}
     <button class="mtb-tool" onclick="flipH()">↔<span>FlipH</span></button>
     <button class="mtb-tool" onclick="flipV()">↕<span>FlipV</span></button>
     <button class="mtb-tool" onclick="openTemplates()">📋<span>Tmplt</span></button>
+  </div>
+  <!-- Animate -->
+  <div class="mtb-panel" id="mtb-anim">
+    <button class="mtb-tool" onclick="toggleAnimMode()">🎬<span>Mode</span></button>
+    <button class="mtb-tool" onclick="addFrame()">➕<span>New Fr</span></button>
+    <button class="mtb-tool" onclick="dupFrame()">⊕<span>Dup Fr</span></button>
+    <button class="mtb-tool" onclick="delFrame()">🗑<span>Del Fr</span></button>
+    <button class="mtb-tool" onclick="togglePlay();syncFabPlay()">▶<span>Play</span></button>
+    <button class="mtb-tool" onclick="toggleOnion()">◎<span>Onion</span></button>
+    <button class="mtb-tool" onclick="addPage()">📄<span>Scene+</span></button>
+    <button class="mtb-tool" onclick="openExport()">⬇<span>Export</span></button>
+    <button class="mtb-tool" onclick="startRecord()">⏺<span>Record</span></button>
+    <button class="mtb-tool" onclick="openFrameEffMenu()">✨<span>Effect</span></button>
   </div>
 </div>
 
@@ -1470,6 +1741,7 @@ const S = {
   brightness:0, contrast:0, saturation:0, hue:0, blur:0,
   drawing:false, lastX:0, lastY:0, strokeAccum:0,
   shapeStart:null, zoom:1, pan:{x:0,y:0},
+  _penPressure:null,
   undoStack:[], redoStack:[], maxUndo:30,
   layers:[{name:'Layer 1',visible:true,canvas:null,ctx:null}],
   activeLayer:0,
@@ -1678,7 +1950,7 @@ function hexToRGBA(h,a){const[r,g,b]=hexToRGB(h);return[r,g,b,Math.round(a*255)]
 /* ════════════════════════════════════════════
    TOOL PANEL
 ════════════════════════════════════════════ */
-const SHAPES=['line','rect','circle','triangle','star','pentagon','hexagon','diamond','arrow','heart','roundrect','star6','cross'];
+const SHAPES=['line','rect','circle','triangle','star','pentagon','hexagon','diamond','arrow','heart','roundrect','star6','cross','octagon','parallelogram','semicircle','cloud','speech','lightning','crescent','donut'];
 function setTool(btn){
   document.querySelectorAll('.tool-btn,.bb-tool-mini,.mtb-tool').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll(`[data-tool="${btn.dataset.tool}"]`).forEach(b=>b.classList.add('active'));
@@ -1753,13 +2025,48 @@ function redo(){if(!S.redoStack.length){toast('Nothing to redo');return;}const c
    DRAWING
 ════════════════════════════════════════════ */
 function getPos(e){
-  const rect=mainC.getBoundingClientRect();
-  const scaleX=mainC.width/mainC.offsetWidth, scaleY=mainC.height/mainC.offsetHeight;
+  const src = e.touches ? e.touches[0] : (e.changedTouches ? e.changedTouches[0] : e);
+
+  // Use actual canvas element bounds — accurate at any zoom level.
+  // getBoundingClientRect() gives the on-screen pixel rect after CSS transform,
+  // so the scale factors correct for both browser zoom and our S.zoom.
+  const rect = mainC.getBoundingClientRect();
+  const scaleX = mainC.width  / rect.width;
+  const scaleY = mainC.height / rect.height;
+
+  // For touch, clamp to nearest canvas edge so strokes don't jump to 0,0.
+  const isTouch = !!(e.touches || e.changedTouches);
+  const cx = isTouch ? Math.max(rect.left, Math.min(rect.right,  src.clientX)) : src.clientX;
+  const cy = isTouch ? Math.max(rect.top,  Math.min(rect.bottom, src.clientY)) : src.clientY;
+
+  return {
+    x: Math.max(0, Math.min(mainC.width,  (cx - rect.left) * scaleX)),
+    y: Math.max(0, Math.min(mainC.height, (cy - rect.top)  * scaleY))
+  };
+}
+function isInCanvasArea(e){
+  const ca=document.getElementById('canvasArea');
+  if(!ca)return false;
   const src=e.touches?e.touches[0]:e;
-  return{x:(src.clientX-rect.left)*scaleX,y:(src.clientY-rect.top)*scaleY};
+  const r=ca.getBoundingClientRect();
+  return src.clientX>=r.left&&src.clientX<=r.right&&src.clientY>=r.top&&src.clientY<=r.bottom;
 }
 function startDraw(e){
-  if(e.target!==mainC&&e.target!==overlayC)return;
+  // Desktop mouse: only fire on the canvas elements themselves
+  if(!e.touches && e.target!==mainC && e.target!==overlayC) return;
+
+  // Touch / tablet: allow the full canvas-area, block only actual UI controls
+  if(e.touches){
+    const tgt = e.target;
+    const tag = (tgt.tagName||'').toUpperCase();
+    const id  = tgt.id || '';
+    // Block buttons, inputs, selects, labels, and the colour-wheel canvases
+    if(tag==='BUTTON'||tag==='INPUT'||tag==='SELECT'||tag==='LABEL') return;
+    if(id==='colorWheelCanvas'||id==='svCanvas') return;
+    // Block touches that originate inside UI panels (right-panel, tool-panel, toolbox, etc.)
+    if(tgt.closest('.right-panel,.tool-panel,.mobile-toolbox,.mobile-top-strip,.studio-nav,.timeline,.pages-strip,.props-sheet,.studio-modal-bg,.frame-eff-menu,.canvas-fab-wrap')) return;
+  }
+
   e.preventDefault();
   const pos=getPos(e);
   if(S.tool==='fill'){saveUndo();floodFill(pos.x,pos.y);renderLayers();return;}
@@ -1775,7 +2082,8 @@ function startDraw(e){
   else{drawDot(pos.x,pos.y);applySymm(pos.x,pos.y);}
 }
 function moveDraw(e){
-  if(!S.drawing)return;e.preventDefault();
+  if(!S.drawing)return;
+  e.preventDefault();
   const pos=getPos(e);
   if(S.tool==='crop'){drawCropPreview(S.shapeStart.x,S.shapeStart.y,pos.x,pos.y);return;}
   const isShape=SHAPES.includes(S.tool);
@@ -1787,7 +2095,7 @@ function moveDraw(e){
 function endDraw(e){
   if(!S.drawing)return;
   S.drawing=false;
-  const pos=e.changedTouches?getPos({clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY}):getPos(e);
+  const pos=getPos(e);
   if(S.tool==='crop'&&S.shapeStart){cropCanvas(S.shapeStart.x,S.shapeStart.y,pos.x,pos.y);clearOverlay();return;}
   const isShape=SHAPES.includes(S.tool);
   if(isShape&&S.shapeStart){commitShape(S.shapeStart.x,S.shapeStart.y,pos.x,pos.y);clearOverlay();S.shapeStart=null;}
@@ -1796,7 +2104,9 @@ function endDraw(e){
 function getActiveDrawCtx(){
   const ctx=getActiveCtx();
   ctx.globalCompositeOperation=S.tool==='eraser'?'destination-out':S.blendMode;
-  ctx.globalAlpha=S.opacity;ctx.fillStyle=S.color;ctx.strokeStyle=S.color;
+  // Apply stylus pressure if available
+  const eff_opacity = S._penPressure!=null ? S.opacity*S._penPressure : S.opacity;
+  ctx.globalAlpha=eff_opacity;ctx.fillStyle=S.color;ctx.strokeStyle=S.color;
   return ctx;
 }
 function drawDot(x,y){
@@ -1953,6 +2263,50 @@ function drawShape(ctx,x1,y1,x2,y2){
   }
   if(S.tool==='pentagon'){drawPoly(ctx,cx,cy,r,5,fill,stroke);return;}
   if(S.tool==='hexagon'){drawPoly(ctx,cx,cy,r,6,fill,stroke);return;}
+  if(S.tool==='octagon'){drawPoly(ctx,cx,cy,r,8,fill,stroke);return;}
+  if(S.tool==='parallelogram'){
+    const sk=rx*.3;
+    ctx.moveTo(x1+sk,y1);ctx.lineTo(x2,y1);ctx.lineTo(x2-sk,y2);ctx.lineTo(x1,y2);
+    ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke();return;
+  }
+  if(S.tool==='semicircle'){
+    ctx.arc(cx,cy,Math.max(rx,ry),Math.PI,0);ctx.closePath();
+    if(fill)ctx.fill();if(stroke)ctx.stroke();return;
+  }
+  if(S.tool==='donut'){
+    ctx.arc(cx,cy,r,0,Math.PI*2);ctx.arc(cx,cy,r*.45,0,Math.PI*2,true);
+    ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke();return;
+  }
+  if(S.tool==='crescent'){
+    ctx.arc(cx,cy,r,0.3,Math.PI*1.7);
+    ctx.arc(cx+r*.3,cy,r*.75,Math.PI*1.7,0.3,true);
+    ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke();return;
+  }
+  if(S.tool==='cloud'){
+    const bx=x1,by=y1+(y2-y1)*.45,bw=x2-x1,bh=(y2-y1)*.55;
+    ctx.arc(bx+bw*.2,by+bh*.3,bh*.4,0,Math.PI*2);
+    ctx.arc(bx+bw*.5,by,bh*.5,0,Math.PI*2);
+    ctx.arc(bx+bw*.8,by+bh*.2,bh*.38,0,Math.PI*2);
+    ctx.arc(bx+bw*.5,by+bh*.5,bh*.5,0,Math.PI*2);
+    if(fill)ctx.fill();if(stroke)ctx.stroke();return;
+  }
+  if(S.tool==='speech'){
+    const r2=Math.min(rx,ry)*.2;
+    ctx.moveTo(x1+r2,y1);ctx.lineTo(x2-r2,y1);
+    ctx.quadraticCurveTo(x2,y1,x2,y1+r2);
+    ctx.lineTo(x2,y2-ry*.35);ctx.quadraticCurveTo(x2,y2-ry*.1,x2-rx*.25,y2-ry*.1);
+    ctx.lineTo(cx-rx*.15,y2-ry*.1);ctx.lineTo(cx-rx*.35,y2);
+    ctx.lineTo(cx-rx*.1,y2-ry*.1);ctx.lineTo(x1+r2,y2-ry*.1);
+    ctx.quadraticCurveTo(x1,y2-ry*.1,x1,y2-ry*.35-ry*.1);
+    ctx.lineTo(x1,y1+r2);ctx.quadraticCurveTo(x1,y1,x1+r2,y1);
+    ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke();return;
+  }
+  if(S.tool==='lightning'){
+    const midX=cx+rx*.1;
+    ctx.moveTo(cx+rx*.25,y1);ctx.lineTo(x1,cy);ctx.lineTo(midX,cy);
+    ctx.lineTo(cx-rx*.25,y2);ctx.lineTo(x2,cy);ctx.lineTo(cx-rx*.1,cy);
+    ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke();return;
+  }
 }
 function drawPoly(ctx,cx,cy,r,sides,fill,stroke){
   ctx.beginPath();
@@ -2222,7 +2576,7 @@ function flipV(){saveUndo();const ctx=getActiveCtx();const tmp=document.createEl
 function selectAll(){toast('Select All (Ctrl+A)');}
 function toggleSymmetry(){const opts=['none','h','v','quad'];const i=opts.indexOf(S.symmetry);S.symmetry=opts[(i+1)%opts.length];toast('Symmetry: '+S.symmetry);}
 function toggleRulers(){document.getElementById('canvasArea').classList.toggle('show-rulers');toast('Rulers toggled');}
-function resizeCanvas(w,h){saveUndo();S.layers.forEach(l=>{const tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;tmp.getContext('2d').drawImage(l.canvas,0,0);l.canvas.width=w;l.canvas.height=h;l.ctx.drawImage(tmp,0,0);});mainC.width=overlayC.width=w;mainC.height=overlayC.height=h;renderLayers();toast(`Canvas: ${w}×${h}`);}
+function resizeCanvas(w,h){saveUndo();S.layers.forEach(l=>{const tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;tmp.getContext('2d').drawImage(l.canvas,0,0);l.canvas.width=w;l.canvas.height=h;l.ctx.drawImage(tmp,0,0);});mainC.width=overlayC.width=w;mainC.height=overlayC.height=h;const pc=document.getElementById('particleCanvas');if(pc){pc.width=w;pc.height=h;}const gc=document.getElementById('gridCanvas');if(gc){gc.width=w;gc.height=h;}renderLayers();const ds=document.getElementById('canvasDimStatus');if(ds)ds.textContent=w+' × '+h;toast(`Canvas: ${w}×${h}`);}
 
 /* New canvas */
 function newCanvas(){document.getElementById('newCanvasModal').classList.add('open');}
@@ -2233,6 +2587,8 @@ function createNewCanvas(){
   S.layers=[{name:'Layer 1',visible:true,canvas:null,ctx:null}];
   initLayer(S.layers[0],w,h);S.activeLayer=0;
   mainC.width=overlayC.width=w;mainC.height=overlayC.height=h;
+  const pc=document.getElementById('particleCanvas');if(pc){pc.width=w;pc.height=h;}
+  const gc=document.getElementById('gridCanvas');if(gc){gc.width=w;gc.height=h;}
   if(bg!=='transparent'){const ctx=S.layers[0].ctx;ctx.fillStyle=bg==='white'?'#ffffff':bg==='black'?'#000000':'#f0ead6';ctx.fillRect(0,0,w,h);}
   S.undoStack=[];S.redoStack=[];
   renderLayers();renderLayerList();
@@ -2249,7 +2605,7 @@ function saveArtwork(format){
   const link=document.createElement('a');
   link.download=`luminary-${Date.now()}.${format==='jpeg'?'jpg':'png'}`;
   link.href=out.toDataURL(format==='jpeg'?'image/jpeg':undefined,format==='jpeg'?.92:undefined);
-  link.click();syncArtworkToState(prompt('Name this artwork (optional):','Untitled')||'Untitled',url);toast('Saved!');
+  link.click();toast('Saved ✓');
 }
 
 /* ════════════════════════════════════════════
@@ -2265,6 +2621,15 @@ const TEMPLATES=[
   {name:'Galaxy',draw:drawTplGalaxy},
   {name:'Neon Grid',draw:drawTplNeonGrid},
   {name:'Watercolour',draw:drawTplWatercolour},
+  {name:'Aurora Borealis',draw:drawTplAurora},
+  {name:'Marble',draw:drawTplMarble},
+  {name:'Retro Waves',draw:drawTplRetroWaves},
+  {name:'Cherry Blossom',draw:drawTplCherryBlossom},
+  {name:'Cyberpunk City',draw:drawTplCyberpunk},
+  {name:'Deep Sea',draw:drawTplDeepSea},
+  {name:'Desert Dunes',draw:drawTplDesert},
+  {name:'Stained Glass',draw:drawTplStainedGlass},
+  {name:'Lava Flow',draw:drawTplLava},
 ];
 function drawTplMandala(ctx,w,h){
   const cx=w/2,cy=h/2,r=Math.min(w,h)/2.5;
@@ -2317,6 +2682,147 @@ function drawTplWatercolour(ctx,w,h){
   const cols=['#c94a6a','#7b5ea7','#2a9a8a','#e07830','#3a6fa8'];
   for(let i=0;i<12;i++){const x=Math.random()*w,y=Math.random()*h;for(let j=0;j<5;j++){ctx.beginPath();ctx.arc(x+(Math.random()-.5)*60,y+(Math.random()-.5)*60,30+Math.random()*60,0,Math.PI*2);ctx.fillStyle=cols[i%cols.length]+(Math.floor(Math.random()*30+10).toString(16));ctx.fill();}}
 }
+function drawTplAurora(ctx,w,h){
+  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#000a15');g.addColorStop(.6,'#021a12');g.addColorStop(1,'#030a20');
+  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  const cols=['rgba(0,220,130,.18)','rgba(0,180,255,.14)','rgba(100,50,220,.12)','rgba(0,255,180,.10)'];
+  for(let b=0;b<6;b++){
+    ctx.beginPath();ctx.moveTo(0,h*.2+Math.random()*h*.4);
+    for(let x=0;x<=w;x+=w/8){ctx.bezierCurveTo(x+w/16,h*.1+Math.random()*h*.5,x+w/12,h*.1+Math.random()*h*.5,x+w/8,h*.2+Math.random()*h*.4);}
+    ctx.lineTo(w,0);ctx.lineTo(0,0);ctx.closePath();
+    const ag=ctx.createLinearGradient(0,0,0,h);ag.addColorStop(0,'transparent');ag.addColorStop(.5,cols[b%cols.length]);ag.addColorStop(1,'transparent');
+    ctx.fillStyle=ag;ctx.fill();
+  }
+  for(let i=0;i<80;i++){ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h*.5,Math.random()*.8+.2,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(Math.random()*.7+.3)+')';ctx.fill();}
+}
+function drawTplMarble(ctx,w,h){
+  ctx.fillStyle='#e8e0d4';ctx.fillRect(0,0,w,h);
+  for(let v=0;v<8;v++){
+    ctx.beginPath();let x=Math.random()*w;ctx.moveTo(x,0);
+    for(let y=0;y<h;y+=12){x+=Math.sin(y*.04+v)*18+(Math.random()-.5)*8;ctx.lineTo(x,y);}
+    const alpha=(0.04+Math.random()*.1).toFixed(2);
+    ctx.strokeStyle=`rgba(${130+Math.random()*40},${120+Math.random()*30},${100+Math.random()*30},${alpha})`;
+    ctx.lineWidth=2+Math.random()*4;ctx.stroke();
+  }
+  ctx.globalAlpha=.12;const gg=ctx.createLinearGradient(0,0,w,h);gg.addColorStop(0,'#c9a84c');gg.addColorStop(1,'transparent');ctx.fillStyle=gg;ctx.fillRect(0,0,w,h);ctx.globalAlpha=1;
+}
+function drawTplRetroWaves(ctx,w,h){
+  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#1a003a');g.addColorStop(.5,'#3d0068');g.addColorStop(1,'#7b0077');
+  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  // Sun
+  const sg=ctx.createLinearGradient(0,h*.25,0,h*.55);sg.addColorStop(0,'#ff6b35');sg.addColorStop(.5,'#ff2d78');sg.addColorStop(1,'#b300b3');
+  ctx.fillStyle=sg;ctx.beginPath();ctx.arc(w/2,h*.45,h*.2,0,Math.PI*2);ctx.fill();
+  // Horizontal scan lines on sun
+  ctx.fillStyle='rgba(26,0,58,.5)';for(let i=0;i<16;i++){ctx.fillRect(w/2-h*.2,h*.35+i*(h*.2/16),h*.4,4);}
+  // Grid floor
+  ctx.strokeStyle='rgba(255,45,120,.55)';ctx.lineWidth=1;
+  const vp={x:w/2,y:h*.65};
+  for(let col=-12;col<=12;col++){ctx.beginPath();ctx.moveTo(vp.x,vp.y);ctx.lineTo(vp.x+col*(w/8),h);ctx.stroke();}
+  for(let row=0;row<=8;row++){const yy=vp.y+(h-vp.y)*(row/8)**.7;ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(w,yy);ctx.stroke();}
+  // Stars
+  for(let i=0;i<60;i++){ctx.fillStyle='rgba(255,255,255,'+(Math.random()*.8+.2)+')';ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h*.35,Math.random()*.8+.2,0,Math.PI*2);ctx.fill();}
+}
+function drawTplCherryBlossom(ctx,w,h){
+  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#fde8ef');g.addColorStop(1,'#fbc6d8');
+  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  // Branches
+  function branch(x,y,ang,len,depth){
+    if(depth<1||len<8)return;
+    ctx.beginPath();ctx.moveTo(x,y);const ex=x+Math.cos(ang)*len,ey=y+Math.sin(ang)*len;ctx.lineTo(ex,ey);
+    ctx.strokeStyle=`rgba(80,30,20,${.4+depth*.1})`;ctx.lineWidth=depth*.8;ctx.stroke();
+    branch(ex,ey,ang-.4+Math.random()*.2,len*.65,depth-1);
+    branch(ex,ey,ang+.4-Math.random()*.2,len*.6,depth-1);
+    if(depth<3){for(let p=0;p<3;p++){ctx.beginPath();ctx.arc(ex+(Math.random()-.5)*12,ey+(Math.random()-.5)*12,Math.random()*4+2,0,Math.PI*2);ctx.fillStyle=`rgba(255,${140+Math.random()*80},${150+Math.random()*60},.7)`;ctx.fill();}}
+  }
+  branch(w*.3,h,-.5-.2,h*.35,7);
+  branch(w*.7,h,-2.6,h*.3,6);
+}
+function drawTplCyberpunk(ctx,w,h){
+  ctx.fillStyle='#050010';ctx.fillRect(0,0,w,h);
+  // Buildings
+  const bldCols=['#0a0025','#08001a','#060018'];
+  for(let i=0;i<20;i++){
+    const bw=30+Math.random()*70,bh=h*.3+Math.random()*h*.5;
+    const bx=Math.random()*w;
+    ctx.fillStyle=bldCols[i%3];ctx.fillRect(bx,h-bh,bw,bh);
+    // Window lights
+    for(let wy=0;wy<bh;wy+=12)for(let wx=0;wx<bw;wx+=10){
+      if(Math.random()<.3){
+        const lc=Math.random()<.5?'rgba(0,229,255,.8)':'rgba(255,45,120,.8)';
+        ctx.fillStyle=lc;ctx.fillRect(bx+wx+1,h-bh+wy+1,4,5);
+      }
+    }
+  }
+  // Neon reflections on ground
+  const rg=ctx.createLinearGradient(0,h*.7,0,h);rg.addColorStop(0,'transparent');rg.addColorStop(.5,'rgba(0,229,255,.06)');rg.addColorStop(1,'rgba(255,45,120,.08)');
+  ctx.fillStyle=rg;ctx.fillRect(0,h*.7,w,h*.3);
+  // Neon sign lines
+  ctx.shadowBlur=12;for(let l=0;l<4;l++){ctx.beginPath();ctx.moveTo(0,h*.55+l*8);ctx.lineTo(w,h*.55+l*8);ctx.strokeStyle=l%2?'rgba(0,229,255,.18)':'rgba(255,45,120,.15)';ctx.lineWidth=1;ctx.stroke();}ctx.shadowBlur=0;
+}
+function drawTplDeepSea(ctx,w,h){
+  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#001a33');g.addColorStop(.5,'#002244');g.addColorStop(1,'#000d22');
+  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  // Light rays from top
+  for(let r=0;r<6;r++){
+    const rx=w*.2+r*(w*.12);ctx.beginPath();ctx.moveTo(rx,0);ctx.lineTo(rx-40,h);ctx.lineTo(rx+40,h);ctx.closePath();
+    const rg=ctx.createLinearGradient(0,0,0,h);rg.addColorStop(0,'rgba(120,200,255,.07)');rg.addColorStop(1,'transparent');ctx.fillStyle=rg;ctx.fill();
+  }
+  // Bubbles
+  for(let b=0;b<40;b++){ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h,Math.random()*3+1,0,Math.PI*2);ctx.strokeStyle='rgba(180,230,255,.3)';ctx.lineWidth=.8;ctx.stroke();}
+  // Sea floor
+  const sf=ctx.createLinearGradient(0,h*.75,0,h);sf.addColorStop(0,'#001a0a');sf.addColorStop(1,'#000d05');
+  ctx.fillStyle=sf;ctx.beginPath();ctx.moveTo(0,h);
+  for(let x=0;x<=w;x+=w/16)ctx.lineTo(x,h*.78+Math.sin(x*.02)*20+Math.random()*15);
+  ctx.lineTo(w,h);ctx.closePath();ctx.fill();
+  // Glowing particles
+  for(let p=0;p<25;p++){ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h,1.5,0,Math.PI*2);ctx.fillStyle=`rgba(${50+Math.random()*100},${200+Math.random()*55},${200+Math.random()*55},.6)`;ctx.fill();}
+}
+function drawTplDesert(ctx,w,h){
+  const sky=ctx.createLinearGradient(0,0,0,h*.6);sky.addColorStop(0,'#1a0a00');sky.addColorStop(1,'#c45a00');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h*.6);
+  // Stars
+  for(let i=0;i<50;i++){ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h*.3,Math.random()*.8,0,Math.PI*2);ctx.fillStyle='rgba(255,255,220,.7)';ctx.fill();}
+  // Moon
+  ctx.fillStyle='#ffe8b0';ctx.beginPath();ctx.arc(w*.8,h*.18,h*.07,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#1a0a00';ctx.beginPath();ctx.arc(w*.83,h*.16,h*.065,0,Math.PI*2);ctx.fill();
+  // Sand dunes
+  const sand1=ctx.createLinearGradient(0,h*.55,0,h);sand1.addColorStop(0,'#c8763a');sand1.addColorStop(1,'#7a3f10');
+  ctx.fillStyle=sand1;ctx.beginPath();ctx.moveTo(0,h*.6);
+  for(let x=0;x<=w;x+=w/10)ctx.bezierCurveTo(x+w/20,h*.5+Math.random()*h*.08,x+w/15,h*.6+Math.random()*h*.05,x+w/10,h*.55+Math.random()*h*.08);
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fill();
+  const sand2=ctx.createLinearGradient(0,h*.7,0,h);sand2.addColorStop(0,'#b56530');sand2.addColorStop(1,'#5a2a08');
+  ctx.fillStyle=sand2;ctx.beginPath();ctx.moveTo(0,h*.78);
+  for(let x=0;x<=w;x+=w/8)ctx.bezierCurveTo(x+w/16,h*.72+Math.random()*h*.06,x+w/12,h*.8,x+w/8,h*.76+Math.random()*h*.05);
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fill();
+}
+function drawTplStainedGlass(ctx,w,h){
+  const colors=['#c94a6a','#c9a84c','#2a9a8a','#7b5ea7','#e07830','#3a6fa8','#27ae60','#ff2d78'];
+  const cells=[];
+  for(let i=0;i<22;i++)cells.push({x:Math.random()*w,y:Math.random()*h,c:colors[i%colors.length]});
+  // Paint Voronoi-like cells
+  for(let py=0;py<h;py+=3)for(let px=0;px<w;px+=3){
+    let minD=Infinity,cc='#000';
+    cells.forEach(c=>{const d=Math.hypot(px-c.x,py-c.y);if(d<minD){minD=d;cc=c.c;}});
+    ctx.fillStyle=cc+'bb';ctx.fillRect(px,py,3,3);
+  }
+  // Dark lead lines
+  ctx.strokeStyle='rgba(0,0,0,.55)';ctx.lineWidth=2;
+  cells.forEach(c=>{cells.forEach(n=>{if(Math.hypot(c.x-n.x,c.y-n.y)<w*.22){ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(n.x,n.y);ctx.stroke();}});});
+}
+function drawTplLava(ctx,w,h){
+  ctx.fillStyle='#0a0000';ctx.fillRect(0,0,w,h);
+  for(let i=0;i<12;i++){
+    const x=Math.random()*w,y=Math.random()*h,r=40+Math.random()*80;
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,'rgba(255,180,0,.7)');g.addColorStop(.4,'rgba(220,60,0,.5)');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  }
+  for(let v=0;v<6;v++){
+    ctx.beginPath();ctx.moveTo(0,h*.3+Math.random()*h*.4);
+    for(let x=0;x<=w;x+=w/10)ctx.bezierCurveTo(x+w/20,Math.random()*h,x+w/15,Math.random()*h,x+w/10,h*.3+Math.random()*h*.4);
+    ctx.strokeStyle=`rgba(255,${80+Math.random()*100},0,.35)`;ctx.lineWidth=3+Math.random()*6;ctx.stroke();
+  }
+}
 
 function openTemplates(){
   const grid=document.getElementById('templateGrid');
@@ -2342,25 +2848,70 @@ function applyTemplate(i){
 /* ════════════════════════════════════════════
    EVENTS
 ════════════════════════════════════════════ */
-mainC.addEventListener('mousedown',startDraw);
-window.addEventListener('mousemove',moveDraw);
-window.addEventListener('mouseup',endDraw);
-mainC.addEventListener('touchstart',startDraw,{passive:false});
-window.addEventListener('touchmove',moveDraw,{passive:false});
-window.addEventListener('touchend',endDraw,{passive:false});
+/* ════════════════════════════════════════════
+   EVENTS — MOUSE + FULL-AREA TOUCH
+   Touch events are attached to the entire document so that touching
+   ANYWHERE in the canvas area (including letterbox margins around the
+   canvas element) registers as a draw stroke. UI panels filter
+   themselves out inside startDraw via the .closest() check.
+════════════════════════════════════════════ */
+mainC.addEventListener('mousedown', startDraw);
+window.addEventListener('mousemove', moveDraw);
+window.addEventListener('mouseup',   endDraw);
 
-// Pinch zoom
-let pt0=null,pt1=null,startZoom=1;
-mainC.addEventListener('touchstart',e=>{if(e.touches.length===2){pt0=e.touches[0];pt1=e.touches[1];startZoom=S.zoom;}},{passive:true});
-window.addEventListener('touchmove',e=>{
-  if(e.touches.length===2&&pt0&&pt1){
-    const d0=Math.hypot(pt0.clientX-pt1.clientX,pt0.clientY-pt1.clientY);
-    const d1=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    setZoom(startZoom*d1/d0);
+// Attach touch events to the full document so no part of the drawing
+// zone is a dead zone. startDraw filters out UI panels internally.
+document.addEventListener('touchstart', startDraw, {passive:false});
+document.addEventListener('touchmove',  moveDraw,  {passive:false});
+document.addEventListener('touchend',   endDraw,   {passive:false});
+
+// ── POINTER EVENTS for stylus/Apple Pencil precision ──────────────────
+// Pointer events give sub-pixel accuracy and pressure data on supported devices.
+// We only add them if the browser supports them and they won't double-fire.
+if(window.PointerEvent){
+  mainC.addEventListener('pointerdown', e=>{
+    if(e.pointerType==='mouse')return; // handled by mousedown above
+    mainC.setPointerCapture(e.pointerId);
+    // Scale pressure to opacity for pen tools
+    if(e.pressure>0&&(S.tool==='brush'||S.tool==='pencil'||S.tool==='pen')){
+      S._penPressure=Math.max(0.05,e.pressure);
+    } else {S._penPressure=null;}
+    startDraw(e);
+  });
+  mainC.addEventListener('pointermove', e=>{
+    if(e.pointerType==='mouse')return;
+    if(e.pressure>0&&(S.tool==='brush'||S.tool==='pencil'||S.tool==='pen')){
+      S._penPressure=Math.max(0.05,e.pressure);
+    }
+    moveDraw(e);
+  });
+  mainC.addEventListener('pointerup', e=>{
+    if(e.pointerType==='mouse')return;
+    S._penPressure=null;
+    endDraw(e);
+  });
+  mainC.addEventListener('pointercancel', e=>{S._penPressure=null;endDraw(e);});
+}
+
+// Pinch-to-zoom — two-finger gesture anywhere in the canvas area
+const _canvasArea = document.getElementById('canvasArea');
+let pt0=null, pt1=null, startZoom=1;
+_canvasArea.addEventListener('touchstart', e=>{
+  if(e.touches.length===2){pt0=e.touches[0]; pt1=e.touches[1]; startZoom=S.zoom;}
+},{passive:true});
+document.addEventListener('touchmove', e=>{
+  if(e.touches.length===2 && pt0 && pt1){
+    const d0=Math.hypot(pt0.clientX-pt1.clientX, pt0.clientY-pt1.clientY);
+    const d1=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                        e.touches[0].clientY-e.touches[1].clientY);
+    setZoom(startZoom * d1/d0);
   }
 },{passive:true});
+document.addEventListener('touchend', ()=>{pt0=null; pt1=null;},{passive:true});
 
-document.getElementById('canvasArea').addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault();setZoom(S.zoom*(e.deltaY<0?1.1:.9));}},{passive:false});
+_canvasArea.addEventListener('wheel',e=>{
+  if(e.ctrlKey){e.preventDefault();setZoom(S.zoom*(e.deltaY<0?1.1:.9));}
+},{passive:false});
 
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
@@ -2370,7 +2921,9 @@ document.addEventListener('keydown',e=>{
     else if(k==='s'){e.preventDefault();saveArtwork('png');}else if(k==='n'){e.preventDefault();newCanvas();}
     else if(k==='m'){e.preventDefault();toggleSymmetry();}
     else if(k==='='||k==='+'){e.preventDefault();zoomIn();}else if(k==='-'){e.preventDefault();zoomOut();}
-    else if(k==='0'){e.preventDefault();zoomFit();}return;
+    else if(k==='0'){e.preventDefault();zoomFit();}
+    else if(k==='a'&&e.shiftKey){e.preventDefault();toggleAnimMode();}
+    return;
   }
   const map={b:'brush',p:'pencil',e:'eraser',i:'eyedrop',g:'fill',t:'text',v:'move'};
   if(map[k]){const btn=document.querySelector(`[data-tool="${map[k]}"]`);if(btn)setTool(btn);}
@@ -2403,6 +2956,199 @@ function toast(msg){
 /* ════════════════════════════════════════════
    RECENT COLORS
 ════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   MOBILE VERTICAL COLOR STRIP (mcs) — full controller
+   Works on touch with no native picker required.
+   Supports changing Brush colour OR Canvas Background.
+════════════════════════════════════════════════════════════ */
+const MCS_SWATCHES = [
+  '#ffffff','#f0ead6','#c9a84c','#e8c97e','#ffd166',
+  '#ff6b6b','#c94a6a','#e07830','#ff922b',
+  '#a87fd4','#7b5ea7','#4d96ff','#3a6fa8',
+  '#4dc9b4','#2a9a8a','#6bcb77','#27ae60',
+  '#000000','#1a1a2e','#2a2420','#5a5040',
+  '#343a40','#868e96','#dee2e6',
+];
+
+let mcsTarget = 'brush';  // 'brush' | 'bg'
+let mcsH = 40, mcsS = 0.75, mcsV = 0.8;
+let mcsDraggingBar = null;
+
+function setMcsTarget(t){
+  mcsTarget = t;
+  document.getElementById('mcsTargetBrush').classList.toggle('active', t==='brush');
+  document.getElementById('mcsTargetBg').classList.toggle('active', t==='bg');
+  const lbl = document.getElementById('mtsTargetLabel');
+  if(lbl) lbl.textContent = t==='bg' ? 'BG' : 'Brush';
+  const label = t==='bg' ? 'Background' : 'Brush';
+  toast('Color target: ' + label);
+}
+
+function mcsApplyColor(hex){
+  // Update the strip UI
+  const cur = document.getElementById('mcsCurrent');
+  if(cur) cur.style.background = hex;
+  const np  = document.getElementById('mcsNativePicker');
+  if(np) np.value = hex;
+  const hx  = document.getElementById('mcsHex');
+  if(hx) hx.value = hex.toUpperCase();
+  // Highlight active swatch
+  document.querySelectorAll('.mcs-swatch').forEach(s=>{
+    s.classList.toggle('active-swatch', s.dataset.color===hex.toLowerCase());
+  });
+
+  if(mcsTarget === 'bg'){
+    // Change canvas area background
+    document.getElementById('canvasArea').style.background = hex;
+    activeBgPreset = hex;
+    toast('Background: ' + hex.toUpperCase());
+  } else {
+    // Change brush / tool colour
+    onColorPick(hex);
+  }
+}
+
+function mcsNativePick(hex){ mcsFromHex(hex); }
+function mcsHexInput(v){ if(/^#[0-9A-Fa-f]{6}$/.test(v)) mcsFromHex(v); }
+
+function mcsFromHex(hex){
+  const hsv = hexToHsv(hex);
+  mcsH = hsv.h; mcsS = hsv.s; mcsV = hsv.v;
+  mcsUpdateThumbs();
+  mcsApplyColor(hex);
+}
+
+function hsvToHexMcs(h,s,v){
+  let r,g,b;
+  const i=Math.floor(h/60)%6, f=h/60-Math.floor(h/60);
+  const p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s);
+  switch(i){
+    case 0:r=v;g=t;b=p;break; case 1:r=q;g=v;b=p;break;
+    case 2:r=p;g=v;b=t;break; case 3:r=p;g=q;b=v;break;
+    case 4:r=t;g=p;b=v;break; default:r=v;g=p;b=q;
+  }
+  return '#'+[r,g,b].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');
+}
+
+function mcsUpdateThumbs(){
+  const hueBar = document.getElementById('mcsHueBar');
+  const satBar = document.getElementById('mcsSatBar');
+  const brtBar = document.getElementById('mcsBrtBar');
+  if(hueBar){
+    const ht = document.getElementById('mcsHueThumb');
+    if(ht) ht.style.top = (mcsH/360*100)+'%';
+  }
+  if(satBar){
+    // Gradient: white (sat=0) → full hue (sat=1)
+    satBar.style.background = `linear-gradient(to bottom,
+      hsl(${mcsH},0%,${mcsV*50+25}%),
+      hsl(${mcsH},100%,${mcsV*50}%))`;
+    const st = document.getElementById('mcsSatThumb');
+    if(st) st.style.top = (mcsS*100)+'%';
+  }
+  if(brtBar){
+    brtBar.style.background = `linear-gradient(to bottom,
+      hsl(${mcsH},${mcsS*100}%,95%),
+      hsl(${mcsH},${mcsS*100}%,50%),
+      hsl(${mcsH},${mcsS*100}%,5%))`;
+    const vt = document.getElementById('mcsBrtThumb');
+    if(vt) vt.style.top = ((1-mcsV)*100)+'%';
+  }
+}
+
+function mcsBarPos(bar, e){
+  const r = bar.getBoundingClientRect();
+  const src = e.touches ? e.touches[0] : e;
+  return Math.max(0, Math.min(1, (src.clientY - r.top) / r.height));
+}
+
+function initMcsBar(barId, onMove){
+  const bar = document.getElementById(barId);
+  if(!bar) return;
+  const down = e=>{
+    e.stopPropagation();
+    mcsDraggingBar = barId;
+    onMove(mcsBarPos(bar, e));
+    e.preventDefault();
+  };
+  const move = e=>{
+    if(mcsDraggingBar !== barId) return;
+    onMove(mcsBarPos(bar, e));
+    e.preventDefault();
+  };
+  const up = ()=>{ if(mcsDraggingBar===barId) mcsDraggingBar=null; };
+  bar.addEventListener('mousedown', down);
+  bar.addEventListener('touchstart', down, {passive:false});
+  window.addEventListener('mousemove',  move);
+  window.addEventListener('touchmove',  move, {passive:false});
+  window.addEventListener('mouseup',  up);
+  window.addEventListener('touchend', up);
+}
+
+function initMobileColorStrip(){
+  // Build quick-access swatches
+  const grid = document.getElementById('mcsSwatches');
+  if(grid){
+    MCS_SWATCHES.forEach(col=>{
+      const s = document.createElement('div');
+      s.className = 'mcs-swatch';
+      s.style.background = col;
+      s.dataset.color = col;
+      s.addEventListener('touchstart', e=>{e.stopPropagation(); mcsFromHex(col);},{passive:true});
+      s.addEventListener('mousedown',  e=>{e.stopPropagation(); mcsFromHex(col);});
+      grid.appendChild(s);
+    });
+  }
+
+  // Hue bar
+  initMcsBar('mcsHueBar', pct=>{
+    mcsH = pct * 360;
+    const hex = hsvToHexMcs(mcsH, mcsS, mcsV);
+    mcsUpdateThumbs();
+    mcsApplyColor(hex);
+  });
+
+  // Saturation bar
+  initMcsBar('mcsSatBar', pct=>{
+    mcsS = pct;
+    const hex = hsvToHexMcs(mcsH, mcsS, mcsV);
+    mcsUpdateThumbs();
+    mcsApplyColor(hex);
+  });
+
+  // Brightness bar
+  initMcsBar('mcsBrtBar', pct=>{
+    mcsV = 1 - pct;
+    const hex = hsvToHexMcs(mcsH, mcsS, mcsV);
+    mcsUpdateThumbs();
+    mcsApplyColor(hex);
+  });
+
+  // Sync strip to current colour on load
+  mcsFromHex(S.color);
+}
+
+/* Keep the strip in sync whenever any other colour picker fires */
+const _mcsOrigOnColorPick = onColorPick;
+onColorPick = function(hex, fromWheel=false){
+  _mcsOrigOnColorPick(hex, fromWheel);
+  // Only sync strip if target is brush (avoid loop)
+  if(mcsTarget === 'brush'){
+    const cur = document.getElementById('mcsCurrent');
+    if(cur) cur.style.background = hex;
+    const np = document.getElementById('mcsNativePicker');
+    if(np) np.value = hex;
+    const hx = document.getElementById('mcsHex');
+    if(hx) hx.value = hex.toUpperCase();
+    const hsv = hexToHsv(hex);
+    mcsH = hsv.h; mcsS = hsv.s; mcsV = hsv.v;
+    mcsUpdateThumbs();
+    document.querySelectorAll('.mcs-swatch').forEach(s=>{
+      s.classList.toggle('active-swatch', s.dataset.color===hex.toLowerCase());
+    });
+  }
+};
+
 const recentColors = [];
 function addRecentColor(hex) {
   if (recentColors[0] === hex) return;
@@ -2681,6 +3427,7 @@ window.addEventListener('load',()=>{
     initAnimSystem();
     buildBgPresets();
     renderRecentColors();
+    initMobileColorStrip();
   },100);
 });
 
