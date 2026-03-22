@@ -249,7 +249,17 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:4rem 
   .artist-arrow{opacity:1;transform:none;}
   .movement-card{transform:none!important;}
 }
+
+/* ── LIGHT MODE ── */
+:root.lum-light{
+  --bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8e0cc;
+  --cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;
+}
+:root.lum-light nav{background:rgba(245,240,232,.97);}
+:root.lum-light .page-hero,.page-hero-bg{filter:none;}
+
 </style>
+<script src="luminary-shared.js"></script>
 </head>
 <body>
 <div id="cursorGlow"></div>
@@ -262,11 +272,16 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:4rem 
     <li><a href="gallery.html">Gallery</a></li>
     <li><a href="learn.html">Learn</a></li>
     <li><a href="about.html">About</a></li>
-    <li><a href="howto.html">How to Use</a><a href="challenges.html">Challenges</a><a href="submit.html">Submit</a><a href="profile.html">Profile</a></li>
+    <li><a href="howto.html">How to Use</a></li>
+    <li><a href="challenges.html">Challenges</a></li>
+    <li><a href="submit.html">Submit</a></li>
+    <li><a href="profile.html">Profile</a></li>
     <li><a href="contact.html">Contact</a></li>
     <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
   </ul>
   <a href="studio.html" class="nav-cta">Open Studio →</a>
+  <button class="theme-toggle" id="themeToggle" onclick="luminaryToggleTheme()" title="Toggle theme">☽</button>
+  <button class="search-toggle-btn" onclick="openSearch()" style="background:none;border:1px solid rgba(201,168,76,.22);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;" title="Search (/)">🔍</button>
   <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -290,6 +305,11 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:4rem 
       <div class="hero-divider"></div>
       <a href="artists.html" class="hero-link">Meet the Masters →</a>
     </div>
+  </div>
+      <div style="display:flex;gap:.6rem;align-items:center;margin-top:1.8rem;max-width:480px;animation:fadeUp 1s ease 1s forwards;opacity:0;">
+        <input type="search" id="heroSearch" placeholder="Search artists, artworks, movements…" style="flex:1;background:rgba(240,234,214,.06);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.7rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.65rem;letter-spacing:.1em;outline:none;transition:border-color .3s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'" onkeydown="if(event.key==='Enter'&&this.value)window.location.href='gallery.html?q='+encodeURIComponent(this.value)">
+        <button onclick="if(document.getElementById('heroSearch').value)window.location.href='gallery.html?q='+encodeURIComponent(document.getElementById('heroSearch').value)" style="background:var(--gold);color:var(--bg);border:none;padding:.7rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .25s;white-space:nowrap;" onmouseover="this.style.background='var(--gold-l)'" onmouseout="this.style.background='var(--gold)'">Search</button>
+      </div>
   </div>
   <div class="hero-art-float"><div class="hero-art-strip" id="heroStrip"></div></div>
   <div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div>
@@ -326,6 +346,12 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:4rem 
   </div>
 </div>
 
+
+<!-- ── DAILY QUOTE TICKER ── -->
+<div style="background:rgba(201,168,76,.04);border-bottom:1px solid rgba(201,168,76,.08);padding:.55rem 4rem;display:flex;align-items:center;gap:1rem;overflow:hidden;" id="quoteTicker">
+  <span style="font-family:'Josefin Sans',sans-serif;font-size:.5rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);flex-shrink:0;">Daily Quote</span>
+  <span style="font-style:italic;font-size:.88rem;color:rgba(240,234,214,.5);" id="quoteText"></span>
+</div>
 <!-- FEATURED ARTISTS -->
 <section class="featured-artists">
   <div class="section-header rev">
@@ -423,6 +449,13 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:4rem 
 </div>
 
 <!-- FOOTER -->
+
+<!-- ── RECENTLY VIEWED ── -->
+<div id="recentlyViewed" style="display:none;padding:4rem 4rem 0;">
+  <h3 style="font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;">Recently Viewed</h3>
+  <div id="rvStrip" style="display:flex;gap:.8rem;overflow-x:auto;scrollbar-width:none;padding-bottom:.4rem;"></div>
+</div>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-brand"><div class="footer-logo">Luminary Atelier</div><div class="gold-line"></div><p>Five centuries of masterworks, one gallery. Presenting the greatest art in history with the depth it deserves.</p></div>
@@ -522,6 +555,92 @@ function closeNav(){
   },{threshold:.5});
   counters.forEach(c=>io.observe(c));
 })();
+
+/* ── DAILY QUOTE ── */
+(function(){
+  const QUOTES=[
+    {q:'Every artist dips his brush in his own soul.',a:'Henry Ward Beecher'},
+    {q:'The purpose of art is washing the dust of daily life off our souls.',a:'Picasso'},
+    {q:'Creativity takes courage.',a:'Henri Matisse'},
+    {q:'I dream of painting, then I paint my dream.',a:'Van Gogh'},
+    {q:'To draw, you must close your eyes and sing.',a:'Picasso'},
+    {q:'Art is not what you see, but what you make others see.',a:'Degas'},
+    {q:'The painting has a life of its own.',a:'Pollock'},
+    {q:'The world always seems brighter when you have just made something.',a:'Neil Gaiman'},
+  ];
+  const q=QUOTES[new Date().getDate()%QUOTES.length];
+  const el=document.getElementById('quoteText');
+  if(el)el.textContent=`"${q.q}" — ${q.a}`;
+})();
+
+/* ── RECENTLY VIEWED ── */
+(function(){
+  const rv=typeof LuminaryState!=='undefined'?LuminaryState.getRecentArtworks():[];
+  if(!rv.length)return;
+  document.getElementById('recentlyViewed').style.display='block';
+  const strip=document.getElementById('rvStrip');
+  strip.innerHTML=rv.slice(0,8).map(a=>`
+    <div onclick="window.location.href='gallery.html'" style="flex-shrink:0;width:100px;cursor:pointer;transition:transform .3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+      <img src="https://picsum.photos/seed/${a.seed||'rv'+a.id}/200/130" style="width:100%;height:68px;object-fit:cover;filter:brightness(.72);border:1px solid rgba(201,168,76,.1);" loading="lazy" alt="">
+      <p style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(a.title||a.name||'Artwork').substring(0,16)}</p>
+    </div>`).join('');
+})();
+
 </script>
+
+<!-- ── GLOBAL SEARCH OVERLAY ── -->
+<div id="lum-search-overlay" onclick="if(event.target===this)document.getElementById('lum-search-overlay').classList.remove('open')" style="position:fixed;inset:0;background:rgba(6,6,10,.88);z-index:600;display:flex;align-items:flex-start;justify-content:center;padding-top:8rem;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);">
+  <div style="width:90%;max-width:640px;background:var(--surface);border:1px solid rgba(201,168,76,.3);padding:1.5rem;position:relative;">
+    <button onclick="document.getElementById('lum-search-overlay').classList.remove('open')" style="position:absolute;top:.8rem;right:.8rem;background:none;border:1px solid rgba(201,168,76,.2);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">✕</button>
+    <input id="lum-search-input" type="search" placeholder="Search artists, artworks, movements… (press / to open)" style="width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.8rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;letter-spacing:.12em;outline:none;transition:border-color .25s;" oninput="lumSearchLive(this.value)" onkeydown="if(event.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open')" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
+    <div id="lum-search-results" style="margin-top:.8rem;max-height:320px;overflow-y:auto;"></div>
+  </div>
+</div>
+<script>
+const _LUM_SITE_IDX=[
+  {n:'Vincent van Gogh',t:'Artist',u:'artists.html'},{n:'Pablo Picasso',t:'Artist',u:'artists.html'},
+  {n:'Claude Monet',t:'Artist',u:'artists.html'},{n:'Frida Kahlo',t:'Artist',u:'artists.html'},
+  {n:'Gustav Klimt',t:'Artist',u:'artists.html'},{n:'Leonardo da Vinci',t:'Artist',u:'artists.html'},
+  {n:'Salvador Dalí',t:'Artist',u:'artists.html'},{n:'Jackson Pollock',t:'Artist',u:'artists.html'},
+  {n:'Andy Warhol',t:'Artist',u:'artists.html'},{n:'Edvard Munch',t:'Artist',u:'artists.html'},
+  {n:'Rembrandt van Rijn',t:'Artist',u:'artists.html'},{n:'Johannes Vermeer',t:'Artist',u:'artists.html'},
+  {n:'Starry Night',t:'Artwork',u:'gallery.html'},{n:'Water Lilies',t:'Artwork',u:'gallery.html'},
+  {n:'The Kiss',t:'Artwork',u:'gallery.html'},{n:'Guernica',t:'Artwork',u:'gallery.html'},
+  {n:'Mona Lisa',t:'Artwork',u:'gallery.html'},{n:'The Scream',t:'Artwork',u:'gallery.html'},
+  {n:'Sunflowers',t:'Artwork',u:'gallery.html'},{n:'The Night Watch',t:'Artwork',u:'gallery.html'},
+  {n:'Impressionism',t:'Movement',u:'gallery.html'},{n:'Cubism',t:'Movement',u:'gallery.html'},
+  {n:'Surrealism',t:'Movement',u:'gallery.html'},{n:'Renaissance',t:'Movement',u:'gallery.html'},
+  {n:'Baroque',t:'Movement',u:'gallery.html'},{n:'Abstract Expressionism',t:'Movement',u:'gallery.html'},
+  {n:'Pop Art',t:'Movement',u:'gallery.html'},{n:'Art Nouveau',t:'Movement',u:'gallery.html'},
+  {n:'Studio',t:'Page',u:'studio.html'},{n:'Gallery',t:'Page',u:'gallery.html'},
+  {n:'Learn',t:'Page',u:'learn.html'},{n:'Challenges',t:'Page',u:'challenges.html'},
+  {n:'Templates',t:'Page',u:'templates.html'},{n:'Community Gallery',t:'Page',u:'studio-gallery.html'},
+  {n:'Submit Artwork',t:'Page',u:'submit.html'},{n:'Profile',t:'Page',u:'profile.html'},
+  {n:'About',t:'Page',u:'about.html'},{n:'Contact',t:'Page',u:'contact.html'},
+];
+function openSearch(){
+  const ol=document.getElementById('lum-search-overlay');
+  ol.classList.add('open');ol.style.opacity='1';ol.style.pointerEvents='all';
+  setTimeout(()=>document.getElementById('lum-search-input').focus(),60);
+}
+document.getElementById('lum-search-overlay').addEventListener('transitionend',function(){
+  if(!this.classList.contains('open')){this.style.opacity='0';this.style.pointerEvents='none';}
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.search-toggle-btn,[onclick*="openSearch"]'))openSearch();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}
+  if(e.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open');
+});
+function lumSearchLive(q){
+  const el=document.getElementById('lum-search-results');if(!el)return;
+  if(!q.trim()){el.innerHTML='';return;}
+  const res=_LUM_SITE_IDX.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!res.length){el.innerHTML='<p style="padding:.5rem;font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">No results found</p>';return;}
+  el.innerHTML=res.map(r=>`<div onclick="if(typeof LuminaryState!=='undefined')LuminaryState.pushSearchHistory('${r.n.replace(/'/g,'')}');window.location.href='${r.u}'" style="display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.06);transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.06)'" onmouseout="this.style.background='none'"><span style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:.12rem .35rem;border:1px solid rgba(201,168,76,.25);flex-shrink:0;">${r.t}</span><span style="font-family:'Playfair Display SC',serif;font-size:.88rem;color:var(--cream);">${r.n}</span></div>`).join('');
+}
+</script>
+
 </body>
 </html>

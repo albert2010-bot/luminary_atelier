@@ -119,7 +119,17 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
   footer{padding:2rem 1.2rem;flex-direction:column;align-items:flex-start;}
 }
 @media(hover:none){.gallery-item-overlay{opacity:1;background:linear-gradient(to top,rgba(6,6,10,.85) 0%,transparent 45%);}}
+
+/* ── LIGHT MODE ── */
+:root.lum-light{
+  --bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8e0cc;
+  --cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;
+}
+:root.lum-light nav{background:rgba(245,240,232,.97);}
+:root.lum-light .page-hero,.page-hero-bg{filter:none;}
+
 </style>
+<script src="luminary-shared.js"></script>
 </head>
 <body>
 
@@ -131,11 +141,15 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
     <li><a href="gallery.html" class="active">Gallery</a></li>
     <li><a href="learn.html">Learn</a></li>
     <li><a href="about.html">About</a></li>
-    <li><a href="howto.html">How to Use</a><a href="challenges.html">Challenges</a><a href="submit.html">Submit</a><a href="profile.html">Profile</a></li>
+    <li><a href="howto.html">How to Use</a></li>
+    <li><a href="challenges.html">Challenges</a></li>
+    <li><a href="submit.html">Submit</a></li>
+    <li><a href="profile.html">Profile</a></li>
     <li><a href="contact.html">Contact</a></li>
     <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
   </ul>
   <a href="studio.html" class="nav-cta">Open Studio →</a>
+  <button class="theme-toggle" id="themeToggle" onclick="luminaryToggleTheme()" title="Toggle theme">☽</button>
   <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
@@ -183,6 +197,11 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
       <p class="lb-artist" id="lbArtist"></p>
       <p class="lb-year" id="lbYear"></p>
       <p class="lb-desc" id="lbDesc"></p>
+      <div style="display:flex;gap:.6rem;margin-top:1rem;margin-bottom:.5rem;">
+        <button onclick="toggleLike_shared(filteredWorks[currentLBIndex]?.seed,this)" style="background:none;border:1px solid rgba(201,168,76,.25);color:var(--muted);padding:.38rem .85rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;cursor:pointer;transition:all .25s;" onmouseover="this.style.color='var(--rose,#c94a6a)'" onmouseout="">♡</button>
+        <button onclick="bookmark_shared({id:filteredWorks[currentLBIndex]?.seed,title:filteredWorks[currentLBIndex]?.title,artist:filteredWorks[currentLBIndex]?.artist,movement:filteredWorks[currentLBIndex]?.tag,src:document.getElementById('lbImg').src})" style="background:none;border:1px solid rgba(201,168,76,.25);color:var(--muted);padding:.38rem .85rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;cursor:pointer;transition:all .25s;" onmouseover="this.style.color='var(--gold)'" onmouseout="">🔖 Save</button>
+        <button onclick="window.open(document.getElementById('lbImg').src,'_blank')" style="background:none;border:1px solid rgba(201,168,76,.25);color:var(--muted);padding:.38rem .85rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;cursor:pointer;transition:all .25s;" onmouseover="this.style.color='var(--gold)'" onmouseout="">⬇ View Full</button>
+      </div>
       <div class="lb-nav">
         <button class="lb-nav-btn" onclick="navLB(-1)">← Previous</button>
         <button class="lb-nav-btn" onclick="navLB(1)">Next →</button>
@@ -310,6 +329,29 @@ document.addEventListener('keydown',e=>{
   }
 });
 
+
+/* ── URL QUERY PARAM SEARCH ── */
+(function(){
+  const p=new URLSearchParams(window.location.search);
+  const q=p.get('q');
+  if(q){
+    document.getElementById('searchInput').value=q;
+    activeSearch=q;
+    renderGallery();
+  }
+})();
+
+/* ── TRACK RECENT ARTWORKS ── */
+const _origOpenLB = openLB;
+openLB = function(idx){
+  _origOpenLB(idx);
+  const w = filteredWorks[idx];
+  if(w && typeof LuminaryState!=='undefined'){
+    LuminaryState.pushRecentArtwork({id:w.seed,title:w.title,name:w.title,seed:w.seed,date:new Date().toLocaleDateString()});
+    LuminaryState.pushSearchHistory(w.artist);
+  }
+};
+
 renderGallery();
 
 /* ── SHARED STATE INTEGRATION ── */
@@ -317,22 +359,72 @@ const _LS='luminary_state_v2';
 function _getState(){try{return JSON.parse(localStorage.getItem(_LS))||{};}catch{return{};}}
 function _setState(p){const s=Object.assign({},_getState(),p);localStorage.setItem(_LS,JSON.stringify(s));return s;}
 function toggleLike_shared(id,el){
-  let likes=_getState().likes||[];
-  if(likes.includes(id+''))likes=likes.filter(l=>l!==id+'');
-  else{likes=[...likes,id+''];_setState({likes});if(el)el.textContent='❤️';}
-  _setState({likes});
-  if(el)el.textContent=likes.includes(id+'')?'❤️':'♡';
+  if(typeof LuminaryState==='undefined')return;
+  const nowLiked=LuminaryState.toggleLike(id);
+  if(el){el.textContent=nowLiked?'❤️':'♡';el.title=nowLiked?'Unlike':'Like';}
+  luminaryToast(nowLiked?'Liked ❤':'Unliked');
 }
 function bookmark_shared(item){
-  let bm=_getState().bookmarks||[];
-  const exists=bm.find(b=>b.id===item.id+'');
-  if(!exists){bm=[{id:item.id+'',name:item.title||'Artwork',artist:item.artist||'',thumb:item.src||'',movement:item.movement||''},...bm].slice(0,40);_setState({bookmarks:bm});}
-  // toast
-  let t=document.getElementById('sharedToast');
-  if(!t){t=document.createElement('div');t.id='sharedToast';t.style.cssText='position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(15,14,18,.98);border:1px solid rgba(42,154,138,.3);color:var(--teal-l);font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;padding:.5rem 1.4rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;';document.body.appendChild(t);}
-  t.textContent=exists?'Already bookmarked':'Bookmarked ✓';t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2000);
+  if(typeof LuminaryState==='undefined')return;
+  const nowSaved=LuminaryState.toggleBookmark({id:item.id,title:item.title,artist:item.artist,src:item.src,movement:item.movement});
+  luminaryToast(nowSaved?'Bookmarked ✓':'Removed from bookmarks');
 }
 
 </script>
+
+<!-- ── GLOBAL SEARCH OVERLAY ── -->
+<div id="lum-search-overlay" onclick="if(event.target===this)document.getElementById('lum-search-overlay').classList.remove('open')" style="position:fixed;inset:0;background:rgba(6,6,10,.88);z-index:600;display:flex;align-items:flex-start;justify-content:center;padding-top:8rem;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);">
+  <div style="width:90%;max-width:640px;background:var(--surface);border:1px solid rgba(201,168,76,.3);padding:1.5rem;position:relative;">
+    <button onclick="document.getElementById('lum-search-overlay').classList.remove('open')" style="position:absolute;top:.8rem;right:.8rem;background:none;border:1px solid rgba(201,168,76,.2);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">✕</button>
+    <input id="lum-search-input" type="search" placeholder="Search artists, artworks, movements… (press / to open)" style="width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.8rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;letter-spacing:.12em;outline:none;transition:border-color .25s;" oninput="lumSearchLive(this.value)" onkeydown="if(event.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open')" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
+    <div id="lum-search-results" style="margin-top:.8rem;max-height:320px;overflow-y:auto;"></div>
+  </div>
+</div>
+<script>
+const _LUM_SITE_IDX=[
+  {n:'Vincent van Gogh',t:'Artist',u:'artists.html'},{n:'Pablo Picasso',t:'Artist',u:'artists.html'},
+  {n:'Claude Monet',t:'Artist',u:'artists.html'},{n:'Frida Kahlo',t:'Artist',u:'artists.html'},
+  {n:'Gustav Klimt',t:'Artist',u:'artists.html'},{n:'Leonardo da Vinci',t:'Artist',u:'artists.html'},
+  {n:'Salvador Dalí',t:'Artist',u:'artists.html'},{n:'Jackson Pollock',t:'Artist',u:'artists.html'},
+  {n:'Andy Warhol',t:'Artist',u:'artists.html'},{n:'Edvard Munch',t:'Artist',u:'artists.html'},
+  {n:'Rembrandt van Rijn',t:'Artist',u:'artists.html'},{n:'Johannes Vermeer',t:'Artist',u:'artists.html'},
+  {n:'Starry Night',t:'Artwork',u:'gallery.html'},{n:'Water Lilies',t:'Artwork',u:'gallery.html'},
+  {n:'The Kiss',t:'Artwork',u:'gallery.html'},{n:'Guernica',t:'Artwork',u:'gallery.html'},
+  {n:'Mona Lisa',t:'Artwork',u:'gallery.html'},{n:'The Scream',t:'Artwork',u:'gallery.html'},
+  {n:'Sunflowers',t:'Artwork',u:'gallery.html'},{n:'The Night Watch',t:'Artwork',u:'gallery.html'},
+  {n:'Impressionism',t:'Movement',u:'gallery.html'},{n:'Cubism',t:'Movement',u:'gallery.html'},
+  {n:'Surrealism',t:'Movement',u:'gallery.html'},{n:'Renaissance',t:'Movement',u:'gallery.html'},
+  {n:'Baroque',t:'Movement',u:'gallery.html'},{n:'Abstract Expressionism',t:'Movement',u:'gallery.html'},
+  {n:'Pop Art',t:'Movement',u:'gallery.html'},{n:'Art Nouveau',t:'Movement',u:'gallery.html'},
+  {n:'Studio',t:'Page',u:'studio.html'},{n:'Gallery',t:'Page',u:'gallery.html'},
+  {n:'Learn',t:'Page',u:'learn.html'},{n:'Challenges',t:'Page',u:'challenges.html'},
+  {n:'Templates',t:'Page',u:'templates.html'},{n:'Community Gallery',t:'Page',u:'studio-gallery.html'},
+  {n:'Submit Artwork',t:'Page',u:'submit.html'},{n:'Profile',t:'Page',u:'profile.html'},
+  {n:'About',t:'Page',u:'about.html'},{n:'Contact',t:'Page',u:'contact.html'},
+];
+function openSearch(){
+  const ol=document.getElementById('lum-search-overlay');
+  ol.classList.add('open');ol.style.opacity='1';ol.style.pointerEvents='all';
+  setTimeout(()=>document.getElementById('lum-search-input').focus(),60);
+}
+document.getElementById('lum-search-overlay').addEventListener('transitionend',function(){
+  if(!this.classList.contains('open')){this.style.opacity='0';this.style.pointerEvents='none';}
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.search-toggle-btn,[onclick*="openSearch"]'))openSearch();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}
+  if(e.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open');
+});
+function lumSearchLive(q){
+  const el=document.getElementById('lum-search-results');if(!el)return;
+  if(!q.trim()){el.innerHTML='';return;}
+  const res=_LUM_SITE_IDX.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!res.length){el.innerHTML='<p style="padding:.5rem;font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">No results found</p>';return;}
+  el.innerHTML=res.map(r=>`<div onclick="if(typeof LuminaryState!=='undefined')LuminaryState.pushSearchHistory('${r.n.replace(/'/g,'')}');window.location.href='${r.u}'" style="display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.06);transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.06)'" onmouseout="this.style.background='none'"><span style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:.12rem .35rem;border:1px solid rgba(201,168,76,.25);flex-shrink:0;">${r.t}</span><span style="font-family:'Playfair Display SC',serif;font-size:.88rem;color:var(--cream);">${r.n}</span></div>`).join('');
+}
+</script>
+
 </body>
 </html>

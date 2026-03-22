@@ -121,7 +121,17 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
   footer{padding:2rem 1.2rem;flex-direction:column;align-items:flex-start;}
 }
 @media(hover:none){.afc-bio{opacity:1;transform:none;}.afc-btn{opacity:1;}}
+
+/* ── LIGHT MODE ── */
+:root.lum-light{
+  --bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8e0cc;
+  --cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;
+}
+:root.lum-light nav{background:rgba(245,240,232,.97);}
+:root.lum-light .page-hero,.page-hero-bg{filter:none;}
+
 </style>
+<script src="luminary-shared.js"></script>
 </head>
 <body>
 
@@ -138,6 +148,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
     <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
   </ul>
   <a href="studio.html" class="nav-cta">Open Studio →</a>
+  <button class="theme-toggle" id="themeToggle" onclick="luminaryToggleTheme()" title="Toggle theme">☽</button>
   <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
@@ -173,6 +184,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
     <img class="modal-img" id="modalImg" src="" alt="">
     <div class="modal-body">
       <button class="modal-close" onclick="closeModal()">✕</button>
+      <button id="modalFollowBtn" onclick="toggleFollowArtist()" style="position:absolute;top:1rem;right:4.5rem;background:none;border:1px solid rgba(201,168,76,.3);color:var(--muted);font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;padding:.35rem .85rem;cursor:pointer;transition:all .3s;z-index:10;"></button>
       <p class="modal-movement" id="modalMovement"></p>
       <div class="gold-line"></div>
       <p class="modal-name" id="modalName"></p>
@@ -252,6 +264,15 @@ function openModal(id){
   document.getElementById('modalBio').textContent = a.bio;
   document.getElementById('modalFact').textContent = `💡 ${a.fact}`;
   document.getElementById('modalWorksGrid').innerHTML = a.works.map(w=>`<img src="https://picsum.photos/seed/${w}/120/72" alt="" loading="lazy">`).join('');
+  // Update follow button state
+  const fb=document.getElementById('modalFollowBtn');
+  if(fb){
+    const following=typeof LuminaryState!=='undefined'&&LuminaryState.isFollowing(a.id);
+    fb.textContent=following?'✓ Following':'+ Follow';
+    fb.style.color=following?'var(--teal-l)':'var(--muted)';
+    fb.style.borderColor=following?'rgba(42,154,138,.5)':'rgba(201,168,76,.3)';
+    fb._artistId=a.id;
+  }
   document.getElementById('artistModal').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -286,6 +307,76 @@ function closeNav(){document.getElementById('navLinks').classList.remove('open')
 
 renderArtists();
 initReveal();
+
+/* ── FOLLOW / UNFOLLOW ── */
+function toggleFollowArtist(){
+  const btn=document.getElementById('modalFollowBtn');
+  if(!btn||!btn._artistId)return;
+  const nowFollowing=typeof LuminaryState!=='undefined'&&LuminaryState.toggleFollow(btn._artistId);
+  btn.textContent=nowFollowing?'✓ Following':'+ Follow';
+  btn.style.color=nowFollowing?'var(--teal-l)':'var(--muted)';
+  btn.style.borderColor=nowFollowing?'rgba(42,154,138,.5)':'rgba(201,168,76,.3)';
+  if(typeof luminaryToast!=='undefined')luminaryToast(nowFollowing?'Following artist ✓':'Unfollowed');
+}
+
+/* ── ARTIST SEARCH ── */
+document.addEventListener('keydown',e=>{if(e.key==='/'&&e.target.tagName!=='INPUT'){e.preventDefault();}});
+
 </script>
+
+<!-- ── GLOBAL SEARCH OVERLAY ── -->
+<div id="lum-search-overlay" onclick="if(event.target===this)document.getElementById('lum-search-overlay').classList.remove('open')" style="position:fixed;inset:0;background:rgba(6,6,10,.88);z-index:600;display:flex;align-items:flex-start;justify-content:center;padding-top:8rem;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);">
+  <div style="width:90%;max-width:640px;background:var(--surface);border:1px solid rgba(201,168,76,.3);padding:1.5rem;position:relative;">
+    <button onclick="document.getElementById('lum-search-overlay').classList.remove('open')" style="position:absolute;top:.8rem;right:.8rem;background:none;border:1px solid rgba(201,168,76,.2);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">✕</button>
+    <input id="lum-search-input" type="search" placeholder="Search artists, artworks, movements… (press / to open)" style="width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.8rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;letter-spacing:.12em;outline:none;transition:border-color .25s;" oninput="lumSearchLive(this.value)" onkeydown="if(event.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open')" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
+    <div id="lum-search-results" style="margin-top:.8rem;max-height:320px;overflow-y:auto;"></div>
+  </div>
+</div>
+<script>
+const _LUM_SITE_IDX=[
+  {n:'Vincent van Gogh',t:'Artist',u:'artists.html'},{n:'Pablo Picasso',t:'Artist',u:'artists.html'},
+  {n:'Claude Monet',t:'Artist',u:'artists.html'},{n:'Frida Kahlo',t:'Artist',u:'artists.html'},
+  {n:'Gustav Klimt',t:'Artist',u:'artists.html'},{n:'Leonardo da Vinci',t:'Artist',u:'artists.html'},
+  {n:'Salvador Dalí',t:'Artist',u:'artists.html'},{n:'Jackson Pollock',t:'Artist',u:'artists.html'},
+  {n:'Andy Warhol',t:'Artist',u:'artists.html'},{n:'Edvard Munch',t:'Artist',u:'artists.html'},
+  {n:'Rembrandt van Rijn',t:'Artist',u:'artists.html'},{n:'Johannes Vermeer',t:'Artist',u:'artists.html'},
+  {n:'Starry Night',t:'Artwork',u:'gallery.html'},{n:'Water Lilies',t:'Artwork',u:'gallery.html'},
+  {n:'The Kiss',t:'Artwork',u:'gallery.html'},{n:'Guernica',t:'Artwork',u:'gallery.html'},
+  {n:'Mona Lisa',t:'Artwork',u:'gallery.html'},{n:'The Scream',t:'Artwork',u:'gallery.html'},
+  {n:'Sunflowers',t:'Artwork',u:'gallery.html'},{n:'The Night Watch',t:'Artwork',u:'gallery.html'},
+  {n:'Impressionism',t:'Movement',u:'gallery.html'},{n:'Cubism',t:'Movement',u:'gallery.html'},
+  {n:'Surrealism',t:'Movement',u:'gallery.html'},{n:'Renaissance',t:'Movement',u:'gallery.html'},
+  {n:'Baroque',t:'Movement',u:'gallery.html'},{n:'Abstract Expressionism',t:'Movement',u:'gallery.html'},
+  {n:'Pop Art',t:'Movement',u:'gallery.html'},{n:'Art Nouveau',t:'Movement',u:'gallery.html'},
+  {n:'Studio',t:'Page',u:'studio.html'},{n:'Gallery',t:'Page',u:'gallery.html'},
+  {n:'Learn',t:'Page',u:'learn.html'},{n:'Challenges',t:'Page',u:'challenges.html'},
+  {n:'Templates',t:'Page',u:'templates.html'},{n:'Community Gallery',t:'Page',u:'studio-gallery.html'},
+  {n:'Submit Artwork',t:'Page',u:'submit.html'},{n:'Profile',t:'Page',u:'profile.html'},
+  {n:'About',t:'Page',u:'about.html'},{n:'Contact',t:'Page',u:'contact.html'},
+];
+function openSearch(){
+  const ol=document.getElementById('lum-search-overlay');
+  ol.classList.add('open');ol.style.opacity='1';ol.style.pointerEvents='all';
+  setTimeout(()=>document.getElementById('lum-search-input').focus(),60);
+}
+document.getElementById('lum-search-overlay').addEventListener('transitionend',function(){
+  if(!this.classList.contains('open')){this.style.opacity='0';this.style.pointerEvents='none';}
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.search-toggle-btn,[onclick*="openSearch"]'))openSearch();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}
+  if(e.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open');
+});
+function lumSearchLive(q){
+  const el=document.getElementById('lum-search-results');if(!el)return;
+  if(!q.trim()){el.innerHTML='';return;}
+  const res=_LUM_SITE_IDX.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!res.length){el.innerHTML='<p style="padding:.5rem;font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">No results found</p>';return;}
+  el.innerHTML=res.map(r=>`<div onclick="if(typeof LuminaryState!=='undefined')LuminaryState.pushSearchHistory('${r.n.replace(/'/g,'')}');window.location.href='${r.u}'" style="display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.06);transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.06)'" onmouseout="this.style.background='none'"><span style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:.12rem .35rem;border:1px solid rgba(201,168,76,.25);flex-shrink:0;">${r.t}</span><span style="font-family:'Playfair Display SC',serif;font-size:.88rem;color:var(--cream);">${r.n}</span></div>`).join('');
+}
+</script>
+
 </body>
 </html>

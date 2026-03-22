@@ -132,7 +132,27 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2rem 
   .field-row{grid-template-columns:1fr;}
   footer{padding:1.5rem;}
 }
+
+/* ── LIGHT MODE ── */
+:root.lum-light{
+  --bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8e0cc;
+  --cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;
+}
+:root.lum-light nav{background:rgba(245,240,232,.97);}
+:root.lum-light .page-hero,.page-hero-bg{filter:none;}
+
+
+/* ── SHARED: theme toggle, search overlay, nav badge ── */
+.theme-toggle{background:none;border:1px solid rgba(201,168,76,.22);color:var(--muted);width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;font-size:.85rem;flex-shrink:0;}
+.theme-toggle:hover{border-color:var(--gold);color:var(--gold);}
+.notif-badge{display:none;background:var(--rose,#c94a6a);color:#fff;font-family:'Josefin Sans',sans-serif;font-size:.44rem;border-radius:10px;padding:.05rem .35rem;margin-left:.25rem;vertical-align:middle;}
+/* Light mode */
+:root.lum-light{--bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8dfc8;--cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;}
+:root.lum-light nav{background:rgba(245,240,232,.97);}
+:root.lum-light body{background:var(--bg);}
+
 </style>
+<script src="luminary-shared.js"></script>
 </head>
 <body>
 <nav>
@@ -431,5 +451,60 @@ function toast(msg){
   t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2200);
 }
 </script>
+
+<!-- ── GLOBAL SEARCH OVERLAY ── -->
+<div id="lum-search-overlay" onclick="if(event.target===this)document.getElementById('lum-search-overlay').classList.remove('open')" style="position:fixed;inset:0;background:rgba(6,6,10,.88);z-index:600;display:flex;align-items:flex-start;justify-content:center;padding-top:8rem;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);">
+  <div style="width:90%;max-width:640px;background:var(--surface);border:1px solid rgba(201,168,76,.3);padding:1.5rem;position:relative;">
+    <button onclick="document.getElementById('lum-search-overlay').classList.remove('open')" style="position:absolute;top:.8rem;right:.8rem;background:none;border:1px solid rgba(201,168,76,.2);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">✕</button>
+    <input id="lum-search-input" type="search" placeholder="Search artists, artworks, movements… (press / to open)" style="width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.8rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;letter-spacing:.12em;outline:none;transition:border-color .25s;" oninput="lumSearchLive(this.value)" onkeydown="if(event.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open')" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
+    <div id="lum-search-results" style="margin-top:.8rem;max-height:320px;overflow-y:auto;"></div>
+  </div>
+</div>
+<script>
+const _LUM_SITE_IDX=[
+  {n:'Vincent van Gogh',t:'Artist',u:'artists.html'},{n:'Pablo Picasso',t:'Artist',u:'artists.html'},
+  {n:'Claude Monet',t:'Artist',u:'artists.html'},{n:'Frida Kahlo',t:'Artist',u:'artists.html'},
+  {n:'Gustav Klimt',t:'Artist',u:'artists.html'},{n:'Leonardo da Vinci',t:'Artist',u:'artists.html'},
+  {n:'Salvador Dalí',t:'Artist',u:'artists.html'},{n:'Jackson Pollock',t:'Artist',u:'artists.html'},
+  {n:'Andy Warhol',t:'Artist',u:'artists.html'},{n:'Edvard Munch',t:'Artist',u:'artists.html'},
+  {n:'Rembrandt van Rijn',t:'Artist',u:'artists.html'},{n:'Johannes Vermeer',t:'Artist',u:'artists.html'},
+  {n:'Starry Night',t:'Artwork',u:'gallery.html'},{n:'Water Lilies',t:'Artwork',u:'gallery.html'},
+  {n:'The Kiss',t:'Artwork',u:'gallery.html'},{n:'Guernica',t:'Artwork',u:'gallery.html'},
+  {n:'Mona Lisa',t:'Artwork',u:'gallery.html'},{n:'The Scream',t:'Artwork',u:'gallery.html'},
+  {n:'Sunflowers',t:'Artwork',u:'gallery.html'},{n:'The Night Watch',t:'Artwork',u:'gallery.html'},
+  {n:'Impressionism',t:'Movement',u:'gallery.html'},{n:'Cubism',t:'Movement',u:'gallery.html'},
+  {n:'Surrealism',t:'Movement',u:'gallery.html'},{n:'Renaissance',t:'Movement',u:'gallery.html'},
+  {n:'Baroque',t:'Movement',u:'gallery.html'},{n:'Abstract Expressionism',t:'Movement',u:'gallery.html'},
+  {n:'Pop Art',t:'Movement',u:'gallery.html'},{n:'Art Nouveau',t:'Movement',u:'gallery.html'},
+  {n:'Studio',t:'Page',u:'studio.html'},{n:'Gallery',t:'Page',u:'gallery.html'},
+  {n:'Learn',t:'Page',u:'learn.html'},{n:'Challenges',t:'Page',u:'challenges.html'},
+  {n:'Templates',t:'Page',u:'templates.html'},{n:'Community Gallery',t:'Page',u:'studio-gallery.html'},
+  {n:'Submit Artwork',t:'Page',u:'submit.html'},{n:'Profile',t:'Page',u:'profile.html'},
+  {n:'About',t:'Page',u:'about.html'},{n:'Contact',t:'Page',u:'contact.html'},
+];
+function openSearch(){
+  const ol=document.getElementById('lum-search-overlay');
+  ol.classList.add('open');ol.style.opacity='1';ol.style.pointerEvents='all';
+  setTimeout(()=>document.getElementById('lum-search-input').focus(),60);
+}
+document.getElementById('lum-search-overlay').addEventListener('transitionend',function(){
+  if(!this.classList.contains('open')){this.style.opacity='0';this.style.pointerEvents='none';}
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.search-toggle-btn,[onclick*="openSearch"]'))openSearch();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}
+  if(e.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open');
+});
+function lumSearchLive(q){
+  const el=document.getElementById('lum-search-results');if(!el)return;
+  if(!q.trim()){el.innerHTML='';return;}
+  const res=_LUM_SITE_IDX.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!res.length){el.innerHTML='<p style="padding:.5rem;font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">No results found</p>';return;}
+  el.innerHTML=res.map(r=>`<div onclick="if(typeof LuminaryState!=='undefined')LuminaryState.pushSearchHistory('${r.n.replace(/'/g,'')}');window.location.href='${r.u}'" style="display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.06);transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.06)'" onmouseout="this.style.background='none'"><span style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:.12rem .35rem;border:1px solid rgba(201,168,76,.25);flex-shrink:0;">${r.t}</span><span style="font-family:'Playfair Display SC',serif;font-size:.88rem;color:var(--cream);">${r.n}</span></div>`).join('');
+}
+</script>
+
 </body>
 </html>

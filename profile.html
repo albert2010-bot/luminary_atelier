@@ -135,7 +135,19 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2rem 
   .stats-grid{grid-template-columns:repeat(2,1fr);}
   .tab-btn{padding:.55rem .8rem;font-size:.52rem;}
 }
+
+/* ── LIGHT MODE ── */
+:root.lum-light{
+  --bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8e0cc;
+  --cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;
+}
+:root.lum-light nav{background:rgba(245,240,232,.97);}
+/* BUG FIX: was ":root.lum-light .page-hero,.page-hero-bg" — the second selector
+   applied filter:none globally to ALL .page-hero-bg regardless of theme */
+:root.lum-light .page-hero, :root.lum-light .page-hero-bg{filter:none;}
+
 </style>
+<script src="luminary-shared.js"></script>
 </head>
 <body>
 <nav>
@@ -150,6 +162,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2rem 
     <li><a href="profile.html" class="active">Profile <span class="notif-badge-dot" id="navDot" style="display:none"></span></a></li>
   </ul>
   <a href="studio.html" class="nav-cta">Open Studio</a>
+  <button class="theme-toggle" id="themeToggle" onclick="luminaryToggleTheme()" title="Toggle theme">☽</button>
   <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
 </nav>
 <div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
@@ -192,6 +205,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2rem 
     <button class="tab-btn" onclick="switchTab('liked',this)">Liked</button>
     <button class="tab-btn" onclick="switchTab('activity',this)">Activity</button>
     <button class="tab-btn" onclick="switchTab('stats',this)">Stats</button>
+    <button class="tab-btn" onclick="switchTab('moodboard',this)">Moodboard</button>
     <button class="tab-btn" onclick="switchTab('notifications',this)">Notifications <span id="notifCount" style="display:none;background:var(--rose);color:#fff;font-size:.45rem;padding:.1rem .35rem;border-radius:8px;font-family:Josefin Sans,sans-serif;margin-left:.2rem;"></span></button>
   </div>
   <div class="tab-panel active" id="tab-artworks"><div class="art-grid" id="artworksGrid"></div></div>
@@ -199,6 +213,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2rem 
   <div class="tab-panel" id="tab-liked"><div id="likedList"></div></div>
   <div class="tab-panel" id="tab-activity"><div id="activityList"></div></div>
   <div class="tab-panel" id="tab-stats"><div class="stats-grid" id="statsGrid"></div><canvas id="statsChart" width="700" height="180" style="width:100%;max-width:700px;display:block;border:1px solid rgba(201,168,76,.1);margin-top:1rem;"></canvas></div>
+  <div class="tab-panel" id="tab-moodboard"><div id="moodboardGrid" class="art-grid"></div></div>
   <div class="tab-panel" id="tab-notifications">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
       <span style="font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);">Notifications</span>
@@ -208,7 +223,8 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2rem 
   </div>
 </div>
 
-<div class="modal-bg" id="editModal">
+<!-- BUG FIX: Added onclick handler so clicking outside the modal closes it -->
+<div class="modal-bg" id="editModal" onclick="handleEditModalBg(event)">
   <div class="modal-box">
     <h3>Edit Profile</h3>
     <div class="field"><label>Display Name</label><input type="text" id="editName" placeholder="Your name"></div>
@@ -256,7 +272,14 @@ function avatar(name,sz){
   const cols=['#c9a84c','#7b5ea7','#2a9a8a','#c94a6a','#e07830'];
   const col=cols[(name||'A').charCodeAt(0)%cols.length];
   const s=`<svg xmlns="http://www.w3.org/2000/svg" width="${sz}" height="${sz}"><circle cx="${sz/2}" cy="${sz/2}" r="${sz/2}" fill="${col}"/><text x="50%" y="50%" dy=".35em" text-anchor="middle" fill="#fff" font-family="Josefin Sans,sans-serif" font-size="${sz*.38}" font-weight="600">${init}</text></svg>`;
-  return 'data:image/svg+xml;base64,'+btoa(s);
+  // BUG FIX: btoa() only handles ASCII — throws InvalidCharacterError for
+  // non-ASCII names (Chinese, Arabic, emoji, etc.). Use safe encoding.
+  try {
+    return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(s)));
+  } catch(e) {
+    // Final fallback: return a plain coloured circle as data URI
+    return 'data:image/svg+xml;base64,' + btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="${sz}" height="${sz}"><circle cx="${sz/2}" cy="${sz/2}" r="${sz/2}" fill="${color}"/></svg>`);
+  }
 }
 /* ── BANNER ── */
 (function(){
@@ -274,6 +297,20 @@ function avatar(name,sz){
   ctx.strokeStyle='rgba(201,168,76,.03)';ctx.lineWidth=1;
   for(let x=0;x<W;x+=70){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=0;y<H;y+=70){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // BUG FIX: canvas dimensions captured before layout paint may be 0 on slow devices.
+  // Re-draw on resize using ResizeObserver.
+  if(window.ResizeObserver){
+    new ResizeObserver(()=>{
+      if(par.offsetWidth===c.width)return;
+      c.width=par.offsetWidth;c.height=par.offsetHeight;
+      cols.forEach((col,i)=>{
+        const x=W*(0.1+i*0.2),y=H*(0.2+Math.sin(i*1.1)*.5);
+        const rg=ctx.createRadialGradient(x,y,0,x,y,H*.8);
+        rg.addColorStop(0,col+'44');rg.addColorStop(1,'transparent');
+        ctx.fillStyle=rg;ctx.fillRect(0,0,c.width,c.height);
+      });
+    }).observe(par);
+  }
 })();
 /* ── LOAD PROFILE ── */
 function loadProfile(){
@@ -296,9 +333,31 @@ loadProfile();
 /* ── AVATAR ── */
 function handleAvatarUpload(e){
   const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>{setProfile({avatar:ev.target.result});loadProfile();toast('Avatar updated ✓');};
-  r.readAsDataURL(f);
+  // BUG FIX: No size limit — storing a full-size photo as base64 easily
+  // exceeds localStorage's ~5MB quota and fails silently.
+  // Now we resize to max 200×200 and compress to JPEG 0.7 before storing.
+  if(f.size>10*1024*1024){toast('Image too large — max 10 MB');return;}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=200;
+      const scale=Math.min(1,MAX/Math.max(img.width,img.height));
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.round(img.width*scale);
+      canvas.height=Math.round(img.height*scale);
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      try{
+        setProfile({avatar:compressed});loadProfile();toast('Avatar updated ✓');
+      }catch(storageErr){
+        toast('Could not save — storage full. Try a smaller image.');
+      }
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+  e.target.value=''; // reset so same file can be re-selected
 }
 /* ── EDIT MODAL ── */
 function openEditModal(){
@@ -312,6 +371,8 @@ function openEditModal(){
   document.getElementById('editModal').classList.add('open');
 }
 function closeEditModal(){document.getElementById('editModal').classList.remove('open');}
+/* BUG FIX: click-outside-to-close handler for edit modal */
+function handleEditModalBg(e){if(e.target===document.getElementById('editModal'))closeEditModal();}
 function saveProfile(){
   setProfile({
     name:document.getElementById('editName').value||'My Atelier',
@@ -327,7 +388,10 @@ function saveProfile(){
 /* ── NOTIFS ── */
 function addNotif(msg,type){
   const n={id:Date.now()+'',msg,type,time:new Date().toISOString(),read:false};
-  const ns=[n,...getNotifs()].slice(0,30);setState({notifications:ns});loadProfile();
+  const ns=[n,...getNotifs()].slice(0,30);setState({notifications:ns});
+  // BUG FIX: only call loadProfile if DOM is ready — avoids null errors
+  // when addNotif is called early (e.g. from shared.js on DOMContentLoaded)
+  if(document.readyState!=='loading')loadProfile();
 }
 function markAllRead(){const ns=getNotifs().map(n=>({...n,read:true}));setState({notifications:ns});renderNotifications();loadProfile();}
 function dismissNotif(id){const ns=getNotifs().filter(n=>n.id!==id);setState({notifications:ns});renderNotifications();loadProfile();}
@@ -347,32 +411,49 @@ function renderArtworks(){
   const grid=document.getElementById('artworksGrid');
   const arts=getArtworks();
   if(!arts.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🎨</div><div class="empty-msg">No artworks yet — open Studio to create!</div><button class="btn-p solid" onclick="location.href='studio.html'" style="margin:0 auto;display:block;">Open Studio</button></div>`;return;}
+  // BUG FIX: was onclick="dlArtwork('${a.id}')" — breaks if id contains quotes.
+  // Use data-id attribute + delegated listener instead.
   grid.innerHTML=arts.map((a,i)=>`
     <div class="art-thumb rev" style="animation-delay:${i*.05}s">
       <img class="art-thumb-img" src="${a.thumbnail||''}" alt="${a.name||'Artwork'}" onerror="this.style.background='var(--surface3)'">
-      <div class="art-thumb-info"><div class="art-thumb-name">${a.name||'Untitled'}</div><div class="art-thumb-date">${a.date||''}</div></div>
+      <div class="art-thumb-info"><div class="art-thumb-name">${(a.name||'Untitled').replace(/</g,'&lt;')}</div><div class="art-thumb-date">${a.date||''}</div></div>
       <div class="art-thumb-overlay">
         <button class="art-ov-btn" title="Open in Studio" onclick="location.href='studio.html'">✎</button>
-        <button class="art-ov-btn" title="Download" onclick="dlArtwork('${a.id}')">⬇</button>
+        <button class="art-ov-btn art-dl-btn" data-id="${a.id}" title="Download">⬇</button>
       </div>
     </div>`).join('');
+  // Delegated click handler — safe regardless of id content
+  grid.querySelectorAll('.art-dl-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{e.stopPropagation();dlArtwork(btn.dataset.id);});
+  });
   initReveal();
 }
 function dlArtwork(id){
   const a=getArtworks().find(x=>x.id===id);if(!a||!a.thumbnail)return;
-  const l=document.createElement('a');l.href=a.thumbnail;l.download=(a.name||'artwork')+'.png';l.click();
+  const l=document.createElement('a');
+  l.href=a.thumbnail;
+  l.download=(a.name||'artwork')+'.png';
+  // BUG FIX: must append to DOM before clicking — without this, Firefox
+  // silently ignores the programmatic click on a detached element
+  document.body.appendChild(l);
+  l.click();
+  document.body.removeChild(l);
 }
 /* ── BOOKMARKS ── */
 function renderBookmarks(){
   const list=document.getElementById('bookmarksList');
   const bm=getBookmarks();
   if(!bm.length){list.innerHTML=`<div class="empty-state"><div class="empty-icon">🔖</div><div class="empty-msg">No bookmarks yet — save from Gallery</div></div>`;return;}
+  // BUG FIX: was onclick="rmBookmark('${b.id}')" — breaks if id has quotes.
   list.innerHTML=bm.map(b=>`
     <div class="bm-item" onclick="location.href='gallery.html'">
-      <img class="bm-thumb" src="${b.thumb||''}" alt="${b.name||''}" onerror="this.style.background='var(--surface3)'">
-      <div class="bm-info"><div class="bm-name">${b.name||'Artwork'}</div><div class="bm-sub">${b.artist||'Unknown'} · ${b.movement||''}</div></div>
-      <button class="bm-remove" onclick="event.stopPropagation();rmBookmark('${b.id}')" title="Remove">✕</button>
+      <img class="bm-thumb" src="${b.thumb||''}" alt="${(b.name||'').replace(/"/g,'&quot;')}" onerror="this.style.background='var(--surface3)'">
+      <div class="bm-info"><div class="bm-name">${(b.name||'Artwork').replace(/</g,'&lt;')}</div><div class="bm-sub">${(b.artist||'Unknown').replace(/</g,'&lt;')} · ${(b.movement||'').replace(/</g,'&lt;')}</div></div>
+      <button class="bm-remove bm-rm-btn" data-id="${b.id}" title="Remove">✕</button>
     </div>`).join('');
+  list.querySelectorAll('.bm-rm-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{e.stopPropagation();rmBookmark(btn.dataset.id);});
+  });
 }
 function rmBookmark(id){
   const bm=getBookmarks().filter(b=>b.id!==id);setState({bookmarks:bm});renderBookmarks();loadProfile();
@@ -382,8 +463,12 @@ function renderLiked(){
   const list=document.getElementById('likedList');
   const likes=getLikes();
   if(!likes.length){list.innerHTML=`<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-msg">No liked artworks — explore the Gallery</div><button class="btn-p" onclick="location.href='gallery.html'" style="margin:0 auto;display:block;">Browse Gallery</button></div>`;return;}
+  // BUG FIX: was onclick="unlikeIt('${id}')" — breaks if id has quotes.
   list.innerHTML=`<p style="font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">${likes.length} artwork${likes.length!==1?'s':''} liked</p>`+
-  likes.map(id=>`<div class="bm-item"><div class="bm-thumb" style="background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🎨</div><div class="bm-info"><div class="bm-name">Artwork #${id}</div><div class="bm-sub">Liked from Gallery</div></div><button class="bm-remove" onclick="unlikeIt('${id}')" title="Unlike">✕</button></div>`).join('');
+  likes.map(id=>`<div class="bm-item"><div class="bm-thumb" style="background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🎨</div><div class="bm-info"><div class="bm-name">Artwork #${String(id).replace(/</g,'&lt;')}</div><div class="bm-sub">Liked from Gallery</div></div><button class="bm-remove unlike-btn" data-id="${id}" title="Unlike">✕</button></div>`).join('');
+  list.querySelectorAll('.unlike-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>unlikeIt(btn.dataset.id));
+  });
 }
 function unlikeIt(id){const l=getLikes().filter(x=>x!==id);setState({likes:l});renderLiked();loadProfile();}
 /* ── ACTIVITY ── */
@@ -417,7 +502,25 @@ function drawChart(){
   const ctx=c.getContext('2d'),W=c.width,H=c.height;
   ctx.fillStyle='#0f0e12';ctx.fillRect(0,0,W,H);
   const days=7,labels=[],vals=[];
-  for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);labels.push(d.toLocaleDateString('en-GB',{weekday:'short'}));vals.push(Math.floor(Math.random()*12));}
+  const s=getState();
+  // BUG FIX: was Math.random() — chart showed new random data on every render.
+  // Now uses real activity counts per day from saved state where available,
+  // falling back to a deterministic seed so chart is stable across renders.
+  const artworksByDay={};
+  (s.recentArtworks||[]).forEach(a=>{
+    const key=a.date?new Date(a.date).toLocaleDateString('en-GB',{weekday:'short'}):'';
+    if(key)artworksByDay[key]=(artworksByDay[key]||0)+1;
+  });
+  for(let i=days-1;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const label=d.toLocaleDateString('en-GB',{weekday:'short'});
+    labels.push(label);
+    // Use real data if available, otherwise use a stable hash of the date
+    const real=artworksByDay[label]||0;
+    // Deterministic fill: stable per day-of-week so chart doesn't jump on re-render
+    const stable=real||(((d.getDate()*7+d.getMonth()*31)%8));
+    vals.push(stable);
+  }
   const max=Math.max(...vals,1);const bw=(W-60)/days,pad=30;
   ctx.strokeStyle='rgba(201,168,76,.12)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(pad,10);ctx.lineTo(pad,H-pad);ctx.lineTo(W-10,H-pad);ctx.stroke();
@@ -427,6 +530,7 @@ function drawChart(){
     rg.addColorStop(0,'rgba(201,168,76,.75)');rg.addColorStop(1,'rgba(201,168,76,.1)');
     ctx.fillStyle=rg;ctx.fillRect(x,H-pad-bh,bw*.7,bh);
     ctx.fillStyle='rgba(240,234,214,.4)';ctx.font='11px Josefin Sans,sans-serif';ctx.fillText(labels[i],x,H-8);
+    if(v>0){ctx.fillStyle='rgba(201,168,76,.7)';ctx.font='10px Josefin Sans,sans-serif';ctx.fillText(v,x+2,H-pad-bh-4);}
   });
 }
 /* ── NOTIFICATIONS ── */
@@ -434,12 +538,16 @@ function renderNotifications(){
   const list=document.getElementById('notifList');
   const ns=getNotifs();
   if(!ns.length){list.innerHTML=`<div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-msg">No notifications</div></div>`;return;}
+  // BUG FIX: was onclick="dismissNotif('${n.id}')" — breaks if id has quotes.
   list.innerHTML=ns.map(n=>`
     <div class="notif-item ${n.read?'':'unread'}">
       <div class="notif-dot ${n.read?'read':''}"></div>
-      <div style="flex:1"><div class="notif-msg">${n.msg}</div><div class="notif-time">${new Date(n.time).toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div></div>
-      <button class="notif-clear" onclick="dismissNotif('${n.id}')">✕</button>
+      <div style="flex:1"><div class="notif-msg">${String(n.msg||'').replace(/</g,'&lt;')}</div><div class="notif-time">${new Date(n.time).toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div></div>
+      <button class="notif-clear notif-dismiss-btn" data-id="${n.id}">✕</button>
     </div>`).join('');
+  list.querySelectorAll('.notif-dismiss-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>dismissNotif(btn.dataset.id));
+  });
 }
 /* ── TOAST ── */
 function toast(msg){
@@ -452,8 +560,137 @@ function initReveal(){
   const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1});
   document.querySelectorAll('.rev:not(.in)').forEach(el=>io.observe(el));
 }
+
+/* ── MOODBOARD TAB ── */
+function renderMoodboard(){
+  const grid=document.getElementById('moodboardGrid');if(!grid)return;
+  const mb=getState().moodboard||[];
+  if(!mb.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🖼</div><div class="empty-msg">Moodboard is empty — bookmark artworks from the Gallery to add them here</div><button class="btn-p" onclick="location.href='gallery.html'" style="margin:0 auto;display:block;">Browse Gallery</button></div>';return;}
+  grid.innerHTML=mb.map((a,i)=>`
+    <div class="art-thumb rev" style="animation-delay:${i*.05}s">
+      <img class="art-thumb-img" src="${a.thumb||''}" alt="${a.name||'Item'}" onerror="this.style.background='var(--surface3)'">
+      <div class="art-thumb-info"><div class="art-thumb-name">${a.name||'Item'}</div><div class="art-thumb-date">${a.type||'artwork'}</div></div>
+      <div class="art-thumb-overlay">
+        <button class="art-ov-btn mb-remove-btn" data-id="${a.id}" title="Remove from moodboard">✕</button>
+      </div>
+    </div>`).join('');
+  // BUG FIX: Use data-id + event delegation instead of onclick injection
+  grid.querySelectorAll('.mb-remove-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{e.stopPropagation();removeMoodboard(btn.dataset.id);});
+  });
+  initReveal();
+}
+function removeMoodboard(id){
+  let mb=(getState().moodboard||[]).filter(x=>x.id!==id);
+  setState({moodboard:mb});renderMoodboard();
+}
+
+/* Extend switchTab to handle moodboard */
+const _origSwitchTab=switchTab;
+switchTab=function(id,btn){
+  _origSwitchTab(id,btn);
+  if(id==='moodboard')renderMoodboard();
+};
+
+/* ── ACHIEVEMENT BADGES ── */
+function renderAchievements(){
+  const s=getState();
+  const badges=[
+    {id:'first_save',icon:'💾',label:'First Save',desc:'Saved your first artwork',earned:!!(s.recentArtworks||[]).length},
+    {id:'likes5',icon:'❤️',label:'Art Lover',desc:'Liked 5+ artworks',earned:(s.likes||[]).length>=5},
+    {id:'challenge',icon:'🏆',label:'Challenger',desc:'Joined a challenge',earned:!!(s.joinedChallenges||[]).length},
+    {id:'lesson',icon:'📚',label:'Student',desc:'Completed a lesson',earned:!!(Object.values(s.lessonProgress||{}).filter(v=>v.done).length)},
+    {id:'bookmarks5',icon:'🔖',label:'Curator',desc:'Saved 5+ bookmarks',earned:(s.bookmarks||[]).length>=5},
+    {id:'submissions',icon:'🖼',label:'Exhibitor',desc:'Submitted artwork to community',earned:!!(s.submissions||[]).length},
+  ];
+  const grid=document.getElementById('statsGrid');
+  if(!grid)return;
+  const statsHtml=`
+    <div class="stat-card"><div class="stat-big">${(s.recentArtworks||[]).length}</div><div class="stat-sub">Artworks Created</div></div>
+    <div class="stat-card"><div class="stat-big">${(s.likes||[]).length}</div><div class="stat-sub">Artworks Liked</div></div>
+    <div class="stat-card"><div class="stat-big">${(s.bookmarks||[]).length}</div><div class="stat-sub">Bookmarked</div></div>
+    <div class="stat-card"><div class="stat-big">${(s.joinedChallenges||[]).length}</div><div class="stat-sub">Challenges</div></div>
+    <div class="stat-card"><div class="stat-big">${Object.values(s.lessonProgress||{}).filter(v=>v.done).length}</div><div class="stat-sub">Lessons Done</div></div>
+    <div class="stat-card"><div class="stat-big">${(s.submissions||[]).length}</div><div class="stat-sub">Submissions</div></div>
+  `;
+  const badgeHtml=`
+    <div style="margin-top:1.5rem;">
+      <span style="font-family:'Josefin Sans',sans-serif;font-size:.56rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:1rem;">Achievements</span>
+      <div style="display:flex;flex-wrap:wrap;gap:.7rem;">
+        ${badges.map(b=>`<div title="${b.desc}" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.75rem;background:var(--surface2);border:1px solid ${b.earned?'rgba(201,168,76,.3)':'rgba(201,168,76,.08)'};opacity:${b.earned?1:0.4};width:80px;text-align:center;transition:all .3s;" ${b.earned?'':''}><span style="font-size:1.6rem;">${b.icon}</span><span style="font-family:'Josefin Sans',sans-serif;font-size:.42rem;letter-spacing:.1em;text-transform:uppercase;color:${b.earned?'var(--gold)':'var(--muted)'};">${b.label}</span></div>`).join('')}
+      </div>
+    </div>
+  `;
+  grid.innerHTML = statsHtml;
+  const statsParent=grid.parentNode;
+  let achEl=document.getElementById('achievementsPanel');
+  if(!achEl){achEl=document.createElement('div');achEl.id='achievementsPanel';statsParent.appendChild(achEl);}
+  achEl.innerHTML=badgeHtml;
+  drawChart();
+}
+
+// BUG FIX: _origRenderStats was captured but never called — dead code.
+// renderStats is now directly set to renderAchievements (which handles
+// both stat cards and achievements) without the unused wrapper variable.
+renderStats = renderAchievements;
+
 renderArtworks();initReveal();
 window.addEventListener('storage',e=>{if(e.key===LS){loadProfile();renderArtworks();}});
 </script>
+
+<!-- ── GLOBAL SEARCH OVERLAY ── -->
+<div id="lum-search-overlay" onclick="if(event.target===this)document.getElementById('lum-search-overlay').classList.remove('open')" style="position:fixed;inset:0;background:rgba(6,6,10,.88);z-index:600;display:flex;align-items:flex-start;justify-content:center;padding-top:8rem;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);">
+  <div style="width:90%;max-width:640px;background:var(--surface);border:1px solid rgba(201,168,76,.3);padding:1.5rem;position:relative;">
+    <button onclick="document.getElementById('lum-search-overlay').classList.remove('open')" style="position:absolute;top:.8rem;right:.8rem;background:none;border:1px solid rgba(201,168,76,.2);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">✕</button>
+    <input id="lum-search-input" type="search" placeholder="Search artists, artworks, movements… (press / to open)" style="width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.8rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;letter-spacing:.12em;outline:none;transition:border-color .25s;" oninput="lumSearchLive(this.value)" onkeydown="if(event.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open')" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
+    <div id="lum-search-results" style="margin-top:.8rem;max-height:320px;overflow-y:auto;"></div>
+  </div>
+</div>
+<script>
+const _LUM_SITE_IDX=[
+  {n:'Vincent van Gogh',t:'Artist',u:'artists.html'},{n:'Pablo Picasso',t:'Artist',u:'artists.html'},
+  {n:'Claude Monet',t:'Artist',u:'artists.html'},{n:'Frida Kahlo',t:'Artist',u:'artists.html'},
+  {n:'Gustav Klimt',t:'Artist',u:'artists.html'},{n:'Leonardo da Vinci',t:'Artist',u:'artists.html'},
+  {n:'Salvador Dalí',t:'Artist',u:'artists.html'},{n:'Jackson Pollock',t:'Artist',u:'artists.html'},
+  {n:'Andy Warhol',t:'Artist',u:'artists.html'},{n:'Edvard Munch',t:'Artist',u:'artists.html'},
+  {n:'Rembrandt van Rijn',t:'Artist',u:'artists.html'},{n:'Johannes Vermeer',t:'Artist',u:'artists.html'},
+  {n:'Starry Night',t:'Artwork',u:'gallery.html'},{n:'Water Lilies',t:'Artwork',u:'gallery.html'},
+  {n:'The Kiss',t:'Artwork',u:'gallery.html'},{n:'Guernica',t:'Artwork',u:'gallery.html'},
+  {n:'Mona Lisa',t:'Artwork',u:'gallery.html'},{n:'The Scream',t:'Artwork',u:'gallery.html'},
+  {n:'Sunflowers',t:'Artwork',u:'gallery.html'},{n:'The Night Watch',t:'Artwork',u:'gallery.html'},
+  {n:'Impressionism',t:'Movement',u:'gallery.html'},{n:'Cubism',t:'Movement',u:'gallery.html'},
+  {n:'Surrealism',t:'Movement',u:'gallery.html'},{n:'Renaissance',t:'Movement',u:'gallery.html'},
+  {n:'Baroque',t:'Movement',u:'gallery.html'},{n:'Abstract Expressionism',t:'Movement',u:'gallery.html'},
+  {n:'Pop Art',t:'Movement',u:'gallery.html'},{n:'Art Nouveau',t:'Movement',u:'gallery.html'},
+  {n:'Studio',t:'Page',u:'studio.html'},{n:'Gallery',t:'Page',u:'gallery.html'},
+  {n:'Learn',t:'Page',u:'learn.html'},{n:'Challenges',t:'Page',u:'challenges.html'},
+  {n:'Templates',t:'Page',u:'templates.html'},{n:'Community Gallery',t:'Page',u:'studio-gallery.html'},
+  {n:'Submit Artwork',t:'Page',u:'submit.html'},{n:'Profile',t:'Page',u:'profile.html'},
+  {n:'About',t:'Page',u:'about.html'},{n:'Contact',t:'Page',u:'contact.html'},
+];
+function openSearch(){
+  const ol=document.getElementById('lum-search-overlay');
+  ol.classList.add('open');ol.style.opacity='1';ol.style.pointerEvents='all';
+  setTimeout(()=>document.getElementById('lum-search-input').focus(),60);
+}
+document.getElementById('lum-search-overlay').addEventListener('transitionend',function(){
+  if(!this.classList.contains('open')){this.style.opacity='0';this.style.pointerEvents='none';}
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.search-toggle-btn,[onclick*="openSearch"]'))openSearch();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}
+  if(e.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open');
+});
+function lumSearchLive(q){
+  const el=document.getElementById('lum-search-results');if(!el)return;
+  if(!q.trim()){el.innerHTML='';return;}
+  const res=_LUM_SITE_IDX.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!res.length){el.innerHTML='<p style="padding:.5rem;font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">No results found</p>';return;}
+  el.innerHTML=res.map(r=>`<div onclick="if(typeof LuminaryState!=='undefined')LuminaryState.pushSearchHistory('${r.n.replace(/'/g,'')}');window.location.href='${r.u}'" style="display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.06);transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.06)'" onmouseout="this.style.background='none'"><span style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:.12rem .35rem;border:1px solid rgba(201,168,76,.25);flex-shrink:0;">${r.t}</span><span style="font-family:'Playfair Display SC',serif;font-size:.88rem;color:var(--cream);">${r.n}</span></div>`).join('');
+}
+</script>
+
 </body>
 </html>

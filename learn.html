@@ -42,6 +42,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);display:fl
 .page-hero::after{content:'';position:absolute;bottom:0;left:4rem;right:4rem;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);}
 .page-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 75% 30%,rgba(42,154,138,.06) 0%,transparent 60%);}
 .page-hero h1{font-family:'Playfair Display SC',serif;font-size:clamp(2.5rem,5.5vw,5rem);font-weight:400;color:var(--cream);position:relative;z-index:2;animation:fadeUp .9s ease forwards;}
+
+/* ── NEW: lesson progress, complete btn, search ── */
+.lesson-complete-btn{font-family:'Josefin Sans',sans-serif;font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;padding:.38rem .85rem;border:1px solid rgba(42,154,138,.3);color:var(--teal-l);background:transparent;cursor:pointer;transition:all .25s;margin-left:auto;}
+.lesson-complete-btn:hover,.lesson-complete-btn.done{background:rgba(42,154,138,.15);border-color:var(--teal-l);color:var(--teal-l);}
+.lesson-done-badge{position:absolute;top:.6rem;right:.6rem;background:rgba(42,154,138,.2);border:1px solid rgba(77,201,180,.35);color:var(--teal-l);font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.14em;text-transform:uppercase;padding:.18rem .45rem;pointer-events:none;}
+.learn-search-bar{padding:1.2rem 4rem;background:var(--surface);border-bottom:1px solid rgba(201,168,76,.1);display:flex;gap:.6rem;align-items:center;}
+.learn-search-input{flex:1;max-width:360px;background:rgba(240,234,214,.04);border:1px solid rgba(201,168,76,.2);color:var(--cream);padding:.5rem 1rem;font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.1em;outline:none;transition:border-color .25s;}
+.learn-search-input:focus{border-color:var(--gold);}
+@media(max-width:640px){.learn-search-bar{padding:.8rem 1.2rem;}}
+
 .page-hero p.sub{font-size:1.05rem;font-style:italic;color:rgba(240,234,214,.45);max-width:520px;margin-top:.9rem;position:relative;z-index:2;animation:fadeUp .9s ease .2s forwards;opacity:0;}
 
 /* TABS */
@@ -130,7 +140,17 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
   .lessons-header{padding:2rem 1.2rem 1rem;}.learning-path{padding:3rem 1.2rem;}
   footer{padding:2rem 1.2rem;flex-direction:column;align-items:flex-start;}
 }
+
+/* ── LIGHT MODE ── */
+:root.lum-light{
+  --bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8e0cc;
+  --cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;
+}
+:root.lum-light nav{background:rgba(245,240,232,.97);}
+:root.lum-light .page-hero,.page-hero-bg{filter:none;}
+
 </style>
+<script src="luminary-shared.js"></script>
 </head>
 <body>
 <nav>
@@ -142,6 +162,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
     <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
   </ul>
   <a href="studio.html" class="nav-cta">Open Studio →</a>
+  <button class="theme-toggle" id="themeToggle" onclick="luminaryToggleTheme()" title="Toggle theme">☽</button>
   <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
@@ -164,6 +185,12 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
   <button class="learn-tab" onclick="filterLessons('digital',this)">Digital Art</button>
 </div>
 
+
+<!-- ── LESSON SEARCH BAR ── -->
+<div class="learn-search-bar">
+  <input class="learn-search-input" type="search" placeholder="Search lessons…" oninput="searchLessons(this.value)">
+  <span id="lessonProgressBadge" style="margin-left:auto;font-family:'Josefin Sans',sans-serif;font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);"></span>
+</div>
 <section class="learning-path rev">
   <div class="path-text">
     <p class="section-label">Recommended Path</p>
@@ -293,7 +320,148 @@ document.querySelectorAll('.rev,.rev-s').forEach(el=>io.observe(el));
 // Progress bar animate
 setTimeout(()=>{document.getElementById('progressFill').style.width='0%';},600);
 
+/* ── LESSON SEARCH ── */
+let _lessonSearchQ = '';
+function searchLessons(q){
+  _lessonSearchQ = q.toLowerCase();
+  renderLessons();
+}
+
+/* ── LESSON PROGRESS ── */
+function updateProgressBadge(){
+  const done = typeof LuminaryState!=='undefined' ? LuminaryState.getLessonsCompleted() : 0;
+  const total = LESSONS.length;
+  const el = document.getElementById('lessonProgressBadge');
+  if(el) el.textContent = done+' / '+total+' completed';
+  const fill = document.getElementById('progressFill');
+  if(fill) fill.style.width = Math.round((done/total)*100)+'%';
+  // Update path steps
+  const pathSteps = document.querySelectorAll('.path-step');
+  const pathIds = [1,2,3,4,5];
+  pathSteps.forEach((step,i)=>{
+    const id = pathIds[i];
+    const done2 = typeof LuminaryState!=='undefined' && LuminaryState.isLessonDone(id);
+    step.style.borderLeftColor = done2 ? 'rgba(42,154,138,.5)' : 'rgba(201,168,76,.1)';
+    if(done2 && !step.querySelector('.step-check')){
+      const chk = document.createElement('span');chk.className='step-check';
+      chk.style.cssText='color:var(--teal-l);margin-left:auto;font-size:.8rem;';
+      chk.textContent='✓';step.appendChild(chk);
+    }
+  });
+}
+
+/* Override renderLessons to include search + progress badges */
+const _origRenderLessons = renderLessons;
+renderLessons = function(){
+  const filtered2 = (activeTag==='all' ? LESSONS : LESSONS.filter(l=>l.tag===activeTag||l.level===activeTag))
+    .filter(l => !_lessonSearchQ || l.title.toLowerCase().includes(_lessonSearchQ) || l.desc.toLowerCase().includes(_lessonSearchQ) || l.tag.toLowerCase().includes(_lessonSearchQ));
+  const grid=document.getElementById('lessonsGrid');
+  grid.innerHTML=filtered2.map((l,i)=>{
+    const done=typeof LuminaryState!=='undefined'&&LuminaryState.isLessonDone(l.id);
+    return `<div class="lesson-card rev-s" style="animation-delay:${(i%3)*.08}s;position:relative;" onclick="openLesson(${l.id})">
+      ${done?'<div class="lesson-done-badge">✓ Complete</div>':''}
+      <div class="lesson-thumb-wrap"><img class="lesson-thumb" src="https://picsum.photos/seed/${l.seed}/500/180" alt="${l.title}" loading="lazy"></div>
+      <div class="lesson-body">
+        <div class="lesson-tag-row">
+          <span class="lesson-tag">${l.tag}</span>
+          <span class="lesson-level-badge level-${l.level}">${l.level}</span>
+        </div>
+        <h3 class="lesson-title">${l.title}</h3>
+        <p class="lesson-desc">${l.desc.substring(0,95)}…</p>
+        <div class="lesson-meta"><span>⏱ ${l.time}</span></div>
+      </div>
+      <span class="start-btn">Start →</span>
+    </div>`;
+  }).join('');
+  setTimeout(()=>{
+    const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.06});
+    document.querySelectorAll('.rev-s:not(.in)').forEach(el=>io.observe(el));
+  },30);
+  updateProgressBadge();
+};
+
+/* Add Mark Complete to lesson modal */
+const _origOpenLesson = openLesson;
+openLesson = function(id){
+  _origOpenLesson(id);
+  // Add complete button to modal
+  const existBtn = document.getElementById('lmCompleteBtn');
+  if(existBtn) existBtn.remove();
+  const btn = document.createElement('button');
+  btn.id = 'lmCompleteBtn';
+  const done = typeof LuminaryState!=='undefined' && LuminaryState.isLessonDone(id);
+  btn.textContent = done ? '✓ Completed' : 'Mark as Complete';
+  btn.className = 'lesson-complete-btn' + (done?' done':'');
+  btn.style.cssText='font-family:"Josefin Sans",sans-serif;font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;padding:.45rem 1rem;border:1px solid rgba(42,154,138,.35);color:var(--teal-l);background:transparent;cursor:pointer;transition:all .25s;';
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    if(typeof LuminaryState!=='undefined') LuminaryState.markLessonComplete(id);
+    btn.textContent='✓ Completed';btn.style.background='rgba(42,154,138,.15)';
+    if(typeof luminaryToast!=='undefined') luminaryToast('Lesson complete! 🎉','success');
+    renderLessons();
+  };
+  const actions=document.querySelector('#lmBox .lm-body > div:last-child');
+  if(actions) actions.prepend(btn);
+};
+
 renderLessons();
+updateProgressBadge();
+
 </script>
+
+<!-- ── GLOBAL SEARCH OVERLAY ── -->
+<div id="lum-search-overlay" onclick="if(event.target===this)document.getElementById('lum-search-overlay').classList.remove('open')" style="position:fixed;inset:0;background:rgba(6,6,10,.88);z-index:600;display:flex;align-items:flex-start;justify-content:center;padding-top:8rem;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);">
+  <div style="width:90%;max-width:640px;background:var(--surface);border:1px solid rgba(201,168,76,.3);padding:1.5rem;position:relative;">
+    <button onclick="document.getElementById('lum-search-overlay').classList.remove('open')" style="position:absolute;top:.8rem;right:.8rem;background:none;border:1px solid rgba(201,168,76,.2);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">✕</button>
+    <input id="lum-search-input" type="search" placeholder="Search artists, artworks, movements… (press / to open)" style="width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.8rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;letter-spacing:.12em;outline:none;transition:border-color .25s;" oninput="lumSearchLive(this.value)" onkeydown="if(event.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open')" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
+    <div id="lum-search-results" style="margin-top:.8rem;max-height:320px;overflow-y:auto;"></div>
+  </div>
+</div>
+<script>
+const _LUM_SITE_IDX=[
+  {n:'Vincent van Gogh',t:'Artist',u:'artists.html'},{n:'Pablo Picasso',t:'Artist',u:'artists.html'},
+  {n:'Claude Monet',t:'Artist',u:'artists.html'},{n:'Frida Kahlo',t:'Artist',u:'artists.html'},
+  {n:'Gustav Klimt',t:'Artist',u:'artists.html'},{n:'Leonardo da Vinci',t:'Artist',u:'artists.html'},
+  {n:'Salvador Dalí',t:'Artist',u:'artists.html'},{n:'Jackson Pollock',t:'Artist',u:'artists.html'},
+  {n:'Andy Warhol',t:'Artist',u:'artists.html'},{n:'Edvard Munch',t:'Artist',u:'artists.html'},
+  {n:'Rembrandt van Rijn',t:'Artist',u:'artists.html'},{n:'Johannes Vermeer',t:'Artist',u:'artists.html'},
+  {n:'Starry Night',t:'Artwork',u:'gallery.html'},{n:'Water Lilies',t:'Artwork',u:'gallery.html'},
+  {n:'The Kiss',t:'Artwork',u:'gallery.html'},{n:'Guernica',t:'Artwork',u:'gallery.html'},
+  {n:'Mona Lisa',t:'Artwork',u:'gallery.html'},{n:'The Scream',t:'Artwork',u:'gallery.html'},
+  {n:'Sunflowers',t:'Artwork',u:'gallery.html'},{n:'The Night Watch',t:'Artwork',u:'gallery.html'},
+  {n:'Impressionism',t:'Movement',u:'gallery.html'},{n:'Cubism',t:'Movement',u:'gallery.html'},
+  {n:'Surrealism',t:'Movement',u:'gallery.html'},{n:'Renaissance',t:'Movement',u:'gallery.html'},
+  {n:'Baroque',t:'Movement',u:'gallery.html'},{n:'Abstract Expressionism',t:'Movement',u:'gallery.html'},
+  {n:'Pop Art',t:'Movement',u:'gallery.html'},{n:'Art Nouveau',t:'Movement',u:'gallery.html'},
+  {n:'Studio',t:'Page',u:'studio.html'},{n:'Gallery',t:'Page',u:'gallery.html'},
+  {n:'Learn',t:'Page',u:'learn.html'},{n:'Challenges',t:'Page',u:'challenges.html'},
+  {n:'Templates',t:'Page',u:'templates.html'},{n:'Community Gallery',t:'Page',u:'studio-gallery.html'},
+  {n:'Submit Artwork',t:'Page',u:'submit.html'},{n:'Profile',t:'Page',u:'profile.html'},
+  {n:'About',t:'Page',u:'about.html'},{n:'Contact',t:'Page',u:'contact.html'},
+];
+function openSearch(){
+  const ol=document.getElementById('lum-search-overlay');
+  ol.classList.add('open');ol.style.opacity='1';ol.style.pointerEvents='all';
+  setTimeout(()=>document.getElementById('lum-search-input').focus(),60);
+}
+document.getElementById('lum-search-overlay').addEventListener('transitionend',function(){
+  if(!this.classList.contains('open')){this.style.opacity='0';this.style.pointerEvents='none';}
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.search-toggle-btn,[onclick*="openSearch"]'))openSearch();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}
+  if(e.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open');
+});
+function lumSearchLive(q){
+  const el=document.getElementById('lum-search-results');if(!el)return;
+  if(!q.trim()){el.innerHTML='';return;}
+  const res=_LUM_SITE_IDX.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!res.length){el.innerHTML='<p style="padding:.5rem;font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">No results found</p>';return;}
+  el.innerHTML=res.map(r=>`<div onclick="if(typeof LuminaryState!=='undefined')LuminaryState.pushSearchHistory('${r.n.replace(/'/g,'')}');window.location.href='${r.u}'" style="display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.06);transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.06)'" onmouseout="this.style.background='none'"><span style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:.12rem .35rem;border:1px solid rgba(201,168,76,.25);flex-shrink:0;">${r.t}</span><span style="font-family:'Playfair Display SC',serif;font-size:.88rem;color:var(--cream);">${r.n}</span></div>`).join('');
+}
+</script>
+
 </body>
 </html>

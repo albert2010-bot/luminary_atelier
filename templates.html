@@ -84,6 +84,21 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);display:fl
 
 /* CTA */
 .templates-cta{padding:6rem 4rem;text-align:center;}
+
+/* ── NEW: recently used, favourites, new badges ── */
+.tc-badge-new{color:var(--teal-l);border-color:rgba(77,201,180,.3);}
+.fav-btn{position:absolute;top:.55rem;right:.55rem;background:rgba(10,9,14,.8);border:1px solid rgba(201,168,76,.2);color:var(--muted);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;z-index:5;transition:all .2s;border-radius:2px;}
+.fav-btn:hover,.fav-btn.faved{border-color:var(--gold);color:var(--gold);}
+.recently-used-section{padding:3rem 4rem 0;}
+.recently-used-section h3{font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;}
+.ru-strip{display:flex;gap:.8rem;overflow-x:auto;scrollbar-width:none;padding-bottom:.5rem;}
+.ru-strip::-webkit-scrollbar{display:none;}
+.ru-card{flex-shrink:0;width:120px;cursor:pointer;background:var(--surface2);border:1px solid rgba(201,168,76,.1);transition:all .3s;}
+.ru-card:hover{border-color:rgba(201,168,76,.35);transform:translateY(-3px);}
+.ru-card canvas{width:120px;height:80px;display:block;}
+.ru-card p{font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:.35rem .5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:640px){.recently-used-section{padding:2rem 1.2rem 0;}.ru-card{width:100px;}.ru-card canvas{width:100px;height:66px;}}
+
 .templates-cta h2{font-family:'Playfair Display SC',serif;font-size:2.2rem;font-weight:400;color:var(--cream);margin-bottom:.8rem;}
 .templates-cta p{font-style:italic;color:rgba(240,234,214,.45);max-width:440px;margin:0 auto 2.5rem;}
 .cta-row{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;}
@@ -109,7 +124,17 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
   .template-preview{height:140px;}.tips-grid{grid-template-columns:1fr;}.tips-section,.templates-cta{padding:3rem 1.2rem;}
   footer{padding:2rem 1.2rem;flex-direction:column;align-items:flex-start;}
 }
+
+/* ── LIGHT MODE ── */
+:root.lum-light{
+  --bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8e0cc;
+  --cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;
+}
+:root.lum-light nav{background:rgba(245,240,232,.97);}
+:root.lum-light .page-hero,.page-hero-bg{filter:none;}
+
 </style>
+<script src="luminary-shared.js"></script>
 </head>
 <body>
 <nav>
@@ -122,6 +147,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
     <li class="nav-studio-mobile"><a href="studio.html" class="active">Studio</a></li>
   </ul>
   <a href="studio.html" class="nav-cta">Open Studio →</a>
+  <button class="theme-toggle" id="themeToggle" onclick="luminaryToggleTheme()" title="Toggle theme">☽</button>
   <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
@@ -144,6 +170,13 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
   <button class="tf-btn" onclick="filterTemplates('study',this)">Study</button>
   <button class="tf-btn" onclick="filterTemplates('popular',this)">★ Popular</button>
   <input id="tmplSearch" type="search" placeholder="Search templates…" style="margin-left:auto;background:rgba(240,234,214,.04);border:1px solid rgba(201,168,76,.2);color:var(--cream);padding:.4rem .9rem;font-family:Josefin Sans,sans-serif;font-size:.6rem;letter-spacing:.1em;outline:none;min-width:0;width:200px;transition:border-color .2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.2)'" oninput="searchTemplates(this.value)">
+</div>
+
+
+<!-- ── RECENTLY USED TEMPLATES ── -->
+<div class="recently-used-section" id="recentlyUsedSection" style="display:none;">
+  <h3>Recently Used</h3>
+  <div class="ru-strip" id="ruStrip"></div>
 </div>
 
 <div class="templates-grid" id="templatesGrid"></div>
@@ -232,8 +265,12 @@ function renderTemplates(){
   if(searchQuery)filtered=filtered.filter(t=>t.name.toLowerCase().includes(searchQuery)||t.tag.toLowerCase().includes(searchQuery)||t.desc.toLowerCase().includes(searchQuery));
   const grid=document.getElementById('templatesGrid');
   if(!filtered.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:5rem 2rem;color:var(--muted);font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;">No templates found</div>`;return;}
-  grid.innerHTML=filtered.map((t,i)=>`
-    <div class="template-card rev-s" style="animation-delay:${(i%4)*.07}s">
+  const favs=JSON.parse(localStorage.getItem('lum_tmpl_favs')||'[]');
+  grid.innerHTML=filtered.map((t,i)=>{
+    const isFav=favs.includes(t.id);
+    const isNew=t.id>=25;
+    return `<div class="template-card rev-s" style="animation-delay:${(i%4)*.07}s;position:relative;">
+      <button class="fav-btn${isFav?' faved':''}" onclick="event.stopPropagation();toggleFav(${t.id},this)" title="${isFav?'Remove favourite':'Add to favourites'}">${isFav?'★':'☆'}</button>
       <div class="template-preview">
         <canvas id="tc-${t.id}" width="300" height="200"></canvas>
         <div class="tp-overlay">
@@ -242,6 +279,7 @@ function renderTemplates(){
       </div>
       <div class="template-card-body">
         <span class="tc-badge badge-${t.badge}">${t.badge==='popular'?'★ Popular':t.badge==='advanced'?'✦ Advanced':'Free'}</span>
+        ${isNew?'<span class="tc-badge badge-free" style="margin-left:.35rem;">✦ New</span>':''}
         <p class="tc-name">${t.name}</p>
         <p class="tc-desc">${t.desc}</p>
         <div class="tc-meta">
@@ -249,8 +287,8 @@ function renderTemplates(){
           <span class="tc-uses">${t.uses} uses</span>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   // Draw canvas previews
   filtered.forEach(t=>{
@@ -307,6 +345,139 @@ const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.tar
 document.querySelectorAll('.rev,.rev-s').forEach(el=>io.observe(el));
 
 renderTemplates();
+
+/* ── TEMPLATE FAVOURITES ── */
+function toggleFav(id, btn){
+  let favs=JSON.parse(localStorage.getItem('lum_tmpl_favs')||'[]');
+  const had=favs.includes(id);
+  favs=had?favs.filter(f=>f!==id):[...favs,id];
+  localStorage.setItem('lum_tmpl_favs',JSON.stringify(favs));
+  if(btn){btn.classList.toggle('faved',!had);btn.textContent=had?'☆':'★';btn.title=had?'Add to favourites':'Remove favourite';}
+  if(typeof luminaryToast!=='undefined')luminaryToast(had?'Removed from favourites':'Added to favourites ★');
+}
+
+/* ── RECENTLY USED ── */
+function renderRecentlyUsed(){
+  const ru=JSON.parse(localStorage.getItem('lum_recent_templates')||'[]');
+  if(!ru.length)return;
+  document.getElementById('recentlyUsedSection').style.display='block';
+  const strip=document.getElementById('ruStrip');
+  strip.innerHTML=ru.slice(0,6).map(id=>{
+    const t=TEMPLATES.find(x=>x.id===id);if(!t)return '';
+    return `<div class="ru-card" onclick="openTemplate(${t.id})">
+      <canvas id="ruc-${t.id}" width="120" height="80"></canvas>
+      <p>${t.name}</p>
+    </div>`;
+  }).join('');
+  ru.slice(0,6).forEach(id=>{
+    const t=TEMPLATES.find(x=>x.id===id);if(!t)return;
+    const canvas=document.getElementById('ruc-'+t.id);if(!canvas)return;
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle=t.palette[0];ctx.fillRect(0,0,120,80);
+    t.palette.slice(1).forEach((c,i)=>{
+      const rg=ctx.createRadialGradient(20+i*25,20+i*15,0,20+i*25,20+i*15,40);
+      rg.addColorStop(0,c+'cc');rg.addColorStop(1,'transparent');
+      ctx.fillStyle=rg;ctx.globalAlpha=.7+i*.1;ctx.fillRect(0,0,120,80);
+    });
+    ctx.globalAlpha=1;
+  });
+}
+
+/* Override openTemplate to track recently used */
+const _origOpenTemplate=openTemplate;
+openTemplate=function(id){
+  let ru=JSON.parse(localStorage.getItem('lum_recent_templates')||'[]');
+  ru=[id,...ru.filter(x=>x!==id)].slice(0,8);
+  localStorage.setItem('lum_recent_templates',JSON.stringify(ru));
+  _origOpenTemplate(id);
+};
+
+/* Add 'Favourites' filter button */
+(function(){
+  const filterBar=document.querySelector('.template-filter');
+  if(!filterBar)return;
+  const favBtn=document.createElement('button');
+  favBtn.className='tf-btn';
+  favBtn.textContent='★ Favourites';
+  favBtn.onclick=function(){
+    const favs=JSON.parse(localStorage.getItem('lum_tmpl_favs')||'[]');
+    const origFilter=activeTag;
+    activeTag='favourites';
+    document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
+    favBtn.classList.add('active');
+    searchQuery='';
+    const grid=document.getElementById('templatesGrid');
+    const favTemplates=TEMPLATES.filter(t=>favs.includes(t.id));
+    if(!favTemplates.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted);font-family:Josefin Sans,sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;">No favourites yet — click ☆ on any template</div>';return;}
+    // Temporarily override
+    activeTag='all';renderTemplates();activeTag='favourites';
+    // Filter grid
+    const items=grid.querySelectorAll('.template-card');
+    let shown=0;items.forEach(el=>{
+      const canvasId=el.querySelector('canvas')?.id;const tid=canvasId?parseInt(canvasId.replace('tc-','')):-1;
+      const show=favs.includes(tid);el.style.display=show?'':'none';if(show)shown++;
+    });
+  };
+  filterBar.appendChild(favBtn);
+})();
+
+renderRecentlyUsed();
+
 </script>
+
+<!-- ── GLOBAL SEARCH OVERLAY ── -->
+<div id="lum-search-overlay" onclick="if(event.target===this)document.getElementById('lum-search-overlay').classList.remove('open')" style="position:fixed;inset:0;background:rgba(6,6,10,.88);z-index:600;display:flex;align-items:flex-start;justify-content:center;padding-top:8rem;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);">
+  <div style="width:90%;max-width:640px;background:var(--surface);border:1px solid rgba(201,168,76,.3);padding:1.5rem;position:relative;">
+    <button onclick="document.getElementById('lum-search-overlay').classList.remove('open')" style="position:absolute;top:.8rem;right:.8rem;background:none;border:1px solid rgba(201,168,76,.2);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">✕</button>
+    <input id="lum-search-input" type="search" placeholder="Search artists, artworks, movements… (press / to open)" style="width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.8rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;letter-spacing:.12em;outline:none;transition:border-color .25s;" oninput="lumSearchLive(this.value)" onkeydown="if(event.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open')" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
+    <div id="lum-search-results" style="margin-top:.8rem;max-height:320px;overflow-y:auto;"></div>
+  </div>
+</div>
+<script>
+const _LUM_SITE_IDX=[
+  {n:'Vincent van Gogh',t:'Artist',u:'artists.html'},{n:'Pablo Picasso',t:'Artist',u:'artists.html'},
+  {n:'Claude Monet',t:'Artist',u:'artists.html'},{n:'Frida Kahlo',t:'Artist',u:'artists.html'},
+  {n:'Gustav Klimt',t:'Artist',u:'artists.html'},{n:'Leonardo da Vinci',t:'Artist',u:'artists.html'},
+  {n:'Salvador Dalí',t:'Artist',u:'artists.html'},{n:'Jackson Pollock',t:'Artist',u:'artists.html'},
+  {n:'Andy Warhol',t:'Artist',u:'artists.html'},{n:'Edvard Munch',t:'Artist',u:'artists.html'},
+  {n:'Rembrandt van Rijn',t:'Artist',u:'artists.html'},{n:'Johannes Vermeer',t:'Artist',u:'artists.html'},
+  {n:'Starry Night',t:'Artwork',u:'gallery.html'},{n:'Water Lilies',t:'Artwork',u:'gallery.html'},
+  {n:'The Kiss',t:'Artwork',u:'gallery.html'},{n:'Guernica',t:'Artwork',u:'gallery.html'},
+  {n:'Mona Lisa',t:'Artwork',u:'gallery.html'},{n:'The Scream',t:'Artwork',u:'gallery.html'},
+  {n:'Sunflowers',t:'Artwork',u:'gallery.html'},{n:'The Night Watch',t:'Artwork',u:'gallery.html'},
+  {n:'Impressionism',t:'Movement',u:'gallery.html'},{n:'Cubism',t:'Movement',u:'gallery.html'},
+  {n:'Surrealism',t:'Movement',u:'gallery.html'},{n:'Renaissance',t:'Movement',u:'gallery.html'},
+  {n:'Baroque',t:'Movement',u:'gallery.html'},{n:'Abstract Expressionism',t:'Movement',u:'gallery.html'},
+  {n:'Pop Art',t:'Movement',u:'gallery.html'},{n:'Art Nouveau',t:'Movement',u:'gallery.html'},
+  {n:'Studio',t:'Page',u:'studio.html'},{n:'Gallery',t:'Page',u:'gallery.html'},
+  {n:'Learn',t:'Page',u:'learn.html'},{n:'Challenges',t:'Page',u:'challenges.html'},
+  {n:'Templates',t:'Page',u:'templates.html'},{n:'Community Gallery',t:'Page',u:'studio-gallery.html'},
+  {n:'Submit Artwork',t:'Page',u:'submit.html'},{n:'Profile',t:'Page',u:'profile.html'},
+  {n:'About',t:'Page',u:'about.html'},{n:'Contact',t:'Page',u:'contact.html'},
+];
+function openSearch(){
+  const ol=document.getElementById('lum-search-overlay');
+  ol.classList.add('open');ol.style.opacity='1';ol.style.pointerEvents='all';
+  setTimeout(()=>document.getElementById('lum-search-input').focus(),60);
+}
+document.getElementById('lum-search-overlay').addEventListener('transitionend',function(){
+  if(!this.classList.contains('open')){this.style.opacity='0';this.style.pointerEvents='none';}
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.search-toggle-btn,[onclick*="openSearch"]'))openSearch();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}
+  if(e.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open');
+});
+function lumSearchLive(q){
+  const el=document.getElementById('lum-search-results');if(!el)return;
+  if(!q.trim()){el.innerHTML='';return;}
+  const res=_LUM_SITE_IDX.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!res.length){el.innerHTML='<p style="padding:.5rem;font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">No results found</p>';return;}
+  el.innerHTML=res.map(r=>`<div onclick="if(typeof LuminaryState!=='undefined')LuminaryState.pushSearchHistory('${r.n.replace(/'/g,'')}');window.location.href='${r.u}'" style="display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.06);transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.06)'" onmouseout="this.style.background='none'"><span style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:.12rem .35rem;border:1px solid rgba(201,168,76,.25);flex-shrink:0;">${r.t}</span><span style="font-family:'Playfair Display SC',serif;font-size:.88rem;color:var(--cream);">${r.n}</span></div>`).join('');
+}
+</script>
+
 </body>
 </html>
