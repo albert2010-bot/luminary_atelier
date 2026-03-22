@@ -70,9 +70,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);display:fl
 .submit-btn{width:100%;font-family:'Josefin Sans',sans-serif;font-size:.68rem;letter-spacing:.26em;text-transform:uppercase;padding:1rem 2rem;background:var(--gold);color:var(--bg);border:none;cursor:pointer;transition:all .3s;margin-top:.5rem;}
 .submit-btn:hover{background:var(--gold-l);}
 .submit-btn:active{transform:scale(.98);}
-.char-count{font-family:'Josefin Sans',sans-serif;font-size:.48rem;letter-spacing:.1em;color:var(--muted);text-align:right;margin-top:.2rem;}
-.field-error input,.field-error textarea{border-color:var(--rose,#c94a6a) !important;}
-.field-error-msg{font-family:'Josefin Sans',sans-serif;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rose,#c94a6a);margin-top:.2rem;}
 
 /* SUCCESS */
 .success-msg{display:none;text-align:center;padding:3rem 2rem;animation:successPop .5s var(--ease) forwards;}
@@ -112,17 +109,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
   .form-row{grid-template-columns:1fr;}.faq-section{padding:3rem 1.2rem;}
   footer{padding:2rem 1.2rem;flex-direction:column;align-items:flex-start;}
 }
-
-/* ── LIGHT MODE ── */
-:root.lum-light{
-  --bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead6;--surface3:#e8e0cc;
-  --cream:#1a1410;--muted:#8a7a5a;--gold:#8a6520;--gold-l:#b08030;--gold-d:#c9a84c;
-}
-:root.lum-light nav{background:rgba(245,240,232,.97);}
-:root.lum-light .page-hero,.page-hero-bg{filter:none;}
-
 </style>
-<script src="luminary-shared.js"></script>
 </head>
 <body>
 <nav>
@@ -134,7 +121,6 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
     <li class="nav-studio-mobile"><a href="studio.html">Studio</a></li>
   </ul>
   <a href="studio.html" class="nav-cta">Open Studio →</a>
-  <button class="theme-toggle" id="themeToggle" onclick="luminaryToggleTheme()" title="Toggle theme">☽</button>
   <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
@@ -153,11 +139,11 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
     <div class="gold-line"></div>
     <h2>Let's Talk Art</h2>
     <p>Whether you're a student, educator, collector, or simply someone who loves beautiful things — Luminary Atelier welcomes every conversation. We aim to respond within two business days.</p>
-    <div class="contact-detail"><div class="contact-detail-icon">✉</div><div class="contact-detail-text"><h4>Email</h4><p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7bfb2bbbbb897bba2babeb9b6a5aeb6a3b2bbbeb2a5f9b4b8ba">[email&#160;protected]</a></p></div></div>
+    <div class="contact-detail"><div class="contact-detail-icon">✉</div><div class="contact-detail-text"><h4>Email</h4><p>hello@luminaryatelier.com</p></div></div>
     <div class="contact-detail"><div class="contact-detail-icon">📍</div><div class="contact-detail-text"><h4>Locations</h4><p>Florence · Paris · New York</p></div></div>
     <div class="contact-detail"><div class="contact-detail-icon">🕐</div><div class="contact-detail-text"><h4>Response Time</h4><p>Within 2 business days</p></div></div>
     <div class="contact-detail"><div class="contact-detail-icon">🎨</div><div class="contact-detail-text"><h4>Studio Sessions</h4><p>By appointment · Online &amp; in-person</p></div></div>
-    <div class="contact-detail"><div class="contact-detail-icon">📰</div><div class="contact-detail-text"><h4>Press Enquiries</h4><p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="99e9ebfceaead9f5ecf4f0f7f8ebe0f8edfcf5f0fcebb7faf6f4">[email&#160;protected]</a></p></div></div>
+    <div class="contact-detail"><div class="contact-detail-icon">📰</div><div class="contact-detail-text"><h4>Press Enquiries</h4><p>press@luminaryatelier.com</p></div></div>
     <div class="social-row">
       <div class="social-btn" title="Twitter/X">𝕏</div>
       <div class="social-btn" title="Instagram">ig</div>
@@ -181,7 +167,7 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
           <option>Artwork Licensing</option><option>Studio Booking</option><option>Collaboration</option><option>Other</option>
         </select>
       </div>
-      <div class="form-group"><label>Message</label><textarea id="message" placeholder="Tell us what's on your mind…" maxlength="2000" oninput="document.getElementById('msgCount').textContent=this.value.length+'/2000'"></textarea><div class="char-count" id="msgCount">0/2000</div></div>
+      <div class="form-group"><label>Message</label><textarea id="message" placeholder="Tell us what's on your mind…"></textarea></div>
       <button class="submit-btn" onclick="submitForm()">Send Message →</button>
     </div>
     <div class="success-msg" id="successMsg">
@@ -212,111 +198,30 @@ footer{background:#03030a;border-top:1px solid rgba(201,168,76,.1);padding:2.5re
   <p class="footer-copy">© 2025 Luminary Atelier</p>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 function toggleNav(){document.getElementById('navLinks').classList.toggle('open');document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navOverlay').classList.toggle('open');}
 function closeNav(){['navLinks','navHamburger','navOverlay'].forEach(id=>document.getElementById(id).classList.remove('open'));}
 
 function submitForm(){
-  let valid=true;
-  document.querySelectorAll('.field-error-msg').forEach(e=>e.remove());
-  ['firstName','email'].forEach(id=>{
-    const el=document.getElementById(id);
-    const wrap=el.closest('.form-group');
-    wrap.classList.remove('field-error');
-    if(!el.value.trim()||(id==='email'&&!/^[^@]+@[^@]+\.[^@]+$/.test(el.value))){
-      wrap.classList.add('field-error');
-      const msg=document.createElement('div');msg.className='field-error-msg';
-      msg.textContent=id==='email'?'Please enter a valid email address':'This field is required';
-      wrap.appendChild(msg);valid=false;
-    }
-  });
-  if(!valid)return;
-  // Autosave draft to localStorage
-  const draft={firstName:document.getElementById('firstName').value,email:document.getElementById('email').value,subject:document.getElementById('subject').value,message:document.getElementById('message').value};
-  localStorage.setItem('luminary_contact_draft',JSON.stringify(draft));
+  const first=document.getElementById('firstName').value.trim();
+  const email=document.getElementById('email').value.trim();
+  if(!first||!email){
+    const inputs=document.querySelectorAll('input[required]');
+    inputs.forEach(i=>{if(!i.value.trim()){i.style.borderColor='var(--rose, #c94a6a)';}});
+    return;
+  }
   document.getElementById('formWrap').style.display='none';
   document.getElementById('successMsg').classList.add('show');
-  if(typeof LuminaryState!=='undefined')LuminaryState.addNotification('Message sent! We'll reply within 2 business days.','success');
 }
-// Restore draft
-(function(){
-  const d=localStorage.getItem('luminary_contact_draft');
-  if(!d)return;
-  try{
-    const draft=JSON.parse(d);
-    if(draft.firstName)document.getElementById('firstName').value=draft.firstName;
-    if(draft.email)document.getElementById('email').value=draft.email;
-    if(draft.subject)document.getElementById('subject').value=draft.subject;
-    if(draft.message)document.getElementById('message').value=draft.message;
-    document.getElementById('msgCount').textContent=(draft.message||'').length+'/2000';
-  }catch(e){}
-})();
 
 function toggleFAQ(item){
   const isOpen=item.classList.contains('open');
   document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
   if(!isOpen)item.classList.add('open');
 }
-/* ── SCROLL REVEAL ── */
-(function(){
-  const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.1,rootMargin:'0px 0px -30px 0px'});
-  document.querySelectorAll('.rev,.rev-l,.rev-r').forEach(el=>io.observe(el));
-})();
-</script>
 
-<!-- ── GLOBAL SEARCH OVERLAY ── -->
-<div id="lum-search-overlay" onclick="if(event.target===this)document.getElementById('lum-search-overlay').classList.remove('open')" style="position:fixed;inset:0;background:rgba(6,6,10,.88);z-index:600;display:flex;align-items:flex-start;justify-content:center;padding-top:8rem;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);">
-  <div style="width:90%;max-width:640px;background:var(--surface);border:1px solid rgba(201,168,76,.3);padding:1.5rem;position:relative;">
-    <button onclick="document.getElementById('lum-search-overlay').classList.remove('open')" style="position:absolute;top:.8rem;right:.8rem;background:none;border:1px solid rgba(201,168,76,.2);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">✕</button>
-    <input id="lum-search-input" type="search" placeholder="Search artists, artworks, movements… (press / to open)" style="width:100%;background:rgba(240,234,214,.05);border:1px solid rgba(201,168,76,.25);color:var(--cream);padding:.8rem 1.2rem;font-family:'Josefin Sans',sans-serif;font-size:.78rem;letter-spacing:.12em;outline:none;transition:border-color .25s;" oninput="lumSearchLive(this.value)" onkeydown="if(event.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open')" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
-    <div id="lum-search-results" style="margin-top:.8rem;max-height:320px;overflow-y:auto;"></div>
-  </div>
-</div>
-<script>
-const _LUM_SITE_IDX=[
-  {n:'Vincent van Gogh',t:'Artist',u:'artists.html'},{n:'Pablo Picasso',t:'Artist',u:'artists.html'},
-  {n:'Claude Monet',t:'Artist',u:'artists.html'},{n:'Frida Kahlo',t:'Artist',u:'artists.html'},
-  {n:'Gustav Klimt',t:'Artist',u:'artists.html'},{n:'Leonardo da Vinci',t:'Artist',u:'artists.html'},
-  {n:'Salvador Dalí',t:'Artist',u:'artists.html'},{n:'Jackson Pollock',t:'Artist',u:'artists.html'},
-  {n:'Andy Warhol',t:'Artist',u:'artists.html'},{n:'Edvard Munch',t:'Artist',u:'artists.html'},
-  {n:'Rembrandt van Rijn',t:'Artist',u:'artists.html'},{n:'Johannes Vermeer',t:'Artist',u:'artists.html'},
-  {n:'Starry Night',t:'Artwork',u:'gallery.html'},{n:'Water Lilies',t:'Artwork',u:'gallery.html'},
-  {n:'The Kiss',t:'Artwork',u:'gallery.html'},{n:'Guernica',t:'Artwork',u:'gallery.html'},
-  {n:'Mona Lisa',t:'Artwork',u:'gallery.html'},{n:'The Scream',t:'Artwork',u:'gallery.html'},
-  {n:'Sunflowers',t:'Artwork',u:'gallery.html'},{n:'The Night Watch',t:'Artwork',u:'gallery.html'},
-  {n:'Impressionism',t:'Movement',u:'gallery.html'},{n:'Cubism',t:'Movement',u:'gallery.html'},
-  {n:'Surrealism',t:'Movement',u:'gallery.html'},{n:'Renaissance',t:'Movement',u:'gallery.html'},
-  {n:'Baroque',t:'Movement',u:'gallery.html'},{n:'Abstract Expressionism',t:'Movement',u:'gallery.html'},
-  {n:'Pop Art',t:'Movement',u:'gallery.html'},{n:'Art Nouveau',t:'Movement',u:'gallery.html'},
-  {n:'Studio',t:'Page',u:'studio.html'},{n:'Gallery',t:'Page',u:'gallery.html'},
-  {n:'Learn',t:'Page',u:'learn.html'},{n:'Challenges',t:'Page',u:'challenges.html'},
-  {n:'Templates',t:'Page',u:'templates.html'},{n:'Community Gallery',t:'Page',u:'studio-gallery.html'},
-  {n:'Submit Artwork',t:'Page',u:'submit.html'},{n:'Profile',t:'Page',u:'profile.html'},
-  {n:'About',t:'Page',u:'about.html'},{n:'Contact',t:'Page',u:'contact.html'},
-];
-function openSearch(){
-  const ol=document.getElementById('lum-search-overlay');
-  ol.classList.add('open');ol.style.opacity='1';ol.style.pointerEvents='all';
-  setTimeout(()=>document.getElementById('lum-search-input').focus(),60);
-}
-document.getElementById('lum-search-overlay').addEventListener('transitionend',function(){
-  if(!this.classList.contains('open')){this.style.opacity='0';this.style.pointerEvents='none';}
-});
-document.addEventListener('click',e=>{
-  if(e.target.closest('.search-toggle-btn,[onclick*="openSearch"]'))openSearch();
-});
-document.addEventListener('keydown',e=>{
-  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}
-  if(e.key==='Escape')document.getElementById('lum-search-overlay').classList.remove('open');
-});
-function lumSearchLive(q){
-  const el=document.getElementById('lum-search-results');if(!el)return;
-  if(!q.trim()){el.innerHTML='';return;}
-  const res=_LUM_SITE_IDX.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
-  if(!res.length){el.innerHTML='<p style="padding:.5rem;font-family:Josefin Sans,sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">No results found</p>';return;}
-  el.innerHTML=res.map(r=>`<div onclick="if(typeof LuminaryState!=='undefined')LuminaryState.pushSearchHistory('${r.n.replace(/'/g,'')}');window.location.href='${r.u}'" style="display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.06);transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.06)'" onmouseout="this.style.background='none'"><span style="font-family:'Josefin Sans',sans-serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:.12rem .35rem;border:1px solid rgba(201,168,76,.25);flex-shrink:0;">${r.t}</span><span style="font-family:'Playfair Display SC',serif;font-size:.88rem;color:var(--cream);">${r.n}</span></div>`).join('');
-}
+const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rev,.rev-l,.rev-r').forEach(el=>io.observe(el));
 </script>
-
 </body>
 </html>
